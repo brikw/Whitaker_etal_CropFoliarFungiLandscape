@@ -1,0 +1,1127 @@
+---
+title: "Basic Community Analyses"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+author: "Briana K. Whitaker"
+date: "`r Sys.Date()`"
+---
+\fontsize{9}{10}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning =FALSE, message=FALSE)
+```
+---
+
+
+
+
+* Run using `r version[['version.string']] `.
+
+# Objective
+This document reports on the **initial analyses and visualization** from the NC Microbiome Landscapes Project, performed in the summer of 2019. 
+
+
+# 0) Load Packages, set path to data
+```{r, echo=FALSE, results='hide', include=FALSE} 
+
+x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "vegan", "RRPP",
+     "geodist","reshape2","ggVennDiagram",   "viridis")
+lapply(x, require, character.only = TRUE)
+
+
+#Load functions
+source("./code/fxn_blastr-bw.R")
+source("./code/blastn_code.R")
+source("./code/multiplot.function.R")
+
+#add 'not in' function
+`%nin%` = Negate(`%in%`)
+
+#set seed
+#runif(1, min = 0, max = 1000)
+set.seed(829)
+
+# set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+# load phyloseq object from post-DADA2
+load("./data/MBLand_ps_filter.RData")
+ps_filter
+
+# color palettes
+display.brewer.pal(8, "Dark2") #assumes Phal is first in order
+brewer.pal(8, "Dark2")
+spp_color <- c("#E6AB02", "#D95F02", "#1B9E77", '#7570B3') 
+#gold, orange, green, purple
+
+#levels(sample_data(ps_filter)$species)
+#"CRN"  "SOY"  "SWCH" "WHT" 
+#https://mdigi.tools/color-shades/#a6761d
+crn_color <- c('#fed561', '#fdc422', '#dda402', '#9e7501')
+soy_color <- c('#fea561', '#fd8122', '#dd6102', '#9e4501')
+swc_color <- c('#77e8c6', '#40deaf', '#21bf90', '#178867')
+wht_color <- c('#cfcde4', '#8f8ac1', '#555096', '#2f2c53')
+
+site_color <- c(crn_color, soy_color, swc_color, wht_color)
+
+```
+
+* get distances between sites
+```{r, echo=FALSE, results='hide'}
+site.dat <- read.csv("./data/MBLand_SiteData_PRISM_2021-03-29.csv", stringsAsFactors = TRUE)
+colnames(site.dat)[1] <- "leaf.type"
+site.dat <- site.dat[site.dat$leaf.type!= "Tassel",]
+rownames(site.dat) <- paste0(site.dat$Species, "-", site.dat$SiteCode)
+# this still includes sites not included in final dataset (not sequenced)
+
+latlong <- site.dat[,4:5]
+
+geo.mat <- geodist(latlong, measure = "geodesic")
+
+rownames(geo.mat) <- rownames(latlong)
+colnames(geo.mat) <- rownames(latlong)
+
+geo.mat.km <- geo.mat/1000
+
+#geo.mat.km
+#sort(geo.mat.km)
+# min dist 0.12729165 km
+# max dist 500.93305710 km
+
+sort(site.dat$Elev)
+
+
+```
+
+
+* Recap, 610 ASVs after DADA2, plant and non-fungal removal, lulu, and analysis of controls. 
+* 239 samples (1 CRN ear missing; 48*5 sp/leaf types - 1 = 239)
+
+
+# 1) Hyp. 1, Part 1 - Structure & Richness
+
+#### Subset Landscape-Analysis Data
+```{r, echo=FALSE, results='hide'}
+## Phyloseq
+#table(sample_data(ps_filter)$leaf.type)
+ps_land <- subset_samples(ps_filter, leaf.type!="Tassel")
+ps_land
+#table(rowSums(otu_table(ps_land)))   #15 ASVs that are now 0
+ps_land <- filter_taxa(ps_land, function(x) mean(x) > 0, TRUE)
+ps_land #595 ASVs
+
+## DESeq2
+require("DESeq2")
+gm_mean_protected <- function(x) {
+  if (all(x == 0)) {
+    return (0)
+  }
+  exp(mean(log(x[x != 0])))
+}
+# dds_land <- phyloseq_to_deseq2(ps_land, ~ 1)
+# gmMeans_land <- apply(counts(dds_land), 1, gm_mean_protected)
+# dds_land <- estimateSizeFactors(dds_land, type = 'ratio', geoMeans = gmMeans_land)
+# dds_land <- estimateDispersions(dds_land)
+# save(dds_land, file="./data/MBLand_dds_land.RData")
+load("./data/MBLand_dds_land.RData")
+
+#rowData(dds_land)
+#sizeFactors(dds_land)  
+#plotDispEsts(dds_land)
+
+## VST
+SbySvst <- getVarianceStabilizedData(dds_land)
+SbySvst <- t(SbySvst) 
+
+# make a phyloseq object with vst, as opposed to filtered abundance data
+ps_vst <- ps_land
+ps_vst@otu_table <- otu_table(SbySvst, taxa_are_rows = FALSE)
+
+# look at correlation of vst and raw
+require("vegan")
+mantel(stats::dist(ps_vst@otu_table@.Data, method = "euclidean"),
+       stats::dist(t(ps_land@otu_table@.Data), method = "euclidean"))
+# VST and raw 64% correlated
+
+## Euclidean of VST
+dist.SbySvst <- stats::dist(SbySvst, method="euclidean")
+
+
+## SbyE
+SbyE <- (as(sample_data(ps_land), "data.frame"))
+# reorder
+SbyE$plot.rep <- factor(SbyE$plot.rep, 
+      levels = c('1', '2', '3', '4'))
+# includes data additional plant parms.
+
+# separate OVT vars vs. Swch vars, & re-order levels in Variety to match species nesting pattern
+SbyE$Variety <- SbyE$OVT.Variety
+levels(SbyE$OVT.Variety)
+levels(SbyE$OVT.Variety)[3] <- ""  #rename SWCH varieties to "" blank # NOTE this code is sensitive, want to rename Kanlow, Performer, and Kanlow_BoMaster
+levels(SbyE$OVT.Variety)[4] <- ""
+levels(SbyE$OVT.Variety)[9] <- ""
+levels(SbyE$OVT.Variety)
+levels(SbyE$Variety)
+SbyE$Variety <- factor(SbyE$Variety, levels = c(
+    "Kanlow", "Kanlow_BoMaster", "Performer",  #SWCH
+    "66G25","LC1289","LC1586TC",                 #CRN
+    "Hilliard","NC11363-25","NC14-22588",  #WHT
+    "S13-10592C", "S14-15146R","MO4901D GT"))    #SOY
+SbyE$OVT.Variety <- factor(SbyE$OVT.Variety, levels = c("",  #SWCH
+    "66G25","LC1289","LC1586TC",                 #CRN
+    "Hilliard","NC11363-25","NC14-22588",  #WHT
+    "S13-10592C", "S14-15146R","MO4901D GT"))    #SOY
+table(SbyE$species, SbyE$Variety)
+table(SbyE$species, SbyE$OVT.Variety)
+
+# create a site nested in species variable
+SbyE$nestSite <- as.factor(paste(SbyE$species, SbyE$site, sep ="-"))
+# create a plot or block nested in the [site nested in species] variable
+SbyE$nestBlock <- as.factor(paste(SbyE$nestSite, SbyE$plot.rep, sep="-"))
+SbyE$nestSiteVar <- as.factor(paste(SbyE$site, SbyE$OVT.Variety, sep ="-"))
+SbyE$nestSppSiteVar <- as.factor(paste(SbyE$species, SbyE$site, SbyE$OVT.Variety, sep ="-"))
+
+
+# add diversity (post-filtering diversity)
+SbyE$Sdiv <- specnumber(t(ps_land@otu_table@.Data))
+SbyE$Hdiv <- diversity(t(ps_land@otu_table@.Data))
+SbyE$Pdiv <- SbyE$Hdiv/log(SbyE$Sdiv)
+#hist(SbyE$Hdiv)
+
+
+#look at data
+table(SbyE$species) #ok
+table(SbyE$nestSite) #ok
+table(SbyE$OVT.Variety) # ok
+table(SbyE$nestBlock)  # ok
+
+# look at nested variables
+table(SbyE$species)
+table(SbyE$species, SbyE$nestSite)
+table(SbyE$species, SbyE$OVT.Variety)
+#table(SbyE$species, SbyE$nestSite, SbyE$nestBlock)  #very long output
+#table(SbyE$species, SbyE$nestSite, SbyE$OVT.Variety)
+#4*4*3*4
+
+# # write out data
+# write.csv(SbyE, "./data/MBLand_SbyE_2021-11-17.csv")
+# write.csv(SbySvst, "./data/MBLand_SbyS_vst_2021-11-17.csv")
+# save(ps_land, file="./data/MBLand_ps_land.RData")
+# save(ps_vst, file="./data/MBLand_ps_vst.RData")
+
+```
+
+### Rarefaction Curves (only samples for MS)
+```{r, results = 'hide', echo = FALSE, fig.height = 3.5, fig.width = 4.5}
+# #origmar <- par()$mar
+# #tiff("./figures/Rarefaction Curves - Landscape.tiff", width=6, height=6, units="in", res=600)
+# par(mfrow = c(1, 1))
+# SbyS <- as.data.frame(ps_land@otu_table@.Data)
+# #min sqn reads per sample
+# min_depth <- min(colSums(SbyS)) ; min_depth   #183
+# rarecurve(SbyS, step=20, label = FALSE, col = 'blue', xlim = c(0,25000)) #sample = min_depth,
+# abline(v=min_depth, col = "black", lty = 2)
+# #dev.off()
+
+```
+
+#### taxonomic for MS
+```{r, echo=FALSE, results='hide'}
+totReads <- sum(colSums(ps_land@otu_table)); totReads #1,002,267 reads after filter/denoise/plant-removal & filtering
+length((rownames(ps_land@otu_table))) #595 ASVs
+
+sort(rowSums(otu_table(ps_land)), decreasing = TRUE)[1:10]
+sum(sort(rowSums(otu_table(ps_land)), decreasing = TRUE)[1:10]/totReads)
+#ASV6, ASV3, ASV12, ASV7, ASV13, ASV15, ASV16, ASV8, ASV17, ASV14
+ 
+tax_table(ps_land)["ASV6",] #Dissoconium Mycosphaerellaceae
+tax_table(ps_land)["ASV3",] #Davidiella Mycosphaerellaceae
+tax_table(ps_land)["ASV12",] #Sporidiobolus
+tax_table(ps_land)["ASV7",]  #Phoma
+tax_table(ps_land)["ASV13",] #Mycosphaerella Mycosphaerellaceae
+tax_table(ps_land)["ASV15",] #Mycosphaerella Mycosphaerellaceae
+tax_table(ps_land)["ASV16",] #Mycosphaerella Mycosphaerellaceae
+tax_table(ps_land)["ASV8",] #Alternaria
+tax_table(ps_land)["ASV17",] #Davidiella Mycosphaerellaceae
+tax_table(ps_land)["ASV14",] #Phoma
+
+# ASVs across phyla
+sort(table(ps_land@tax_table[,"phylum"]))
+
+```
+* how many sites is each ASV present in?
+```{r, echo=FALSE, results='hide', fig.keep= 'none'}
+# add nestSite nested factor to ps obj
+sample_data(ps_land)$nestSite <- as.factor(paste(
+      sample_data(ps_land)$species, sample_data(ps_land)$site, sep ="-"))
+# table(sample_data(ps_land)$species, sample_data(ps_land)$nestSite) #sanity
+
+isTRUE(taxa_are_rows(ps_land))  #TRUE, no need to transform before metling
+ps_melted <- reshape2::melt((otu_table(ps_land)))    
+dim(ps_melted)
+# dropped the 'E" from all the corn names
+key <- data.frame("plain" = c(unique(ps_melted$Var2)), "real" = c(unique(sample_names(ps_land))) )
+ps_melted$Var2 <- key$real[match(ps_melted$Var2, key$plain)]
+# aggregate
+ps_melted <- merge(ps_melted, sample_data(ps_land), by.x = "Var2", by.y = "row.names") 
+ps_agg <- aggregate(as.formula(paste("value ~ Var1 +", "nestSite")),   #could also use species  
+            data = ps_melted, function(x) (sum(x > 0)/length(x) >= 0) * mean(x))    
+ps_mat <- reshape2::dcast(as.formula(paste("Var1 ~ ", "nestSite")),   #could also use species
+             data = ps_agg, value.var = "value")                           
+rownames(ps_mat) <- ps_mat$Var1
+ps_mat <- ps_mat[, -1]
+ps_mat_bin <- (ps_mat>0)*1
+rownames(ps_mat_bin) <- rownames(ps_mat)
+# ps_mat_bin object is presence absence of each ASV by site (not by host/sample)
+numSites <- rowSums(ps_mat_bin) 
+
+# how many sites is each ASV present in?
+table(numSites) 
+(table(numSites)/length(numSites))*100
+
+plot((table(numSites)/length(numSites))*100)
+
+sort(numSites, dec = TRUE)[1:10]
+#ASV14 ASV21  ASV3  ASV7  ASV8  appear at all 16 sites
+tax_table(ps_land)["ASV14",] #Phoma [Pleosporales incertae sedis]
+tax_table(ps_land)["ASV21",] #Phoma [Pleosporales incertae sedis]
+tax_table(ps_land)["ASV3",] #Davidiella [Mycosphaerellaceae]
+tax_table(ps_land)["ASV7",]  #Phoma [Pleosporales incertae sedis]
+tax_table(ps_land)["ASV8",] #Alternaria [Pleosporaceae]
+
+```
+
+
+### 1a) Structure RRPP
+
+* Model for all 4 species, without variety, to avoid uneven design 
+
+```{r, echo=FALSE, results='hide'}
+
+# #Site as factor variable, not possible to test interaction
+# spp.rrpp1 <- lm.rrpp(dist.SbySvst ~ species +
+#                          species:site +
+#                          species:site:plot.rep, iter = 9999,
+#                          print.progress = TRUE, data = SbyE, SS.type="III")
+# save(spp.rrpp1, file="./data/MBLand_landscape_RRPP_sppComparison.RData")
+load("./data/MBLand_landscape_RRPP_sppComparison.RData")
+# #spp.rrpp1$LM$term.labels
+# #anova(spp.rrpp1, effect.type = "F")
+# #note that the final two terms (testing "plot rep" ie block, and the 
+#    #variety x block interaction, are essentially not testable)
+full.anova <- anova(spp.rrpp1, effect.type = "F", error = c("species:site:plot.rep",
+    "species:site:plot.rep", "Residuals"))
+
+# capture.output(summary(full.anova, formula = false),
+#     file = file.path("./tables/MBLand_landscape_RRPP_sppComparison.txt"))
+
+```
+
+```{r, echo=FALSE}
+summary(full.anova)
+```
+
+
+
+### 1b) Richness
+
+```{r, echo=FALSE, results='hide'}
+# #Site as factor variable, no variety
+# S.spp.rrpp1 <- lm.rrpp(Sdiv ~ species +
+#                          species:site +
+#                          species:site:plot.rep, iter = 9999,  #999
+#                          print.progress = TRUE, data = SbyE, SS.type="III")
+# save(S.spp.rrpp1, file="./data/MBLand_landscape_RRPP_spp_Sdiv.RData")
+load("./data/MBLand_landscape_RRPP_spp_Sdiv.RData")
+full.anova <- anova(S.spp.rrpp1, effect.type = "F", error = c("species:site:plot.rep",
+    "species:site:plot.rep", "Residuals"))
+
+# capture.output(summary(full.anova, formula = false),
+#     file = file.path("./tables/MBLand_landscape_RRPP-SDiv_spp_PxSxB.txt"))
+```
+
+* For Richness - Speices and Site (nested in Speices), but not Block, differ in richness
+
+```{r, echo=FALSE}
+summary(full.anova)
+```
+
+
+# 2) Structure & Richness Figures
+
+* Exludes tassel data
+
+### 2a) Set up PCoA
+```{r, echo = FALSE, results = 'hide'}
+pcoa <- cmdscale(dist.SbySvst, eig =TRUE)
+
+explainvar1 <- round(pcoa$eig[1] / sum(pcoa$eig), 3) * 100
+explainvar1  # 16.5
+explainvar2 <- round(pcoa$eig[2] / sum(pcoa$eig), 3) * 100 
+explainvar2  # 15.8
+explainvar3 <- round(pcoa$eig[3] / sum(pcoa$eig), 3) * 100 
+explainvar3  # 7
+```
+```{r, echo = FALSE, fig.keep = 'none'}
+### Broken Stick significance plot
+par(mfrow=c(1,1))
+#plots eignevalues themselves
+plot(pcoa$eig, xlab = 'PCoA Axis', ylab = 'Eigenvalue', las=1,
+     cex.lab=1.5, pch=16, xlim=c(0,20))  
+#Kaiser-Guttman criterion, average of all eig-vals
+abline(h = mean(pcoa$eig), lty=2, lwd=2,col='blue') 
+#scale Total Variance of eigenvalues to 1; cmdscale does not by default
+b.stick <- bstick(length(pcoa$eig), tot.var=sum(pcoa$eig))  
+#Broken-Stick Model
+lines(1:length(pcoa$eig), b.stick, type="l", lty=4, lwd=2, col='red') 
+# add legend
+legend("topright", legend=c("Avg. Eigenvalue", "Broken Stick"), lty=c(2,4), bty="n", col=c("blue", "red"))
+```
+
+* 10 PCo-Axes are significant
+
+```{r, echo = FALSE, results = 'hide'}
+# create dataframes for use in plots
+PCoAscores <- as.data.frame(pcoa$points)
+PCoAscores$ids <- rownames(PCoAscores) 
+#merge the temporary and SbyE dataframes
+pcoa.dat <- merge(PCoAscores, SbyE, by.x="ids",
+                  by.y="unique.plot")
+
+# function for PCoA ellipses - 
+veganCovEllipse <- function (cov, center = c(0, 0), scale = 1, npoints = 100)   {
+  theta <- (0:npoints) * 2 * pi/npoints
+  Circle <- cbind(cos(theta), sin(theta))
+  t(center + scale * t(Circle %*% chol(cov)))    }
+
+#species
+#create a standard error ellipse
+#set up a data frame before running the function.
+ellipses.host <- data.frame() 
+#loop, 
+#change pcoa.dat$____ to your var name, and same for =g at end
+#change name of ellipses.___ to name of dataframe above
+for(g in levels(pcoa.dat$species)){ 
+  ellipses.host <- rbind(ellipses.host, cbind(as.data.frame(with(
+    pcoa.dat[pcoa.dat$species==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , species=g))   } 
+
+# OVT.Variety
+ellipses.var <- data.frame() 
+for(g in levels(pcoa.dat$OVT.Variety)){ 
+  ellipses.var <- rbind(ellipses.var, cbind(as.data.frame(with(
+    pcoa.dat[pcoa.dat$OVT.Variety==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , OVT.Variety=g))   } 
+
+# Site
+ellipses.site <- data.frame() 
+for(g in levels(pcoa.dat$nestSite)){ 
+  ellipses.site <- rbind(ellipses.site, cbind(as.data.frame(with(
+    pcoa.dat[pcoa.dat$nestSite==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , nestSite=g))   } 
+
+```
+
+### 2b) Species
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+pcoa_spp <- ggplot() + coord_equal() + 
+    geom_path(data = ellipses.host, aes(x = V1, y = V2, 
+          group = species, colour = species), linetype = 1, size = 1.1,  
+          show.legend = TRUE) +
+    geom_point(data = pcoa.dat, aes(x = V1, y = V2, 
+          color = factor(species)) , size = 2) +
+    scale_colour_manual("", values = spp_color) +
+    scale_x_continuous(paste("PCoA 1 (", explainvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", explainvar2, "%)", sep = "")) +
+    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
+         legend.text=element_text(size=10), legend.title=element_text(size=12),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom") 
+pcoa_spp
+
+# tiff("./figures/PCoA_spp.tiff", width=6, height=6, units="in", res=600)
+# pcoa_spp
+# dev.off()
+```
+
+### 2c) Site (nested in Species)
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+# # used this to get centroid of each species
+# mean(pcoa.dat$V2[pcoa.dat$species == "WHT"])
+
+pcoa_site <- ggplot() + coord_equal() + 
+    geom_path(data = ellipses.site, aes(x = V1, y = V2, 
+          group = nestSite, colour = nestSite), linetype = 1, size = 1.1,  
+          show.legend = TRUE) +
+    geom_point(data = pcoa.dat, aes(x = V1, y = V2, 
+          color = factor(nestSite)) , size = 1.5) +
+    scale_colour_manual("", values = site_color) +
+    guides(colour = 'none') +
+    scale_x_continuous(paste("PCoA 1 (", explainvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", explainvar2, "%)", sep = "")) +
+    #scale_shape_manual("", values = c(17, 1,10,16, 5,9,18, 0,7,15)) +
+    theme(axis.title = element_text(size = 14) ) +
+    annotate(geom = "text", x = c(-24.5+10, -6.6+10, 35.6-10, -5.1+10), 
+                            y = c(-25.4, 9.0, -11.6, 27.4), 
+             label = levels(pcoa.dat$species), colour = spp_color) +
+    annotate(geom = "text", x = -30, y = 35, label = "A)", size = 5)
+pcoa_site
+
+#tiff("./figures/PCoA_site.tiff", width=6, height=6, units="in", res=600)
+pcoa_site
+#dev.off()
+```
+
+
+### 2d) Richness, Venn Diagram, Rel-Abund plots
+* Site (nested Species)
+```{r, echo = FALSE, results = 'hide', fig.height = 4, fig.width = 6}
+site.rich <- ggplot(SbyE, aes(y = Sdiv, x = nestSite, fill = factor(nestSite))) +
+    geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
+    geom_jitter(width = .1)+
+    scale_x_discrete("Site") +
+    scale_y_continuous("Observed Richness") + guides(fill = 'none') +
+    theme(axis.text.x = element_text(angle = 90))
+site.rich
+# tiff("./figures/Sdiv_by_spp & site.tiff", width=6, height=6, units="in", res=600)
+# site.rich
+# dev.off()
+```
+
+* Venn Diagram
+```{r, echo = FALSE, results = 'hide', fig.height = 4, fig.width = 6}
+table(rowSums(subset_samples(ps_land, species == "CRN")@otu_table) >0) #329
+table(rowSums(subset_samples(ps_land, species == "SOY")@otu_table) >0) #177
+table(rowSums(subset_samples(ps_land, species == "SWCH")@otu_table) >0) #326
+table(rowSums(subset_samples(ps_land, species == "WHT")@otu_table) >0) #210
+
+crn <- subset_samples(ps_land, species == "CRN")
+crnASVs <- rownames(crn@otu_table[rowSums(crn@otu_table) > 0,])
+
+soy <- subset_samples(ps_land, species == "SOY")
+soyASVs <- rownames(soy@otu_table[rowSums(soy@otu_table) > 0,])
+
+swch <- subset_samples(ps_land, species == "SWCH")
+swchASVs <- rownames(swch@otu_table[rowSums(swch@otu_table) > 0,])
+
+wht <- subset_samples(ps_land, species == "WHT")
+whtASVs <- rownames(wht@otu_table[rowSums(wht@otu_table) > 0,])
+
+# create a set list for Venn Diagram
+mySet <- list(CRN = crnASVs, SOY = soyASVs, SWCH = swchASVs, WHT = whtASVs) 
+
+
+vd1 <- ggVennDiagram(mySet, label = "count", col = "gray") +
+    scale_fill_gradient(low="#c6daeb",high = "#2e5c85") +
+    guides(fill = 'none') +
+    scale_color_manual(values = c(rep("black",4)))
+#tiff("./figures/VD_spp.tiff", width=6, height=6, units="in", res=600)
+vd1
+#dev.off()
+```
+
+* Relative Abundance Plot
+```{r, echo = FALSE, results = 'hide', fig.height = 4, fig.width = 6}
+topTen <- names(sort(rowSums(otu_table(ps_land)), 
+                     decreasing = TRUE)[1:10])
+otherASVs <- c(rownames(otu_table(ps_land))[rownames(otu_table(ps_land)) %nin% topTen])
+
+dat <- data.frame(SbyE[,c("species", "nestSite", "OVT.Variety")] ,
+                  decostand(t(otu_table(ps_land)),"total")[,topTen] ,
+   Other = rowSums(decostand(t(otu_table(ps_land)),"total")[,otherASVs] ))
+# covert wide-format data.frame into long-format using 'melt'
+dat2 <- reshape2::melt(dat, id.vars=c("species", "nestSite", "OVT.Variety"))
+
+
+# 'variable' is the ASVs, 'value' is the normalized relative abundance
+spp.dat = dat2 %>% group_by(species, variable) %>% summarize(value = sum(value))
+# make an ASV color variable, with gray for 'other'
+asv_color <- c(viridis_pal(option = "plasma")(length(levels(spp.dat$variable))-1),
+               "#696969")
+a <- ggplot(spp.dat, aes(x = species, y = value, fill = variable)) +
+  geom_bar(stat = "identity", position = 'fill') +
+  scale_fill_manual("ASV", values = asv_color) +
+  xlab("") + ylab("Relative Abundance") +
+  theme_bw()
+  #theme(axis.title.x = element_text(size=8),
+  #      axis.text.x  = element_text(size=8)) +
+  #theme(legend.text = element_text(size = 7)) +
+  #theme(legend.title = element_text(size = 9))
+#tiff("./figures/RelAbun_spp.tiff", width=4, height=6, units="in", res=600)
+a
+#dev.off()
+
+#write.csv(tax_table(ps_land)[rownames(tax_table(ps_land)) %in% topTen,],
+#          "./intermediate/MBLand_topTen_tax.csv") 
+# note, manually added a rank column and a final species name column to this table
+```
+
+
+
+# 3) Hyp.1, Part 2 - Structure & Richness Within-Crop Models
+
+#### Subset data by crop
+
+* Examine within-crop individually -- don't re-calculate VST
+```{r, echo=FALSE, results='hide'}
+# SWCH
+SbyE %>%
+  filter(species == "SWCH") -> SbyE.swch  #lose rownames
+SbyE.swch <- droplevels(SbyE.swch)
+rownames(SbyE.swch) <- SbyE.swch$unique.plot
+vst.swch <- SbySvst[row.names(SbySvst) %in% SbyE.swch$unique.plot,]
+identical(rownames(SbyE.swch), rownames(vst.swch)) # must be TRUE
+dist.swch <- stats::dist(vst.swch, method="euclidean")
+#dist.SbySvst;dist.swch      #  same values
+
+# CRN
+SbyE %>%
+  filter(species == "CRN") -> SbyE.crn
+SbyE.crn <- droplevels(SbyE.crn)
+rownames(SbyE.crn) <- SbyE.crn$unique.plot
+vst.crn <- SbySvst[row.names(SbySvst) %in% SbyE.crn$unique.plot,]
+identical(rownames(SbyE.crn), rownames(vst.crn)) # must be TRUE
+dist.crn <- stats::dist(vst.crn, method="euclidean")
+#dist.SbySvst;dist.crn      #  confirmed, that it keeps the same values
+
+# WHT
+SbyE %>%
+  filter(species == "WHT") -> SbyE.wht
+SbyE.wht <- droplevels(SbyE.wht)
+rownames(SbyE.wht) <- SbyE.wht$unique.plot
+vst.wht <- SbySvst[row.names(SbySvst) %in% SbyE.wht$unique.plot,]
+identical(rownames(SbyE.wht), rownames(vst.wht)) # must be TRUE
+dist.wht <- stats::dist(vst.wht, method="euclidean")
+
+# SOY
+SbyE %>%
+  filter(species == "SOY") -> SbyE.soy
+SbyE.soy <- droplevels(SbyE.soy)
+rownames(SbyE.soy) <- SbyE.soy$unique.plot
+vst.soy <- SbySvst[row.names(SbySvst) %in% SbyE.soy$unique.plot,]
+identical(rownames(SbyE.soy), rownames(vst.soy)) # must be TRUE
+dist.soy <- stats::dist(vst.soy, method="euclidean")
+```
+
+### 3a) Structure RRPP
+* NOTE! warnings come back on the strcuture and richness ANOVAs, the residuals and diagnostic plots will not plot.
+* vignettes online suggests that if results still come out and the model converges, it is fine. likely an issue with internal likelihood function within RRPP
+```{r, echo=FALSE}
+# rrpp.swch <- lm.rrpp(dist.swch ~ site + site:plot.rep, iter = 9999,
+#                        print.progress = TRUE, data = SbyE.swch, SS.type = "III")
+# save(rrpp.swch, file="./data/MBLand_landscape_RRPP_swch.RData")
+load("./data/MBLand_landscape_RRPP_swch.RData")  
+
+anova.vst <- anova(rrpp.swch, effect.type = "F", error = c("site:plot.rep", "Residuals"))
+summary(anova.vst, formula = false)
+# capture.output(summary(anova.vst, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP_swch_site.txt"))
+
+```
+
+```{r, echo=FALSE}
+# rrpp.crn <- lm.rrpp(dist.crn ~ site + OVT.Variety +
+#                          site:OVT.Variety + site:plot.rep +
+#                          site:OVT.Variety:plot.rep, iter = 9999,
+#                        print.progress = TRUE, data = SbyE.crn, SS.type = "III")
+# save(rrpp.crn, file="./data/MBLand_landscape_RRPP_crn.RData")
+load("./data/MBLand_landscape_RRPP_crn.RData")  
+
+anova.vst <- anova(rrpp.crn, effect.type = "F", error = c("site:plot.rep", 
+    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+    "Residuals", "Residuals"))
+summary(anova.vst, formula = false)
+# capture.output(summary(anova.vst, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP_crn_SxV.txt"))
+
+```
+
+```{r, echo=FALSE}
+# rrpp.wht <- lm.rrpp(dist.wht ~ site + OVT.Variety +
+#                          site:OVT.Variety + site:plot.rep +
+#                          site:OVT.Variety:plot.rep, iter = 9999,
+#                        print.progress = TRUE, data = SbyE.wht, SS.type = "III")
+# save(rrpp.wht, file="./data/MBLand_landscape_RRPP_wht.RData")
+load("./data/MBLand_landscape_RRPP_wht.RData")  
+
+anova.vst <- anova(rrpp.wht, effect.type = "F", error = c("site:plot.rep", 
+    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+    "Residuals", "Residuals"))
+summary(anova.vst, formula = false)
+# capture.output(summary(anova.vst, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP_wht_SxV.txt"))
+
+```
+
+```{r, echo=FALSE}
+# rrpp.soy <- lm.rrpp(dist.soy ~ site + OVT.Variety +
+#                          site:OVT.Variety + site:plot.rep +
+#                          site:OVT.Variety:plot.rep, iter = 9999,
+#                        print.progress = TRUE, data = SbyE.soy, SS.type = "III")
+# save(rrpp.soy, file="./data/MBLand_landscape_RRPP_soy.RData")
+load("./data/MBLand_landscape_RRPP_soy.RData")  
+
+anova.vst <- anova(rrpp.soy, effect.type = "F", error = c("site:plot.rep", 
+    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+    "Residuals", "Residuals"))
+summary(anova.vst, formula = false)
+# capture.output(summary(anova.vst, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP_soy_SxV.txt"))
+
+```
+
+
+### 3b) Richness
+
+```{r, echo=FALSE, results='hide', fig.keep = 'none'}
+#SWCH
+S.swch <- lm.rrpp(Sdiv ~ site + site:plot.rep, iter = 9999,
+                        print.progress = FALSE, data = SbyE.swch, SS.type = "III")
+swch.rich <- anova(S.swch, effect.type = "F", error = c("site:plot.rep", "Residuals"))
+summary(swch.rich, formula = false)
+# capture.output(summary(swch.rich, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP-SDiv_swch_site.txt"))
+
+# CRN
+S.crn <- lm.rrpp(Sdiv ~ site + OVT.Variety +
+                          site:OVT.Variety + site:plot.rep +
+                          site:OVT.Variety:plot.rep, iter = 9999, 
+                          print.progress = FALSE, data = SbyE.crn, SS.type = "III")
+crn.rich <- anova(S.crn, effect.type = "F", error = c("site:plot.rep", 
+                    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+                    "Residuals", "Residuals"))
+summary(crn.rich, formula = false)
+# capture.output(summary(crn.rich, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP-SDiv_crn_SxV.txt"))
+
+
+# WHT
+S.wht <- lm.rrpp(Sdiv ~ site + OVT.Variety +
+                          site:OVT.Variety + site:plot.rep +
+                          site:OVT.Variety:plot.rep, iter = 9999,
+                          print.progress = FALSE, data = SbyE.wht, SS.type = "III")
+wht.rich <- anova(S.wht, effect.type = "F", error = c("site:plot.rep", 
+                    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+                    "Residuals", "Residuals"))
+summary(wht.rich, formula = false)
+# capture.output(summary(wht.rich, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP-SDiv_wht_SxV.txt"))
+
+# SOY
+S.soy <- lm.rrpp(Sdiv ~ site + OVT.Variety +
+                          site:OVT.Variety + site:plot.rep +
+                          site:OVT.Variety:plot.rep, iter = 9999,
+                          print.progress = FALSE, data = SbyE.soy, SS.type = "III")
+soy.rich <- anova(S.soy, effect.type = "F", error = c("site:plot.rep", 
+                    "site:OVT.Variety:plot.rep", "site:OVT.Variety:plot.rep", 
+                    "Residuals", "Residuals"))
+summary(soy.rich, formula = false)
+# capture.output(summary(soy.rich, formula = false),
+#    file = file.path("./tables/MBLand_landscape_RRPP-SDiv_soy_SxV.txt"))
+
+```
+
+
+### 3c) PCoAs - Variety x Site w/in Species
+```{r, echo = FALSE, results = 'hide', fig.keep = 'none'}
+# setup pcoa
+pcoa.swch <- cmdscale(dist.swch, eig =TRUE)
+pcoa.crn <- cmdscale(dist.crn, eig =TRUE)
+pcoa.wht <- cmdscale(dist.wht, eig =TRUE)
+pcoa.soy <- cmdscale(dist.soy, eig =TRUE)
+# eigenvalues
+swchvar1 <- round(pcoa.swch$eig[1] / sum(pcoa.swch$eig), 3) * 100 ; swchvar1
+swchvar2 <- round(pcoa.swch$eig[2] / sum(pcoa.swch$eig), 3) * 100 ; swchvar2
+swchvar2 <- "17.0"
+swchvar3 <- round(pcoa.swch$eig[3] / sum(pcoa.swch$eig), 3) * 100 ; swchvar3
+crnvar1 <- round(pcoa.crn$eig[1] / sum(pcoa.crn$eig), 3) * 100 ; crnvar1
+crnvar2 <- round(pcoa.crn$eig[2] / sum(pcoa.crn$eig), 3) * 100 ; crnvar2
+crnvar3 <- round(pcoa.crn$eig[3] / sum(pcoa.crn$eig), 3) * 100 ; crnvar3
+whtvar1 <- round(pcoa.wht$eig[1] / sum(pcoa.wht$eig), 3) * 100 ; whtvar1
+whtvar2 <- round(pcoa.wht$eig[2] / sum(pcoa.wht$eig), 3) * 100 ; whtvar2
+whtvar3 <- round(pcoa.wht$eig[3] / sum(pcoa.wht$eig), 3) * 100 ; whtvar3
+soyvar1 <- round(pcoa.soy$eig[1] / sum(pcoa.soy$eig), 3) * 100 ; soyvar1
+soyvar2 <- round(pcoa.soy$eig[2] / sum(pcoa.soy$eig), 3) * 100 ; soyvar2
+soyvar3 <- round(pcoa.soy$eig[3] / sum(pcoa.soy$eig), 3) * 100 ; soyvar3
+# scores
+swch.scores <- as.data.frame(pcoa.swch$points); swch.scores$ids <- rownames(swch.scores) 
+swch.dat <- merge(swch.scores, SbyE.swch, by.x="ids", by.y="unique.plot")
+crn.scores <- as.data.frame(pcoa.crn$points); crn.scores$ids <- rownames(crn.scores) 
+crn.dat <- merge(crn.scores, SbyE.crn, by.x="ids", by.y="unique.plot")
+wht.scores <- as.data.frame(pcoa.wht$points); wht.scores$ids <- rownames(wht.scores) 
+wht.dat <- merge(wht.scores, SbyE.wht, by.x="ids", by.y="unique.plot")
+soy.scores <- as.data.frame(pcoa.soy$points); soy.scores$ids <- rownames(soy.scores) 
+soy.dat <- merge(soy.scores, SbyE.soy, by.x="ids", by.y="unique.plot")
+
+# ellipses
+ellipses.swch <- data.frame() 
+for(g in levels(swch.dat$site)){ 
+  ellipses.swch <- rbind(ellipses.swch, cbind(as.data.frame(with(
+    swch.dat[swch.dat$site==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , site=g))   }
+
+ellipses.crn <- data.frame() 
+for(g in levels(crn.dat$nestSiteVar)){ 
+  ellipses.crn <- rbind(ellipses.crn, cbind(as.data.frame(with(
+    crn.dat[crn.dat$nestSiteVar==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , nestSiteVar=g))   } 
+
+ellipses.wht <- data.frame() 
+for(g in levels(wht.dat$nestSiteVar)){ 
+  ellipses.wht <- rbind(ellipses.wht, cbind(as.data.frame(with(
+    wht.dat[wht.dat$nestSiteVar==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , nestSiteVar=g))   } 
+
+ellipses.soy <- data.frame() 
+for(g in levels(soy.dat$nestSiteVar)){ 
+  ellipses.soy <- rbind(ellipses.soy, cbind(as.data.frame(with(
+    soy.dat[soy.dat$nestSiteVar==g,],  
+    veganCovEllipse(cov.wt(cbind(V1, V2),
+         wt=rep(1/length(V1),length(V1)))$cov, 
+         center=c(mean(V1), mean(V2)))   )) , nestSiteVar=g))   } 
+
+
+## set ggplot2 theme
+theme_set(theme_bw(base_size=14)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+
+# used this to get centroid of each site
+#mean(crn.dat$V1[crn.dat$site == "GREVT"])
+
+
+# plots
+swch.gxe <- ggplot() + #coord_equal() + 
+    geom_path(data = ellipses.swch, aes(x = V1, y = V2, 
+          group = site, colour = site), linetype = 1, size = 1.1,  
+          show.legend = TRUE) +
+    geom_point(data = swch.dat, aes(x = V1, y = V2, 
+          color = factor(site)) , size = 2) +
+    scale_colour_manual("", values = swc_color, 
+          guide = guide_legend(override.aes = list(alpha = 0) ) ) +  #
+    scale_x_continuous(paste("PCoA 1 (", swchvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", swchvar2, "%)", sep = "")) +
+    annotate(geom = "text", x = c(-1.8, 43.9, -10.7, -31.4), 
+                            y = c(-26.9+5, 15.4+8, -16.6+8, 28.0-8), 
+          label = levels(swch.dat$site), colour = swc_color) +
+    theme(legend.position = "bottom", axis.title = element_text(size = 14), 
+          legend.text = element_text(color = "transparent")) +
+    annotate(geom = "text", x = -39, y = 38, label = "E)", size = 5)
+
+
+crn.gxe <- ggplot() + #coord_equal() + 
+    geom_path(data = ellipses.crn, aes(x = V1, y = V2, 
+          group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
+          size = 0.9, show.legend = TRUE) +
+    geom_point(data = crn.dat, aes(x = V1, y = V2, 
+          shape = factor(OVT.Variety), color = site) , size = 2) +
+    #guides(shape = 'none', color = 'none') +
+    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_colour_manual(values = rep(crn_color, each=4) ) +
+    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+           linetype = 'none', colour = 'none' ) +
+    scale_x_continuous(paste("PCoA 1 (", crnvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", crnvar2, "%)", sep = "")) +
+    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
+         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom") +
+    annotate(geom = "text", x = c(-24.7, -24.2, 11.3, 35.6), 
+                            y = c(7+10, 2.7-7, -23.7+11, 14.3-11), 
+             label = levels(crn.dat$site), colour = crn_color) +
+    annotate(geom = "text", x = -31, y = 22, label = "B)", size = 5)
+
+wht.gxe <- ggplot() + #coord_equal() + 
+    geom_path(data = ellipses.wht, aes(x = V1, y = V2, 
+          group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
+          size = 0.9, show.legend = TRUE) +
+    geom_point(data = wht.dat, aes(x = V1, y = V2, 
+          shape = factor(OVT.Variety), color = site) , size = 2) +
+    #guides(shape = 'none', color = 'none') +
+    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_colour_manual(values = rep(wht_color, each=4) ) +
+    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+           linetype = 'none', colour = 'none' ) +
+    scale_x_continuous(paste("PCoA 1 (", whtvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", whtvar2, "%)", sep = "")) +
+    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
+         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom") +
+    annotate(geom = "text", x = c(-22.6, -13.0, 9.3, 26.4), 
+                            y = c(-7.4-6, 16.0-10, -15.6+6, 6.9+8), 
+             label = levels(wht.dat$site), colour = wht_color) +
+    annotate(geom = "text", x = -30, y = 20, label = "D)", size = 5)
+  
+soy.gxe <- ggplot() + #coord_equal() + 
+    geom_path(data = ellipses.soy, aes(x = V1, y = V2, 
+          group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
+          size = 0.9, show.legend = TRUE) +
+    geom_point(data = soy.dat, aes(x = V1, y = V2, 
+          shape = factor(OVT.Variety), color = site) , size = 2) +
+    #guides(shape = 'none', color = 'none') +
+    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_colour_manual(values = rep(soy_color, each=4) ) +
+    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+           linetype = 'none', colour = 'none' ) +
+    scale_x_continuous(paste("PCoA 1 (", soyvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", soyvar2, "%)", sep = "")) +
+    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
+         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom") +
+    annotate(geom = "text", x = c(-17.3, -12.9, 14.6, 15.6), 
+                            y = c(1.6+11, -0.8+12, -11.1-7, 10.2+9), 
+             label = levels(soy.dat$site), colour = soy_color) +
+    annotate(geom = "text", x = -21, y = 19.5, label = "C)", size = 5)
+
+```
+
+```{r, echo = FALSE, results = 'hide', fig.height = 7, fig.width = 7}
+#tiff("./figures/Swch_PCoA_by_site.tiff", width=6, height=6, units="in", res=600)
+#swch.gxe
+#dev.off()
+
+#tiff("./figures/GxE_by_spp.tiff", width=9, height=8, units="in", res=600)
+multiplot(crn.gxe, soy.gxe, wht.gxe, swch.gxe, cols = 2)
+#dev.off()
+```
+
+```{r, echo = FALSE, results = 'hide'}
+## RE-set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+```
+
+
+# 4) Variance Partitioning
+```{r, echo=FALSE}
+# anova(rrpp.swch, effect.type = "F", error = c("site:plot.rep", "Residuals"))
+# rrpp.swch$LM$X
+# colnames(rrpp.swch$LM$X)
+# levels(SbyE.swch$nestBlock)
+# X matrix :
+#   1 column for intercept which is CCRS and all plot.rep1's
+#   3 columns for site
+#   12 columns for plot rep nested in site BUT one of those columns is all 0s (WBFL:plot.rep4) because the WBFL site had only 3 plot reps
+
+# #dummy vrbl coding
+swchXSite <- model.matrix(~ site, SbyE.swch)[,-1] #3col
+      #swchXPlot <- model.matrix(~ plot.rep, SbyE.swch)[,-1] #3col
+swchXPlot <- rrpp.swch$LM$X[,c(5:15)] #11 col
+row.names(swchXPlot) <- row.names(rrpp.swch$LM$data$Y)
+
+#perform variance partitioning on distance matrix
+VP.swch <- varpart(dist.swch, ~swchXSite, ~swchXPlot)
+VP.swch$part   #same total SS as RRPP model
+
+# because 'Y' matrix is a distance matrix, use db-rda to test significance 
+  # of fractions of interest (see capscale)
+  # however, if capscale (db-rda) is called with euclidean distance, the results 
+  # are identical to rda
+
+#whole model signif test
+swch.vp1 <- capscale(dist.swch ~ swchXSite + swchXPlot,
+           data = SbyE.swch, comm = vst.swch)
+anova(swch.vp1)
+# #same as capscale results!
+
+#Conditional Fraction signif test
+swch.vp2 <- capscale(dist.swch ~ swchXSite +
+           Condition(cbind(swchXPlot)),
+           data = SbyE.swch, comm = vst.swch)
+anova(swch.vp2, permutations = 9999)
+
+swch.vp3 <- capscale(dist.swch ~ swchXPlot +
+           Condition(cbind(swchXSite)),
+           data = SbyE.swch, comm = vst.swch)
+anova(swch.vp3, permutations = 9999)
+```
+
+```{r, echo=FALSE}
+# #dummy vrbl coding
+crn.XSite <- model.matrix(~ site, SbyE.crn)[,-1] #3col
+crn.XVar <- model.matrix(~ OVT.Variety, SbyE.crn)[,-1] #2col
+#crn.XPlot <- model.matrix(~ plot.rep, SbyE.crn)[,-1] #3col
+crn.XPlot <- rrpp.crn$LM$X[,13:24] #12 cols
+row.names(crn.XPlot) <- row.names(rrpp.crn$LM$data$Y)
+# X matrix 1st column intercept (all 1s)
+# 2:4 is site, 5:6 is variety, 7:12 is SxV, 13:24 is B(S), 25:48 is VB(S),
+# but one of those columns will be all 0s because of the dead ROBVT-CRN site
+
+#perform variance partitioning on distance matrix
+VP.crn <- varpart(dist.crn, ~crn.XSite, ~crn.XVar, ~crn.XPlot)
+VP.crn$part
+#showvarparts(3)
+
+# #whole model signif test
+crn.vp1 <- capscale(dist.crn ~ crn.XSite + crn.XVar + crn.XPlot,
+           data = SbyE.crn, comm = vst.crn)
+anova(crn.vp1, permutations = 9999)
+
+# #Conditional Fraction signif test
+crn.vp2 <- capscale(dist.crn ~ crn.XSite +
+           Condition(cbind(crn.XVar, crn.XPlot)),
+           data = SbyE.crn, comm = vst.crn)
+anova(crn.vp2, permutations = 9999)
+
+crn.vp3 <- capscale(dist.crn ~ crn.XVar +
+           Condition(cbind(crn.XSite, crn.XPlot)),
+           data = SbyE.crn, comm = vst.crn)
+anova(crn.vp3, permutations = 9999)
+
+crn.vp4 <- capscale(dist.crn ~ crn.XPlot +
+           Condition(cbind(crn.XSite, crn.XVar)),
+           data = SbyE.crn, comm = vst.crn)
+anova(crn.vp4, permutations = 9999)
+
+
+#controlling for only one variable
+crn.vp2a <- capscale(dist.crn ~ crn.XSite +
+           Condition(cbind(crn.XVar)),
+           data =  SbyE.crn, comm = vst.crn)
+anova(crn.vp2a, permutations = 9999)  #this is the variation explained by site conditioned on variety but NOT conditioned on plot[site], therefore it gives the individual fraction of site + marginal fraction with plot[site]
+crn.vp4a <- capscale(dist.crn ~ crn.XPlot +
+           Condition(cbind(crn.XVar)),
+           data = SbyE.crn, comm = vst.crn)
+anova(crn.vp4a, permutations = 9999) #this is the variation explained by plot conditioned on variety but NOT conditioned on site, therefore it gives the individual fraction of plot[site] + marginal fraction with site
+```
+
+```{r, echo=FALSE}
+# #dummy vrbl coding
+wht.XSite <- model.matrix(~ site, SbyE.wht)[,-1] #3col
+wht.XVar <- model.matrix(~ OVT.Variety, SbyE.wht)[,-1] #2col
+    #wht.XPlot <- model.matrix(~ plot.rep, SbyE.wht)[,-1] #3col
+wht.XPlot <- rrpp.wht$LM$X[,13:24] #12 cols
+row.names(wht.XPlot) <- row.names(rrpp.wht$LM$data$Y)
+# X matrix 1st column intercept (all 1s)
+# 2:4 is site, 5:6 is variety, 7:12 is SxV, 13:24 is B(S), 25:48 is VB(S)
+
+#perform variation partitioning on distance matrix
+VP.wht <- varpart(dist.wht, ~wht.XSite, ~wht.XVar, ~wht.XPlot)
+VP.wht$part
+
+# #whole model signif test
+wht.vp1 <- capscale(dist.wht ~ wht.XSite + wht.XVar + wht.XPlot,
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp1, permutations = 9999)
+
+# #Conditional Fraction signif test
+wht.vp2 <- capscale(dist.wht ~ wht.XSite +
+           Condition(cbind(wht.XVar, wht.XPlot)),
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp2, permutations = 9999)
+
+wht.vp3 <- capscale(dist.wht ~ wht.XVar +
+           Condition(cbind(wht.XSite, wht.XPlot)),
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp3, permutations = 9999)
+
+wht.vp4 <- capscale(dist.wht ~ wht.XPlot +
+           Condition(cbind(wht.XSite, wht.XVar)),
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp4, permutations = 9999)
+
+
+#controlling for only one variable
+wht.vp2a <- capscale(dist.wht ~ wht.XSite +
+           Condition(cbind(wht.XVar)),
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp2a, permutations = 9999)  #this is the variation explained by site conditioned on variety but NOT conditioned on plot[site], therefore it gives the individual fraction of site + marginal fraction with plot[site]
+wht.vp4a <- capscale(dist.wht ~ wht.XPlot +
+           Condition(cbind(wht.XVar)),
+           data = SbyE.wht, comm = vst.wht)
+anova(wht.vp4a, permutations = 9999) #this is the variation explained by plot conditioned on variety but NOT conditioned on site, therefore it gives the individual fraction of plot[site] + marginal fraction with site
+```
+
+```{r, echo=FALSE}
+# #dummy vrbl coding
+soy.XSite <- model.matrix(~ site, SbyE.soy)[,-1] #3col
+soy.XVar <- model.matrix(~ OVT.Variety, SbyE.soy)[,-1] #2col
+    #soy.XPlot <- model.matrix(~ plot.rep, SbyE.soy)[,-1] #3col
+soy.XPlot <- rrpp.soy$LM$X[,13:24] #12 cols
+row.names(soy.XPlot) <- row.names(rrpp.soy$LM$data$Y)
+# X matrix 1st column intercept (all 1s)
+# 2:4 is site, 5:6 is variety, 7:12 is SxV, 13:24 is B(S), 25:48 is VB(S)
+
+#perform variance partitioning on distance matrix
+VP.soy <- varpart(dist.soy, ~soy.XSite, ~soy.XVar, ~soy.XPlot)
+VP.soy$part
+#showvarparts(3)
+
+# #whole model signif test
+soy.vp1 <- capscale(dist.soy ~ soy.XSite + soy.XVar + soy.XPlot,
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp1, permutations = 9999)
+
+
+# #Conditional Fraction signif test
+soy.vp2 <- capscale(dist.soy ~ soy.XSite +
+           Condition(cbind(soy.XVar, soy.XPlot)),
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp2, permutations = 9999)
+
+soy.vp3 <- capscale(dist.soy ~ soy.XVar +
+           Condition(cbind(soy.XSite, soy.XPlot)),
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp3, permutations = 9999)
+
+soy.vp4 <- capscale(dist.soy ~ soy.XPlot +
+           Condition(cbind(soy.XSite, soy.XVar)),
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp4, permutations = 9999)
+
+#controlling for only one variable
+soy.vp2a <- capscale(dist.soy ~ soy.XSite +
+           Condition(cbind(soy.XVar)),
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp2a, permutations = 9999)  #this is the variation explained by site conditioned on variety but NOT conditioned on plot[site], therefore it gives the individual fraction of site + marginal fraction with plot[site]
+soy.vp4a <- capscale(dist.soy ~ soy.XPlot +
+           Condition(cbind(soy.XVar)),
+           data = SbyE.soy, comm = vst.soy)
+anova(soy.vp4a, permutations = 9999) #this is the variation explained by plot conditioned on variety but NOT conditioned on site, therefore it gives the individual fraction of plot[site] + marginal fraction with site
+```
+
+```{r, echo = FALSE, results = 'hide', fig.width = 8, fig.height = 9}
+#tiff("./figures/VarPart_results.tiff", width=10, height=10, units="in", res=600)
+par(mfrow = c(2,2))
+par(mar=c(3.1, 2.1, 2.1, 1.1)) #trbl
+plot(VP.crn, bg=2:4, Xnames = c("Site", "Var.", "Block"), cex = 1.5)
+title("A) CRN", adj = 0)
+plot(VP.soy, bg=2:4, Xnames = c("Site", "Var.", "Block"), cex = 1.5)
+title("B) SOY", adj = 0)
+plot(VP.wht, bg=2:4, Xnames = c("Site", "Var.", "Block"), cex = 1.5)
+title("C) WHT", adj = 0)
+plot(VP.swch, bg=c(2,4), Xnames = c("Site", "Block"), cex = 1.5)
+title("D) SWCH", adj = 0)
+#dev.off()
+
+par(mfrow = c(1,1))
+```
+
+
+
+
+###### end

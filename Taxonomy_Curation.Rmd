@@ -1,0 +1,709 @@
+---
+title: "Taxonomy & Curation"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+author: "Briana K. Whitaker"
+date: "`r Sys.Date()`"
+---
+\fontsize{9}{10}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.width=3.5, fig.height=3,
+                      warning=FALSE, message=FALSE)
+```
+---
+
+
+* Run using `r version[['version.string']] `.
+
+# Objective
+This document reports on the **curation and taxonomic assignment of the full ASV matrix** from the NC Microbiome Landscapes Project, performed in the summer of 2019. 
+
+
+
+
+# 0) Load Packages, set path to data
+```{r, echo=FALSE, results='hide', include=FALSE} 
+
+x<-c("ggplot2", "phyloseq", "Biostrings", "tidyverse", "lulu", "vegan", 
+     "genefilter","tcltk", "dismo", "sem", "leaps", "aplpack")   #, "BiodiversityR"
+lapply(x, require, character.only = TRUE)
+
+#Load functions
+source("./code/fxn_blastr-bw.R")
+source("./code/blastn_code.R")
+
+#add 'not in' function
+`%nin%` = Negate(`%in%`)
+
+#set seed
+set.seed(392)
+
+# set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+# load phyloseq object from post-DADA2
+load("./data/MBLand_ps.RData")
+ps #1637
+```
+
+
+
+
+# 1) Summarize & Remove Plant Reads
+### Run local BLASTn on local DBs
+- 48 total plant sequences from all 4 plant species, multiple accessions each.
+**(code hidden)**
+```{r, results='hide', echo=FALSE}
+# import a reference database of all plant species
+allPlants.SS <- readDNAStringSet("./db/allPlants_db/allPlants.fasta")
+# create ncbi plant blast database
+allPlants.db.path <- "./db/allPlants_db/allPlants.fasta"
+#makeblastdb(file = allPlants.db.path)
+# this creates 'nhr', 'nin', and 'nsq files in addition to the original fasta
+
+# make sure the RDP fungal database is being read as a database too
+fung.db.path <- "./db/fungal_db/sh_general_release_dynamic_02.02.2019.fasta"
+#makeblastdb(file = fung.db.path)
+# this creates 'nhr', 'nin', and 'nsq files in addition to the original fasta
+
+# * on the command line * Merge two blast databases
+#blastdb_aliastool -dblist "/Users/brianawhitaker/Documents/2019-MBLand/db/fungal_db/sh_general_release_dynamic_02.02.2019.fasta /Users/brianawhitaker/Documents/2019-MBLand/db/allPlants_db/allPlants.fasta" -dbtype nucl -out /Users/brianawhitaker/Documents/2019-MBLand/db/pcr_ref -title "My plant and fungal DB"
+##Created nucleotide BLAST (alias) database /Users/brianawhitaker/Documents/2019-MBLand/db/pcr_ref with 35715 sequences
+
+# alternatively, merge the two files into a fasta file on CLI
+#cat ./fungal_db/sh_general_release_dynamic_02.02.2019.fasta ./allPlants_db/allPlants.fasta > plant_fungal_db.fasta
+
+# ## on supercomputer or local blast installation
+# module load blast+/2.11.0
+# makeblastdb -in plant_fungal_db.fasta -dbtype nucl -title "mbland plant-fungal"
+# blastn -query MBLand_uniqueSeqs.fasta -db plant_fungal_db.fasta -word_size 50 -perc_identity 60 -out MBLand_uniqueSeqs_blast.csv -outfmt 10
+
+blast <- read.csv(
+    "./data/MBLand_uniqueSeqs_blast.csv", head = FALSE)
+#head(blast)
+colnames(blast) <- c("QueryID", "SubjectID", "Perc.Ident", "Alignment.Length", 
+                    "Mismatches", "Gap.Openings", "Q.start", "Q.end", "S.start", 
+                    "S.end", "E", "Bits")
+
+length(table(blast$QueryID))  
+ps
+```
+
+* only 1229 out of 1637 have a blast hit (either plant or fungal); will need to ID the remaining 408 ASVs using NCBI web browser to confirm non-plant/other
+
+### Summarize Hits
+```{r, results='hide', echo=FALSE}
+# Determine whether the best hit(s) per read (based on E score) are:
+#    Plant or Fungal. 
+#Summarize the number of Plant/Fungal ID'd reads.
+# summarize the best hit per read
+#hit <- summ_hits_quickly(blasthits = blast)
+
+#save the blast summary tables
+#write.csv(hit, "./data/MBLand_uniqueSeqs_hit.csv")
+hit <- read.csv(
+    "./data/MBLand_uniqueSeqs_hit.csv", row.names = 1)
+
+# Summarize Plant Contaminants
+hit %>%
+  group_by(uniq.Subject.Type) %>%
+  summarize(n = length(QueryID))
+```
+
+* *72 out of 1229 and 1637 total ASVs are an un-ambiguous match to Plants*
+
+
+```{r, results = 'hide', echo = FALSE}
+# create key to translate NCBI names into Genus names
+get.NCBI.code <- function(fname) strsplit(basename(fname), " ")[[1]][1]  
+ncbiCode <- unname(sapply(names(allPlants.SS), get.NCBI.code)) 
+get.genus <- function(fname) strsplit(basename(fname), " ")[[1]][2]  
+genus <- unname(sapply(names(allPlants.SS), get.genus))
+ncbiKey <- data.frame("genus" = genus, "NCBI" = ncbiCode)
+
+# #merge key with hit list -- NOTE, this doesn't work on hits with multiple matches
+# hit_spp <- merge(hit, ncbiKey, by.x = "uniq.Subject",
+#                        by.y = "NCBI", sort = FALSE, all.x = TRUE)
+# # write it out and manually edit the double hits in the Plant category
+# write.csv(hit_spp,
+#          "./data/MBLand_uniqueSeqs_hit_species.csv")
+# # filled in blanks for any that had multiple plant matches 
+hit_spp <- read.csv("./data/MBLand_uniqueSeqs_hit_species-edit.csv",
+                                 row.names = 1, stringsAsFactors = TRUE)
+sort(droplevels(hit_spp$QueryID[hit_spp$genus=="Zea"]))
+#Triticum often comes back as Pseudoroegneria or Elymus in nr genbank database. some seqs identified as panicum may be from Triticum plants 
+```
+
+### Summarize the Plant hits from this first pass
+```{r}
+hit_spp %>%
+  group_by(forcats::fct_explicit_na(genus)) %>%
+  summarize(n = length(QueryID))
+```
+
+### Blast no match hits
+* Externally, blastn the 408 ASVs with no hits in local blast
+* Use python geneutils package on CLI to assign taxonomy to the accession numbers for hit table downloaded from NCBI (~49,000 hits total)
+* Parse taxonomy using function, then exclude plants and other non-fungal ASVs
+```{r, results = 'hide', echo = FALSE}
+# 408 ASVs have no match
+# write this out, BLAST it, 
+noMatch <- refseq(ps)[names(refseq(ps)) %nin% unique(hit$QueryID)]
+#writeXStringSet(noMatch,
+#                 filepath = "./intermediate/MBLand_uniqueSeqs_noMatchSeqs.fasta")
+
+### EXTERNALLY
+
+## FIRST blast this file https://blast.ncbi.nlm.nih.gov/Blast.cgi
+##  "Your search is limited to records that exclude: models (XM/XP),
+##   uncultured/environmental sample sequences"
+## download hit table(s)
+# raw <- rbind(
+#   read.csv("./intermediate/N3WBZXHP01N-Alignment-HitTable.csv", head=FALSE),
+#   read.csv("./intermediate/N3WDNV0001N-Alignment-HitTable.csv", head=FALSE),
+#   read.csv("./intermediate/N3WGMXH401N-Alignment-HitTable.csv", head=FALSE),
+#   read.csv("./intermediate/N3WHU7A901N-Alignment-HitTable.csv", head=FALSE),
+#   read.csv("./intermediate/N3WM7F2X013-Alignment-HitTable.csv", head=FALSE))
+# write.csv(raw, "./data/MBLand_noMatchSeqs_Alignment_HitTable.csv")
+## THEN use geneutils program on supercomputer
+#     geneutils blasthit --path "/path/to/MBLand_noMatchSeqs_Alignment_HitTable.csv" --db n
+# (note: this assumes you have already initialized program with API key)
+
+noMatch_hit <- read.csv(
+    "./data/MBLand_noMatchSeqs_Alignment_HitTable.csv", head = FALSE)
+colnames(noMatch_hit) <- c("QueryID", "SubjectID", "Perc.Ident",
+    "Alignment.Length", "Mismatches", "Gap.Openings", "Q.start", "Q.end",
+    "S.start", "S.end", "E", "Score") 
+dim(noMatch_hit)[1]
+# 45663
+length(unique(noMatch_hit$SubjectID))
+# 17713
+
+noMatch_hit_ann <- read.csv(
+    "./data/MBLand_noMatchSeqs_Alignment_HitTable_annotated.csv", head = FALSE)
+colnames(noMatch_hit_ann) <- c("SubjectID","Description", "Organism",
+                           "Taxonomy", "Authors", "Modification.Date")  
+dim(noMatch_hit_ann)[1]
+# 28025
+length(unique(noMatch_hit_ann$SubjectID))
+# 17713
+noMatch_hit_ann <- noMatch_hit_ann[!duplicated(noMatch_hit_ann),]
+dim(noMatch_hit_ann)
+
+noMatch_merge <- base::merge(noMatch_hit, noMatch_hit_ann, 
+              by.x="SubjectID", by.y="SubjectID",
+              all.x = FALSE, all.y = FALSE)
+dim(noMatch_merge) #45663
+noMatch_summary <- summ_hits_annotated(blasthits = noMatch_merge)
+# Summarize results
+noMatch_summary %>%
+ group_by(uniq.Subject.Type) %>%
+ summarize(n = length(QueryID))
+# 1 + 1 = 2 ambiguous things
+# 359 Fungi
+# 34 plant
+# 11 "other" aka protists & things
+
+#investigate ambiguous matches
+ambiguous <- 
+    noMatch_summary$QueryID[noMatch_summary$uniq.Subject.Type=="Bacteria----Other" | 
+                            noMatch_summary$uniq.Subject.Type=="Other----Fungi"]
+ambiguous
+# ASV1507 ASV460
+test <- noMatch_merge[noMatch_merge$QueryID %in% ambiguous[1], c(1:4,11,14,15)]
+#View(test[order(test$E), ])
+#ASV1507    # clearly bacteria
+#ASV460     # extremely low alignment length(all ~50bp), results within that ambiguously metazoa/fungi
+
+
+
+# subset the Fungal ASVs from the non-Fungal ASVs from this summary
+FungiASVs <- c(as.character(
+    noMatch_summary$QueryID[noMatch_summary$uniq.Subject.Type=="Fungi"]))
+FungiASVs <- as.factor(FungiASVs)
+notFungiASVs0a <- noMatch_summary$QueryID[noMatch_summary$QueryID %nin% FungiASVs]
+
+notFungiASVs0a_plant <- 
+    noMatch_summary$QueryID[noMatch_summary$uniq.Subject.Type=="Plant"]
+```
+
+### Organize datasets to subset out non-Fungal ASVs
+```{r, results = 'hide', echo = FALSE}
+notFungiASVs0b <- 
+  hit_spp$QueryID[hit_spp$uniq.Subject.Type == "Plant"]
+
+#  combine all Plant & non-Fungi/non-Plant
+notFungiASVs <- c(as.character(notFungiASVs0a), 
+                  as.character(notFungiASVs0b))
+notFungiASVs <- as.factor(notFungiASVs)
+length(notFungiASVs) #119 ASVs are plants or bacteria or protists, out of 1637
+
+#write_delim(as.data.frame(notFungiASVs),
+#            "./intermediate/MBLand_notFungalASVs.txt", 
+#            delim = "\t", col_names = FALSE)
+notFungiASVs <- as.factor(read.delim("./intermediate/MBLand_notFungalASVs.txt", 
+                                  sep="\t", header=FALSE)$V1)
+
+
+#  subset only the plant ASVs (not the bacteria/protists/other)
+plantASVs <- c(as.character(notFungiASVs0a_plant), 
+               as.character(notFungiASVs0b))
+plantASVs <- as.factor(plantASVs)
+length(plantASVs)
+#106   # =72 from the local blast screening, + 34 from NCBI GenBank screening
+
+# write_delim(as.data.frame(plantASVs),
+#             "./intermediate/MBLand_plantASVs.txt", 
+#             delim = "\t", col_names = FALSE)
+plantASVs <- as.factor(read.delim("./intermediate/MBLand_plantASVs.txt", 
+                                  sep="\t", header=FALSE)$V1)
+ps_plantOnly <- ps
+ps_plantOnly@otu_table <- otu_table(ps)[,colnames(otu_table(ps)) %in% plantASVs]
+ps_plantOnly@refseq <- refseq(ps_plantOnly)[names(refseq(ps_plantOnly)) %in% plantASVs]
+# writeXStringSet(refseq(ps_plantOnly),
+#                 filepath = "./intermediate/MBLand_uniqueSeqs_onlyPlant.fasta")
+```
+
+
+### Caclulate Proportion Plant Overall
+```{r, results='hide', echo=FALSE}
+# calculate proportion plant OR completely unknown after multiple database cross-reference
+ps_plant <- ps
+ps_plant@otu_table <- otu_table(ps)[,colnames(otu_table(ps)) %in% notFungiASVs]
+ps_plant@refseq <- refseq(ps_plant)[names(refseq(ps_plant)) %in% notFungiASVs]
+
+proportionPlantOverall <-
+    sum(colSums(ps_plant@otu_table))/sum(colSums(ps@otu_table))
+
+#add a column to the environmental matrix to specify what prop. of reads were plant
+ps@sam_data$propPlant <- c(rowSums(ps_plant@otu_table)/rowSums(ps@otu_table))
+
+# add a column for sequencing depth overall
+ps@sam_data$seqDepth <- c(rowSums(ps@otu_table))
+```
+
+```{r}
+proportionPlantOverall
+```
+
+# 2) LULU
+* After removing plant and other non-Fungal ASVs (119 ASVs)
+* Leaves 1518 ASVs
+* Then perform LULU curation
+
+### Make new phyloseq object
+```{r, echo = FALSE, results = 'hide'}
+# remove plant and other non-Fungal ASVs
+ps_fungi <- ps
+ps_fungi@otu_table <- otu_table(ps)[,colnames(otu_table(ps)) %nin% notFungiASVs]
+ps_fungi@refseq <- refseq(ps_fungi)[names(refseq(ps_fungi)) %nin% notFungiASVs]
+#writeXStringSet(refseq(ps_fungi),
+#                 filepath = "./data/MBLand_uniqueSeqs_onlyFungi.fasta")
+#save(ps_fungi, file="./data/MBLand_ps_onlyFungi.RData") 
+load("./data/MBLand_ps_onlyFungi.RData")
+ps_fungi
+```
+
+### LULU itself
+```{r, echo = FALSE, results = 'hide', fig.keep = 'none'}
+require(lulu)
+
+## Create a local database of the sequences themselves.
+#makeblastdb -in /path/to/MBLand_uniqueSeqs_onlyFungi.fasta -parse_seqids -dbtype nucl
+### Adding sequences from FASTA; added 1518 sequences in 0.060385 seconds.
+
+## Perform a local blast on the ASV sequences, using the ASV sequence database, 
+##  for the purpose of cross-referencing.
+#blastn -query /path/to/MBLand_uniqueSeqs_onlyFungi.fasta -db /path/to/MBLand_uniqueSeqs_onlyFungi.fasta -out /path/to/MBLand_LULU_matchlist.txt -num_threads 4 -outfmt '6 std qseqid sseqid pident' -qcov_hsp_perc 80 -perc_identity 84
+
+#read in Match List file, obtained through CLI
+matchlist <- read.delim("./data/MBLand_LULU_matchlist.txt", sep="\t", header=FALSE)[,1:3]
+#dim(matchlist) #23406    3
+colnames(matchlist) <- c("childASV", "parentASV", "matchPerc")
+
+# need an SbyS df for input to LULU
+SbyS2 <- otu_table(ps_fungi)@.Data
+
+#Perform LULU algorithm for ASV curation
+# luluObj <- lulu(as.data.frame(t(SbyS2)), matchlist)
+# save(luluObj, file="./data/MBLand_luluObj.RData") 
+load("./data/MBLand_luluObj.RData")
+dim(SbyS2); dim(t(luluObj$curated_table))
+# collapsed 1518 ASVs into 1214 ASVs
+
+# convert lulu curated table to lulu SbyS
+SbyS_lulu <- luluObj$curated_table
+
+#visualize
+hist(colSums(SbyS_lulu), xlab = "Sample Sequencing Depth")
+hist(log10(rowSums(SbyS_lulu)), xlab = "Log10 of ASV Sequencing Depth")
+hist(specnumber(t(SbyS_lulu)), xlab = "Sample Species Richness")
+```
+
+* LULU curatioin collapsed 1518 ASVs into 1214 ASVs
+
+### Plot Proportion Plant & Seq Depth
+```{r, echo = FALSE, fig.width = 7.5}
+# add a column for sequencing depth post removal of plant seqs :/
+ps_fungi@sam_data$seqDepth_onlyFungi <- colSums(SbyS_lulu)
+SbyE2 <- (as(sample_data(ps_fungi), "data.frame"))
+
+par(mfrow = c(1, 3))
+plot(propPlant ~ species, data = SbyE2, 
+     ylab = "Proportion Plant Sequences - per Sample",
+     ylim = c(0,1), cex.axis = 1.5, cex.lab = 1.5)
+points(propPlant ~ species, data = SbyE2, pch = 16, cex =.5)
+plot(seqDepth_onlyFungi ~ species, data = SbyE2, 
+     ylab = "Sequencing Depth [only Fungi] - per Sample",
+     cex.axis = 1.5, cex.lab = 1.5)
+points(seqDepth_onlyFungi ~ species, data = SbyE2, pch = 16, cex =.5)
+plot(seqDepth ~ species, data = SbyE2, 
+     ylab = "Sequencing Depth [Overall] - per Sample",
+     cex.axis = 1.5, cex.lab = 1.5)
+points(seqDepth ~ species, data = SbyE2, pch = 16, cex =.5)
+```
+
+# 3) Initial Rarefaction & Controls
+
+### Rarefaction Curves (all)
+```{r, results = 'hide', echo = FALSE, fig.height = 3.5, fig.width = 4.5}
+#origmar <- par()$mar
+par(mfrow = c(1, 1))
+#min sqn reads per sample
+min_depth <- min(rowSums(t(SbyS_lulu))[1:(dim(SbyS_lulu)[2]-4)]) 
+rarecurve(t(SbyS_lulu[,1:239]), step=20, label = FALSE, col = 'blue') #sample = min_depth,
+abline(v=min_depth, col = "black", lty = 2)
+title("Rarefaction Curves - All samples")
+```
+
+### Make post-LULU phyloseq object
+```{r, echo = FALSE, results = 'hide'}
+# #update ps with lulu table
+# ps_lulu <- phyloseq(otu_table(SbyS_lulu, taxa_are_rows=TRUE),
+#                    sample_data(ps_fungi),
+#                    refseq(ps_fungi))
+# writeXStringSet(refseq(ps_lulu),
+#                 filepath = "./data/MBLand_uniqueSeqs_onlyFungi_lulu.fasta")
+# save(ps_lulu, file="./data/MBLand_ps_onlyFungi_lulu.RData")
+load("./data/MBLand_ps_onlyFungi_lulu.RData")
+ps_lulu
+```
+
+### Controls
+```{r, results = 'hide', echo = FALSE}
+# subset control samples and ASVs appearing in controls
+ps_cont <- subset_samples(ps_lulu, species == "control")
+ps_cont <- filter_taxa(ps_cont, function(x) mean(x) > 0, TRUE)
+otu_table(ps_cont)
+
+hit[hit$QueryID=="ASV3",]       #2 reads in PCRNeg2     #Cladosporium_delicatulum
+hit[hit$QueryID=="ASV740",]     #16 reads in POS-CONT   #Talaromyces_euchlorocarpius
+hit[hit$QueryID=="ASV1455",]    #3 reads in POS-CONT    #Aspergillus_terreus [note this is one of the TX fungi....]
+hit[hit$QueryID=="ASV37",]      #9656 in POS-CONT       #Xylariales_sp
+
+table(c(ps_lulu@otu_table["ASV740"] > 0))   #Talaromyces_euchlorocarpius only in POS-CONT, likely a TX-Endos contaminant in the DNA extraction
+table(c(ps_lulu@otu_table["ASV1455"] > 0))  #Aspergillus_terreus only in POS-CONT, likely a TX-Endos contaminant in the original DNA extraction
+table(c(ps_lulu@otu_table["ASV37"] > 0))  #in one other sample besides POS-CONT, w/ only 2 reads
+
+ps_lulu@otu_table["ASV37",c("67T", "POS-CONT")]
+```
+
+* From analysis of the positive and negative controls, 2 reads of a legitimate ASV are in PCRNeg2, and 2 reads of the positive-control fungus [Xylariales = TX1 fungi] in one other real sample (67T tassel corn sample)
+* Thus, likely tag-switching/splash-contam level is 2 reads
+* Also NOTE that the DNA extraction for the postive control itself was contaminated with two other known TX/Indigo Fungi from the Hawkes Lab culture collection, but these other two contaminants were not in anything else.
+
+### Prune out controls & Control-only ASVs
+* drops ASVs from 1214 to 1211
+```{r, results = 'hide', echo = FALSE}
+# ps_lulu <- subset_samples(ps_lulu, species != "control")
+# bad_taxa <- c("ASV37", "ASV740", "ASV1455")
+# all_taxa <- taxa_names(ps_lulu)
+# good_taxa <- all_taxa[all_taxa %nin% bad_taxa]
+# ps_lulu <- prune_taxa(good_taxa, ps_lulu)
+# identical(sort(names(ps_lulu@refseq)),
+#     sort(rownames(ps_lulu@otu_table))) # sanity check
+# writeXStringSet(refseq(ps_lulu),
+#                  filepath = "./data/MBLand_uniqueSeqs_onlyFungi_lulu_noCont.fasta")
+# save(ps_lulu, file="./data/MBLand_ps_onlyFungi_lulu_noCont.RData")
+
+load("./data/MBLand_ps_onlyFungi_lulu_noCont.RData")
+
+identical(sort(names(ps_lulu@refseq)),
+    sort(rownames(ps_lulu@otu_table))) # sanity check
+ps_lulu
+```
+
+# 4) Filter Low Abundance Taxa
+* Remove singletons
+* Remove ASVs with <=2 reads only (determined based on analysis of controls)
+
+```{r, results = 'hide', echo = FALSE}
+
+# remove singletons
+threshold1 <- kOverA(2, A = 1) 
+ps_filter1 <- filter_taxa(ps_lulu, threshold1, TRUE)
+ps_filter1 # removing singletons leaves 610 ASVs
+# remove
+ps_filter <- filter_taxa(ps_filter1, function(x) sum(x) > 2, TRUE)
+ps_filter
+# removing taxa with <=2 reads, leaves 610 ASVs ... still
+
+#sort(rowSums(otu_table(ps_filter)))
+
+# #save filtered ps object
+# save(ps_filter, file="./data/MBLand_ps_filter.RData")
+# writeXStringSet(refseq(ps_filter),
+#                  filepath = "./data/MBLand_uniqueSeqs_onlyFungi_lulu_noCont_filter.fasta")
+load("./data/MBLand_ps_filter.RData")
+```
+
+```{r}
+ps_filter
+```
+
+# 5) Taxonomy
+
+### 5a) Read in Warcup RDP Results
+RDP Naive Bayesian Classifier using the Warcup database (Deshpande et al 2015).
+```{r, echo = FALSE, results = 'hide'}
+# #load in taxonomic results, RDP classifier w/ Warcup database
+# rdp.warcup <- read.csv(
+#     "./intermediate/MBLand_RDP_Warcup.csv", row.names = 1)
+# rdp.warcup$num <- row.names(rdp.warcup)
+# row.names(rdp.warcup) <- rdp.warcup$asv
+# rdp.warcup <- as.data.frame(apply(rdp.warcup, 2, gsub, patt="%", replace=""))
+# # write out modified results file
+# write.csv(rdp.warcup,
+#   "./data/MBLand_RDP_Warcup-edit.csv")
+```
+
+### 5b) Read in UNITE RDP Results
+RDP Naive Bayesian Classifier using the UNITE database.
+
+```{r, echo = FALSE, results = 'hide'}
+#load in taxonomic results, RDP classifier w/ UNITE database
+# rdp.unite <- read.csv(
+#     "./intermediate/MBLand_RDP_UNITE.csv", row.names = 1)
+# rdp.unite$num <- row.names(rdp.unite)
+# row.names(rdp.unite) <- rdp.unite$asv
+# rdp.unite <- as.data.frame(apply(rdp.unite, 2, gsub, patt="%", replace=""))
+# # write out modified results file
+# write.csv(rdp.unite,
+#   "./data/MBLand_RDP_UNITE-edit.csv")
+```
+
+### 5c) Merge Warcup & UNITE
+* Note that I manually removed low-confidence taxonomic level estimates. Specifically, I used a <70% confidence cutoff. 
+* For example, if Ascomycota was the taxonomic hypothesis at the Phylum level for an ASV, but the confidence was 69 out of 100, I removed the Ascomycota hypothesis and left it just as a the higher taxonomic levels (in this case Fungi at Kingdom level).
+
+```{r, echo = FALSE, results = 'hide'}
+# rdp.warcup <- read.csv(
+#  "./data/MBLand_RDP_Warcup-edit.csv", row.names = 1, stringsAsFactors = FALSE)
+# rdp.unite <- read.csv(
+#  "./data/MBLand_RDP_UNITE-edit.csv", row.names = 1, stringsAsFactors = FALSE)
+# 
+# ## CHECK THIS, this must == TRUE for the following to work
+# identical(rdp.warcup$ASV, rdp.unite$ASV)
+# 
+# combo_classify <- rdp.warcup
+# 
+# combo_classify <- combo_classify %>%
+#     #phylum
+#     mutate(phylum = if_else(conf.p < 70, rdp.unite$phylum, phylum)) %>%
+#     mutate(conf.p = if_else(conf.p < 70, rdp.unite$conf.p, conf.p)) %>%
+#     #class
+#     mutate(class = if_else(conf.c < 70, rdp.unite$class, class)) %>%
+#     mutate(conf.c = if_else(conf.c < 70, rdp.unite$conf.c, conf.c)) %>%
+#     #order
+#     mutate(order = if_else(conf.o < 70, rdp.unite$order, order)) %>%
+#     mutate(conf.o = if_else(conf.o < 70, rdp.unite$conf.o, conf.o)) %>%
+#     #family
+#     mutate(family = if_else(conf.f < 70, rdp.unite$family, family)) %>%
+#     mutate(conf.f = if_else(conf.f < 70, rdp.unite$conf.f, conf.f)) %>%
+#     #genus
+#     mutate(genus = if_else(conf.g < 70, rdp.unite$genus, genus)) %>%
+#     mutate(conf.g = if_else(conf.g < 70, rdp.unite$conf.g, conf.g)) %>%
+#     #species
+#     mutate(species = if_else(conf.s < 70, rdp.unite$species, species)) %>%
+#     mutate(conf.s = if_else(conf.s < 70, rdp.unite$conf.s, conf.s))
+# write.csv(combo_classify, 
+#  "./data/MBLand_RDP_WarcupDefault_AddUNITE.csv")
+
+combo_classify <- read.csv(row.names = 1,
+ "./data/MBLand_RDP_WarcupDefault_AddUNITE.csv", stringsAsFactors = FALSE)
+```
+
+```{r, echo = FALSE, results = 'hide'}
+# format for phyloseq
+combo_classify %>% dplyr::select(-asv, -direction, -num, -contains("conf.")) -> rdp.warcup.unite
+
+# #save PS again with tax table
+# ps_filter@tax_table <- tax_table(as.matrix(rdp.warcup.unite))
+# save(ps_filter, file="./data/MBLand_ps_filter.RData")
+
+load("./data/MBLand_ps_filter.RData")
+ps_filter
+```
+
+
+
+
+# 6) Accumulation Curves
+
+### Treatment-wide Rarefaction
+* Using BiodiversityR package, random method, bootstrap method for estimating total extrapolated number of species, 200 permutations
+```{r, echo = FALSE, results = 'hide'}
+SbyE <- (as(sample_data(ps_filter), "data.frame"))
+
+# create new SbyS_filter df same as ps_filter otu_table
+SbyS_filter <- SbyS_lulu[colnames(SbyS_lulu) %in% colnames(otu_table(ps_filter))]
+SbyS_filter <- SbyS_lulu[rownames(SbyS_lulu) %in% rownames(otu_table(ps_filter)),]
+
+# create new variable for Host-Leaf Type combo
+#levels(SbyE$leaf.type)
+SbyE$leaf <- SbyE$leaf.type
+levels(SbyE$leaf)[1] <- "UpperCanopy" #rename to something simpler
+levels(SbyE$leaf)[3] <- "Flag" # capitalize
+SbyE$species_leaf <- as.factor(paste(SbyE$species, "_", SbyE$leaf, sep = ""))
+
+# accumresult -- must have species as columns
+crnE.ar <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf", gamma = "boot", 
+                      level = "CRN_Ear", method = "rarefaction", permutations = 200)
+crnT.ar <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf", gamma = "boot", 
+                      level = "CRN_Tassel", method = "rarefaction", permutations = 200)
+wht.ar <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf", gamma = "boot", 
+                      level = "WHT_Flag", method = "rarefaction", permutations = 200)
+swch.ar <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf", gamma = "boot", 
+                       level = "SWCH_Flag", method = "rarefaction", permutations = 200)
+soy.ar <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf", gamma = "boot", 
+                      level = "SOY_UpperCanopy", method = "rarefaction", permutations = 200)
+```
+
+### By Host Species/Leaf Type
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+accumplot(crnE.ar, cex = 1, col = "#E6AB02", xlim = c(0,63), labels = "Corn-Ear")
+#accumplot(crnT.ar, cex = 1, col = "#E6AB02", addit = TRUE, labels = "Corn-Tassel")
+accumplot(wht.ar, cex = 1, col = "#7570B3", addit = TRUE, labels = "Wheat-Flag")
+accumplot(swch.ar, cex = 1, col = "#1B9E77", addit = TRUE, labels = "Swch-Flag")
+accumplot(soy.ar, cex = 1, col = "#D95F02", addit = TRUE, labels = "\n\nSoy-\nUpCanopy")
+title(main = "Host Species & Leaf Types")
+```
+
+
+### By Site
+#### Corn Ear
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+# make vrbl
+SbyE$species_leaf_site <- as.factor(paste(SbyE$species_leaf, "_", SbyE$site, sep = ""))
+
+grevt.ce <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "CRN_Ear_GREVT", method = "rarefaction", permutations = 200)
+robvt.ce <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "CRN_Ear_ROBVT", method = "rarefaction", permutations = 200)
+rowvt.ce <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "CRN_Ear_ROWVT", method = "rarefaction", permutations = 200, 
+                      subset = c(rep(TRUE, 12), FALSE, FALSE))
+# NOTE!! for some reason, possibly a weird update with BiodiversityR, rowvt.ce 
+# is the ONLY one that is adding non-existant extra sampled plots (upped it to 
+# 14 plots not 12); adding in the subset, seems to be a hack, comes out with
+# basically the same final asymptote value
+yadvt.ce <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                       level = "CRN_Ear_YADVT", method = "rarefaction", permutations = 200)
+
+tiff("./figures/Accumulation Curve CRN Ear by Site.tiff", width=6, height=5, units="in", res=600)
+accumplot(rowvt.ce, cex = 1, col = "#E6AB02", xlim = c(0,15), labels = "ROWVT", main = "Corn")
+accumplot(robvt.ce, cex = 1, col = "#E6AB02", addit = TRUE, labels = "ROBVT")
+accumplot(grevt.ce, cex = 1, col = "#E6AB02", addit = TRUE, labels = "GREVT")
+accumplot(yadvt.ce, cex = 1, col = "#E6AB02", addit = TRUE, labels = "YADVT")
+title(main = "A) Corn")
+dev.off()
+```
+
+#### Corn Tassel
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+# grevt.ct <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+#                       level = "CRN_Tassel_GREVT", method = "rarefaction", permutations = 200)
+# robvt.ct <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+#                       level = "CRN_Tassel_ROBVT", method = "rarefaction", permutations = 200)
+# rowvt.ct <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+#                       level = "CRN_Tassel_ROWVT", method = "rarefaction", permutations = 200)
+# yadvt.ct <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+#                        level = "CRN_Tassel_YADVT", method = "rarefaction", permutations = 200)
+# 
+# accumplot(rowvt.ct, cex = 1, col = "#E6AB02", xlim = c(0,15), labels = "ROWVT", main = "Corn-Tassel")
+# accumplot(robvt.ct, cex = 1, col = "#E6AB02", addit = TRUE, labels = "ROBVT")
+# accumplot(grevt.ct, cex = 1, col = "#E6AB02", addit = TRUE, labels = "GREVT")
+# accumplot(yadvt.ct, cex = 1, col = "#E6AB02", addit = TRUE, labels = "YADVT")
+# title(main = "Corn Flag Leaves")
+```
+
+#### Wheat Flag
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+lenvt.wf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "WHT_Flag_LENVT", method = "rarefaction", permutations = 200)
+pasvt.wf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "WHT_Flag_PASVT", method = "rarefaction", permutations = 200)
+rowvt.wf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "WHT_Flag_ROWVT", method = "rarefaction", permutations = 200)
+univt.wf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                       level = "WHT_Flag_UNIVT", method = "rarefaction", permutations = 200)
+
+tiff("./figures/Accumulation Curve WHT Flag by Site.tiff", width=6, height=5, units="in", res=600)
+accumplot(univt.wf, cex = 1, col = "#7570B3", xlim = c(0,15), labels = "UNIVT", main = "Wheat-Flag")
+accumplot(lenvt.wf, cex = 1, col = "#7570B3", addit = TRUE, labels = "LENVT")
+accumplot(pasvt.wf, cex = 1, col = "#7570B3", addit = TRUE, labels = "PASVT")
+accumplot(rowvt.wf, cex = 1, col = "#7570B3", addit = TRUE, labels = "ROWVT")
+title(main = "D) Wheat")
+dev.off()
+```
+
+#### Swch Flag
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+ccrs.sf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SWCH_Flag_CCRS", method = "rarefaction", permutations = 200)
+otrs.sf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SWCH_Flag_OTRS", method = "rarefaction", permutations = 200)
+shfa.sf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SWCH_Flag_SHFA", method = "rarefaction", permutations = 200)
+wbfl.sf <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                       level = "SWCH_Flag_WBFL", method = "rarefaction", permutations = 200)
+
+tiff("./figures/Accumulation Curve SWCH Flag by Site.tiff", width=6, height=5, units="in", res=600)
+accumplot(wbfl.sf, cex = 1, col = "#1B9E77", xlim = c(0,15), labels = "WBFL", main = "Swch-Flag")
+accumplot(ccrs.sf, cex = 1, col = "#1B9E77", addit = TRUE, labels = "CCRS")
+accumplot(shfa.sf, cex = 1, col = "#1B9E77", addit = TRUE, labels = "SHFA")
+accumplot(otrs.sf, cex = 1, col = "#1B9E77", addit = TRUE, labels = "OTRS")
+title(main = "C) Switchgrass")
+dev.off()
+```
+
+#### Soy Upper Canopy
+```{r, echo = FALSE, results = 'hide', fig.height = 6, fig.width = 6}
+beavt.su <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SOY_UpperCanopy_BEAVT", method = "rarefaction", permutations = 200)
+pasvt.su <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SOY_UpperCanopy_PASVT", method = "rarefaction", permutations = 200)
+rowvt.su <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                      level = "SOY_UpperCanopy_ROWVT", method = "rarefaction", permutations = 200)
+yadvt.su <- accumresult(t(SbyS_filter), y = SbyE, factor = "species_leaf_site", gamma = "boot", 
+                       level = "SOY_UpperCanopy_YADVT", method = "rarefaction", permutations = 200)
+
+tiff("./figures/Accumulation Curve SOY Upper by Site.tiff", width=6, height=5, units="in", res=600)
+accumplot(yadvt.su, cex = 1, col = "#D95F02", xlim = c(0,15), labels = "YADVT")
+accumplot(pasvt.su, cex = 1, col = "#D95F02", addit = TRUE, labels = "PASVT")
+accumplot(rowvt.su, cex = 1, col = "#D95F02", addit = TRUE, labels = "ROWVT")
+accumplot(beavt.su, cex = 1, col = "#D95F02", addit = TRUE, labels = "BEAVT")
+title(main = "B) Soy")
+dev.off()
+```
+
+
+
+
+###### end

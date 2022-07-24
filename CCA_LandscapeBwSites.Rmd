@@ -1,0 +1,784 @@
+---
+title: "CCA"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+author: "Briana K. Whitaker"
+date: "`r Sys.Date()`"
+---
+\fontsize{9}{10}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning=FALSE, message=FALSE)
+```
+---
+
+
+* Run using `r version[['version.string']] `.
+
+# Objective
+This document reports on the CCA analyses from the NC Microbiome Landscapes Project, performed in the summer of 2019. 
+
+
+
+
+### 0) Load Packages, set path to data
+
+```{r, include=FALSE} 
+x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "vegan", 
+     "reshape2", "viridis", "metagMisc", "olsrr")
+#simba:liste function depreciated, replace metagMisc
+
+lapply(x, require, character.only = TRUE)
+
+#Load functions
+source("./code/fxn_blastr-bw.R")
+source("./code/blastn_code.R")
+source("./code/multiplot.function.R")
+
+#add 'not in' function
+`%nin%` = Negate(`%in%`)
+
+#set seed
+#runif(1, min = 0, max = 1000)
+set.seed(829)  # same as 3-MBLand_CommAnalyses.Rmd code
+
+# set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+
+# color palettes
+
+spp_color <- c("#E6AB02", "#D95F02", "#1B9E77", '#7570B3') 
+#gold, orange, green, purple
+#levels(sample_data(ps_filter)$species)
+#"CRN"  "SOY"  "SWCH" "WHT" 
+#https://mdigi.tools/color-shades/#a6761d
+crn_color <- c('#fed561', '#fdc422', '#dda402', '#9e7501')
+soy_color <- c('#fea561', '#fd8122', '#dd6102', '#9e4501')
+swc_color <- c('#77e8c6', '#40deaf', '#21bf90', '#178867')
+wht_color <- c('#cfcde4', '#8f8ac1', '#555096', '#2f2c53')
+
+site_color <- c(crn_color, soy_color, swc_color, wht_color)
+
+swch_color <- brewer.pal(6, "Set3")[3:6]
+
+
+
+#protected  means
+gm_mean_protected <- function(x) {
+  if (all(x == 0)) {
+    return (0)
+  }
+  exp(mean(log(x[x != 0])))
+}
+#protected means
+mean_protected <- function(x) {
+  if (all(is.na(x) == TRUE)) {
+    return (NA)
+  }
+  mean(x[is.na(x) == FALSE])
+}
+#protected sd
+sd_protected <- function(x) {
+  if (all(is.na(x) == TRUE)) {
+    return (NA)
+  }
+  sd(x[is.na(x) == FALSE])
+}
+```
+
+
+```{r, include=FALSE} 
+## Phyloseq
+load("./data/MBLand_ps_land.RData")
+ps_land #595 ASVs
+load("./data/MBLand_ps_vst.RData")
+ps_vst
+
+## DESeq2
+load("./data/MBLand_dds_land.RData")
+#rowData(dds_land)
+
+
+## VST
+SbySvst <- read.csv( "./data/MBLand_SbyS_vst_2021-11-17.csv", row.names = 1)
+dim(SbySvst)
+## Euclidean of VST
+dist.SbySvst <- stats::dist(SbySvst, method="euclidean")
+#dist.SbySvst
+
+
+## SbyE -- this version has final versions of the soil data
+SbyE0 <- read.csv("./data/MBLand_SbyE_2022-01-10.csv", 
+                 row.names = 1, stringsAsFactors = TRUE)
+dim(SbyE0)
+# for now, remove extraneous columns
+SbyE <- SbyE0 %>% dplyr::select(-Site.Sample.Order, -Field.Location, -site.rep, 
+    -OVT.Var.Entry, -variety.rep, -OVT.plot, -temp, -humid, -leaftemp.diff, -NPQt,
+    -Phi2, -PhiNO, -PhiNPQ, -PAR, -Chla, -leafthick, -LAI.ratio.type, -LAI.sd, -LAI.reps,
+    LAI.CV, -Notes)
+rownames(SbyE) <- SbyE$unique.plot
+SbyE$unique.plot <- as.factor(SbyE$unique.plot)
+dim(SbyE)
+
+
+sample_data(ps_land)$nestSite <- as.factor(paste(
+        sample_data(ps_land)$species, 
+        sample_data(ps_land)$site, sep ="-"))
+```
+
+
+
+# 1) Diversity and Landscape metrics
+
+### 1a) Landscape Metrics
+* Pull in data from Google Earth Engine analyses
+
+```{r, include=FALSE}
+gee <- read.csv("./data/MBLand_SiteData_GEE.csv", stringsAsFactors = TRUE)
+
+#merge
+SbyE_gee <- merge(SbyE, gee, by.x = "nestSite", by.y = "Species_Site", all.x = TRUE)
+```
+
+
+```{r, echo = FALSE, results = 'hide', fig.width = 8, fig.height = 4.5}
+#pdf("./figures/GEE_scale_correlations.pdf", width=8, height=4.5)
+par(mfrow = c(1,2))
+
+# % crop
+plot(Perc_crop_10km ~ Perc_crop_1km, data = gee) #
+gee1 <- lm(Perc_crop_10km ~ Perc_crop_1km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #p<0.0001
+
+# % veg
+plot(Perc_veg_10km ~ Perc_veg_1km, data = gee) 
+gee1 <- lm(Perc_veg_10km ~ Perc_veg_1km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #p=0.0002
+
+```
+
+* Examine correlations between different landscape metrics, within a set scale (e.g., 10km).
+
+```{r, echo = FALSE, results = 'hide', fig.width = 8, fig.height = 3.4}
+#pdf("./figures/GEE_landcover_correlations.pdf", width=8, height=3.4)
+par(mfrow = c(1,3))
+# 10km correlations
+plot(Perc_crop_10km ~ Perc_veg_10km, data = gee) #correlated
+gee1 <- lm(Perc_crop_10km ~ Perc_veg_10km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #p<0.0001
+plot(Perc_crop_10km ~ Perc_nonveg_10km, data = gee) #correlated
+gee1 <- lm(Perc_crop_10km ~ Perc_nonveg_10km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #NS
+plot(Perc_veg_10km ~ Perc_nonveg_10km, data = gee) #correlated
+gee1 <- lm(Perc_veg_10km ~ Perc_nonveg_10km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #NS
+```
+
+---
+
+```{r, echo = FALSE, results = 'hide', fig.width = 8, fig.height = 4.5}
+# 1km correlations
+plot(Perc_crop_1km ~ Perc_veg_1km, data = gee) #correlated
+gee1 <- lm(Perc_crop_1km ~ Perc_veg_1km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #p=0.0001
+plot(Perc_crop_1km ~ Perc_nonveg_1km, data = gee) #correlated
+gee1 <- lm(Perc_crop_1km ~ Perc_nonveg_1km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #p=0.0039
+plot(Perc_veg_1km ~ Perc_nonveg_1km, data = gee) #correlated
+gee1 <- lm(Perc_veg_1km ~ Perc_nonveg_1km, data = gee)
+abline(gee1, lty = 2, col = 'blue')
+title(paste0("Adj. R^2 = ", round(summary(gee1)$adj.r.squared*100,2)))
+anova(gee1) #NS
+
+#dev.off()
+par(mfrow = c(1,1))
+```
+
+
+### 1b) Compute Microbial dissimilarity (within sites)
+```{r,  include=FALSE}
+
+# # now convert VST-Euclid dist. matrix to numeric also, need to keep diag here because already a distance matrix
+# dist.SbySvst2 <- as.numeric(dist.SbySvst)
+# # use liste function from simba package, to get row and col name comparisons
+# vst.dist.ls <- liste(dist.SbySvst, entry = "vst.dist")
+# 
+# # function
+get.nestSite <- function(fname) strsplit(fname, "_")[[1]][1] 
+# #Create a KEY, then assign a FACTOR identity to each plant id using the key 
+# # match the sample IDs using key 
+id.key <- SbyE %>%
+   dplyr::select(unique.plot, species, nestSite, nestBlock, nestSppSiteVar)
+# 
+# ## within and between species
+# vst.dist.ls$spp.1 <- id.key$species[match(vst.dist.ls$NBX, id.key$unique.plot)]
+# vst.dist.ls$spp.2 <- id.key$species[match(vst.dist.ls$NBY, id.key$unique.plot)]
+# vst.dist.ls$spp <- as.factor(ifelse(
+#     vst.dist.ls$spp.1 == "CRN" & vst.dist.ls$spp.2 == "CRN","CRN_within", ifelse(
+#     vst.dist.ls$spp.1 == "SOY" & vst.dist.ls$spp.2 == "SOY", "SOY_within", ifelse(
+#     vst.dist.ls$spp.1 == "SWCH" & vst.dist.ls$spp.2 == "SWCH", "SWCH_within", ifelse(
+#     vst.dist.ls$spp.1 == "WHT" & vst.dist.ls$spp.2 == "WHT", "WHT_within",
+#     "between")))))
+# ## within and between sites
+# vst.dist.ls$site.1 <- id.key$nestSite[match(vst.dist.ls$NBX, id.key$unique.plot)]
+# vst.dist.ls$site.2 <- id.key$nestSite[match(vst.dist.ls$NBY, id.key$unique.plot)]
+# # function to get within site beta diversity comparisons
+# mysites <- levels(id.key$nestSite)
+# out <- list()
+# for(i in (1:length(mysites))) {
+#   mylevel <- mysites[i]
+#   sub <- vst.dist.ls[vst.dist.ls$site.1 == mylevel,]  #uneven split because of matrix
+#   sub$site <- as.factor(ifelse(
+#   sub$site.1 == mylevel & sub$site.2 == mylevel,
+#   paste(mylevel, "within", sep = "_"), "between"    ))
+#   out <- base::rbind(out, sub)
+# }
+# dim(out)
+# write.csv(out, "./data/MBLand_CommDistance_VST_spp_site.csv")
+vst.dist.ls <- read.csv("./data/MBLand_CommDistance_VST_spp_site.csv", 
+                     row.names = 1, stringsAsFactors = TRUE)
+
+detach(package:DESeq2)
+
+# remove species columns from melt dataset, focusing on sites
+vst.dist.site <- vst.dist.ls %>% dplyr::select(-spp.1, -spp.2, -spp, -site.1, -site.2)
+
+#create a means, sd, se, and ci dataset
+vst.means <- data.frame(site = c(levels(vst.dist.site$site)),
+  count = c(table(vst.dist.site$site)),
+  mean = c(tapply(vst.dist.site$vst.dist, vst.dist.site$site, mean)), 
+  sd = c(tapply(vst.dist.site$vst.dist, vst.dist.site$site, sd)) )
+# add se, ci-95%, and 95% confidence interval
+vst.means$se <- (vst.means$sd/sqrt(vst.means$count))
+vst.means$ciMult <- qt(.975, vst.means$count-1)
+vst.means$ci <- vst.means$se * vst.means$ciMult 
+vst.means$site <- as.factor(unname(sapply(as.character(vst.means$site), get.nestSite)))
+# remove the "between sites" comparisons
+vst.means2 <- vst.means[vst.means$site != 'between',]
+#make factor
+vst.means2$site <- factor(vst.means2$site)
+rownames(vst.means2) <- vst.means2$site
+
+#write.csv(vst.means2, "./data/MBLand_CommDistance_VST_means.csv")
+
+```
+
+
+# 2) Site level CCA
+* merge microbiome ASV read counts to the site level, to run site-level analyses.
+* Perform partial Constrained unimodal ordination (CCA with hypothesis testing), conditioning out latitude and longitude
+
+### 2a) Organize data for CCAs
+
+* Climate data consistently available at site level (MHT, MLT, MAP; then HT, LT, and Precip _90day).
+* But also looked at Coefficient of Variation for plot level data (soil moisture, LAI, and plant height). Generally low CV values, so asserted site-level productivity and soil moisture by taking the average for the site across varieties and plots.
+
+```{r,include=FALSE}
+### SbyE environmental matrix
+
+# looking at CV across our data we have at the plot level
+(round(tapply(SbyE$soilmoist, SbyE$nestSite, sd)/tapply(SbyE$soilmoist, SbyE$nestSite, mean),4)*100)  # Corn-Robeson has high variability
+(round(tapply(SbyE$LAI.mean, SbyE$nestSite, sd)/tapply(SbyE$LAI.mean, SbyE$nestSite, mean),4)*100)  # Soy-Pasquotank and Yadkin have high variability
+(round(tapply(SbyE$plantHt, SbyE$nestSite, sd)/tapply(SbyE$plantHt, SbyE$nestSite, mean),4)*100)  # Wheat-Rowan high variability
+# looking at CV across corn-soy soil data, only site level for wheat (missing PASVT), and no data for SWCH
+(round(tapply(SbyE$CEC, SbyE$nestSite, sd)/tapply(SbyE$CEC, SbyE$nestSite, mean),4)*100)  #very low variability
+(round(tapply(SbyE$P.soil, SbyE$nestSite, sd)/tapply(SbyE$P.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$K.soil, SbyE$nestSite, sd)/tapply(SbyE$K.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$Ca.soil, SbyE$nestSite, sd)/tapply(SbyE$Ca.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$Mg.soil, SbyE$nestSite, sd)/tapply(SbyE$Mg.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$Mn.soil, SbyE$nestSite, sd)/tapply(SbyE$Mn.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$Zn.soil, SbyE$nestSite, sd)/tapply(SbyE$Zn.soil, SbyE$nestSite, mean),4)*100) #low
+(round(tapply(SbyE$Cu.soil, SbyE$nestSite, sd)/tapply(SbyE$Cu.soil, SbyE$nestSite, mean),4)*100) #low
+
+# soil data we have for swch also
+(round(tapply(SbyE$HM_perc, SbyE$nestSite, sd)/tapply(SbyE$HM_perc, SbyE$nestSite, mean),4)*100) #bit higher, don't have CV here for SWCH, but have it in a separate column. Not able to get CV for Wheat data (maybe Ryan has)
+(round(tapply(SbyE$pH, SbyE$nestSite, sd)/tapply(SbyE$pH, SbyE$nestSite, mean),4)*100) #very low
+
+
+# looking at CV across yield data, missing WHT-PASVT and a few plots here and there, no SWCH data
+(round(tapply(SbyE$Yield, SbyE$nestSite, sd_protected)/tapply(SbyE$Yield, SbyE$nestSite, mean_protected),4)*100)  #CRN-GREVT CRN-ROBVT higher variability
+
+
+SbyE_site <- data.frame(
+    nestSite = c(levels(SbyE_gee$nestSite)),
+    # site level
+    Lat.N = c(tapply(SbyE_gee$Lat.N, SbyE_gee$nestSite, mean)),
+    Lon.W = c(tapply(SbyE_gee$Lon.W, SbyE_gee$nestSite, mean)),
+    Elev = c(tapply(SbyE_gee$Elev, SbyE_gee$nestSite, mean)),
+    Precip_90day = c(tapply(SbyE_gee$Precip_90day, SbyE_gee$nestSite, mean)),
+    LT_90day = c(tapply(SbyE_gee$LT_90day, SbyE_gee$nestSite, mean)),
+    HT_90day = c(tapply(SbyE_gee$HT_90day, SbyE_gee$nestSite, mean)),
+    MAP = c(tapply(SbyE_gee$MAP, SbyE_gee$nestSite, mean)),
+    MLT = c(tapply(SbyE_gee$MLT, SbyE_gee$nestSite, mean)),
+    MHT = c(tapply(SbyE_gee$MHT, SbyE_gee$nestSite, mean)),
+    Perc_crop_10km = c(tapply(SbyE_gee$Perc_crop_10km, SbyE_gee$nestSite, mean)),
+    Perc_crop_1km = c(tapply(SbyE_gee$Perc_crop_1km, SbyE_gee$nestSite, mean)),
+    Perc_veg_10km = c(tapply(SbyE_gee$Perc_veg_10km, SbyE_gee$nestSite, mean)),
+    Perc_veg_1km = c(tapply(SbyE_gee$Perc_veg_1km, SbyE_gee$nestSite, mean)),
+    #plot level
+    soilmoist = c(tapply(SbyE_gee$soilmoist, SbyE_gee$nestSite, mean)),
+    LAI.mean = c(tapply(SbyE_gee$LAI.mean, SbyE_gee$nestSite, mean)),
+    plantHt = c(tapply(SbyE_gee$plantHt, SbyE_gee$nestSite, mean)),
+    # mixed site and plot level, or missing, no SWCH or WHT-PASVT
+    CEC = c(tapply(SbyE_gee$CEC, SbyE_gee$nestSite, mean)),
+    HM_perc = c(tapply(SbyE_gee$HM_perc, SbyE_gee$nestSite, mean)),
+    pH = c(tapply(SbyE_gee$pH, SbyE_gee$nestSite, mean)),
+    P.soil = c(tapply(SbyE_gee$P.soil, SbyE_gee$nestSite, mean)),
+    K.soil = c(tapply(SbyE_gee$K.soil, SbyE_gee$nestSite, mean)),
+    Ca.soil = c(tapply(SbyE_gee$Ca.soil, SbyE_gee$nestSite, mean)),
+    Mg.soil = c(tapply(SbyE_gee$Mg.soil, SbyE_gee$nestSite, mean)),
+    Mn.soil = c(tapply(SbyE_gee$Mn.soil, SbyE_gee$nestSite, mean)),
+    Zn.soil = c(tapply(SbyE_gee$Zn.soil, SbyE_gee$nestSite, mean)),
+    Cu.soil = c(tapply(SbyE_gee$Cu.soil, SbyE_gee$nestSite, mean)),
+    # plot level, but with some missing values, no SWCH or WHT-PASVT
+    Yield = c(tapply(SbyE_gee$Yield, SbyE_gee$nestSite, mean_protected))
+    )
+
+# tidbits for MS
+# height and Yield correlated for sites we have that data on 
+test <- SbyE_site[,c("Yield", "plantHt", "LAI.mean")]
+test2 <- test[c("CRN-GREVT","CRN-ROBVT","CRN-ROWVT","CRN-YADVT",
+                "SOY-BEAVT","SOY-PASVT","SOY-ROWVT","SOY-YADVT",
+                "WHT-LENVT",            "WHT-ROWVT","WHT-UNIVT"),]
+cor(test2$Yield, test2$plantHt)
+#0.9622756
+summary(lm(test2$Yield ~ test2$plantHt))  #significant
+
+cor(test2$Yield, test2$LAI.mean) 
+#0.25992 # much lower
+
+SbyE_site$species <- as.factor(unname(sapply(
+  SbyE_site$nestSite,  function(x) strsplit(as.character(x), "-")[[1]][1] )) )
+tapply(SbyE_site$LAI.mean, SbyE_site$species, mean)
+#      CRN       SOY      SWCH       WHT 
+# 5.582045  6.273517 10.075545  4.896249 
+
+
+tapply(SbyE_site$Perc_veg_10km, SbyE_site$species, mean)
+#      CRN      SOY     SWCH      WHT 
+# 54.64785 48.56595 67.42175 48.13010 
+#(67.42175/mean(c(54.64785,48.56595,48.13010)))
+```
+
+
+
+
+### 2b) Microbiome PCoA @ site level
+```{r,include=FALSE}
+require(DESeq2)
+ps_land_site <- merge_samples(ps_land, "nestSite")
+
+dds_land_site <- phyloseq_to_deseq2(ps_land_site, ~ 1)
+gmMeans_land <- apply(counts(dds_land_site), 1, gm_mean_protected)
+dds_land_site <- estimateSizeFactors(dds_land_site, type = 'ratio', geoMeans = gmMeans_land)
+dds_land_site <- estimateDispersions(dds_land_site)
+#rowData(dds_land_site)
+#sizeFactors(dds_land_site)
+plotDispEsts(dds_land_site)
+SbySvst_site <- getVarianceStabilizedData(dds_land_site)
+SbySvst_site <- t(SbySvst_site) 
+dist_site <- stats::dist(SbySvst_site, method="euclidean")
+```
+
+```{r,include=FALSE}
+# make the PCoA of the microbiome
+pcoa <- cmdscale(dist_site, eig =TRUE)
+explainvar1 <- round(pcoa$eig[1] / sum(pcoa$eig), 3) * 100
+explainvar1  # 21.2
+explainvar2 <- round(pcoa$eig[2] / sum(pcoa$eig), 3) * 100 
+explainvar2  # 18.4
+explainvar3 <- round(pcoa$eig[3] / sum(pcoa$eig), 3) * 100 
+explainvar3  # 9.9
+# only two axes significant by Broken-Stick model
+plot(pcoa$eig, xlab = 'PCoA Axis', ylab = 'Eigenvalue', las=1,
+     cex.lab=1.5, pch=16, xlim=c(0,20))  
+abline(h = mean(pcoa$eig), lty=2, lwd=2,col='blue') 
+b.stick <- bstick(length(pcoa$eig), tot.var=sum(pcoa$eig))  
+lines(1:length(pcoa$eig), b.stick, type="l", lty=4, lwd=2, col='red') 
+legend("topright", legend=c("Avg. Eigenvalue", "Broken Stick"), lty=c(2,4), bty="n", col=c("blue", "red"))
+
+# create dataframes for use in plots
+PCoAscores <- as.data.frame(pcoa$points)
+PCoAscores$ids <- rownames(PCoAscores) 
+#merge the temporary and SbyE dataframes
+pcoa.dat <- merge(PCoAscores, SbyE_site, by.x="ids",
+                  by.y="nestSite")
+```
+
+* Matches all plots PcoA visual
+
+```{r, echo = FALSE}
+# PCoA plot, for site-level microbiome
+PCoA_sitelevel <- ggplot() + coord_equal() + 
+    geom_point(data = pcoa.dat, aes(x = V1, y = V2, 
+          color = factor(ids)) , size = 3) +
+    scale_colour_manual("", values = site_color) +
+    scale_x_continuous(paste("PCoA 1 (", explainvar1, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", explainvar2, "%)", sep = "")) +
+    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 12),
+         legend.text=element_text(size=10), legend.title=element_text(size=12),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom")
+
+#tiff("./figures/PCoA_SiteLevel.tiff", width=6, height=6, units="in", res=600)
+PCoA_sitelevel
+#dev.off()
+
+```
+
+### 2c) Organize & Examine VIFs
+
+```{r, include=FALSE}
+# SbyE, drop high interannual variability soil measures, and WHT-PASVT
+SbyE_site_sub <- SbyE_site %>% 
+  dplyr::select(-CEC, -P.soil, -K.soil, -Ca.soil, -Mg.soil,
+                -Mn.soil, -Zn.soil, -Cu.soil, -Yield) %>%
+  filter(nestSite != 'WHT-PASVT')
+#geog
+SbyE_site_geog <- as.matrix(SbyE_site_sub[,2:3])
+```
+
+```{r, include=FALSE}
+# make SbyS
+ps_land_site2 <- subset_samples(ps_land_site, 
+                             sample_names(ps_land_site) != "WHT-PASVT")
+ps_land_site2 <- filter_taxa(ps_land_site2, function(x) sum(x) > 0, TRUE)
+#592  taxa across 15 samples
+dds_land_site2 <- phyloseq_to_deseq2(ps_land_site2, ~ 1)
+gmMeans_land2 <- apply(counts(dds_land_site2), 1, gm_mean_protected)
+dds_land_site2 <- estimateSizeFactors(dds_land_site2, type = 'ratio', geoMeans = gmMeans_land2)
+dds_land_site2 <- estimateDispersions(dds_land_site2)
+#rowData(dds_land_site2)
+#sizeFactors(dds_land_site2)
+plotDispEsts(dds_land_site2)
+SbySvst_site2 <- getVarianceStabilizedData(dds_land_site2)
+SbySvst_site2 <- t(SbySvst_site2) 
+
+range(SbySvst_site2)  #-4.932503 15.220863
+SbySvst_site_tr <- SbySvst_site2+5
+
+```
+
+#### Examine VIFs
+```{r, include=FALSE}
+#names(SbyE_site_sub)
+#"nestSite"       "Lat.N"         "Lon.W"          "Elev"          
+#"Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
+#"MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km" 
+#"Perc_veg_10km"  "Perc_veg_1km"  "soilmoist"      "LAI.mean"      
+#"plantHt"        "HM_perc"       "pH"
+
+# ## evaluate VIF -- test correlaaitons more rigorously
+# # starting option 1
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,20)]))
+# vif(M) #failed
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9,20)])) #remove MLT
+# vif(M) #failed
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9:10,20)])) #remove MHT
+# vif(M)   #Perc_crop_1km highest
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9:10,12,20)])) #remove Perc_crop_1km
+# vif(M)   #Perc_veg_1km highest
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9:10,12,14,20)])) #remove Perc_veg_1km
+# vif(M)   #Perc_veg_10km >10
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9:10,12:14,20)])) #remove Perc_veg_10km
+# vif(M)   # Elev >5 (=5.3)
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,4,9:10,12:14,20)])) #remove Elev
+# vif(M) # all <5, HM_perc ~4
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,4,9:10,12:14,18,20)])) #remove HM_perc
+# vif(M) # Perc_crop_10km 2.5
+# M <- lm(LT_90day ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,4,9:10,11,12:14,18,20)])) #remove Perc_crop_10km
+# vif(M) # all <2
+# #Precip_90day, HT_90day, MAP , soilmoist, LAI.mean, plantHt, pH
+# 
+# # option 2
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,20)]))
+# vif(M) #failed
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9,20)])) #remove MLT
+# vif(M) #failed
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9,20)])) #remove LT_90day
+# vif(M) #Perc_veg_1km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9,14,20)])) #remove Perc_veg_1km
+# vif(M) #MHT highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9:10,14,20)])) #remove MHT
+# vif(M) #Perc_crop_1km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9:10,12,14,20)])) #remove Perc_crop_1km
+# vif(M) #Perc_veg_10km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9:10,12:14,20)])) #remove Perc_veg_10km
+# vif(M) # HM_perc ~4
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9:10,12:14,18,20)])) #remove HM_perc
+# vif(M) # Perc_crop_10km = 2.5
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,6,9:10,11,12:14,18,20)])) #remove Perc_crop_10km
+# vif(M) # all <2
+# #Precip_90day, HT_90day, MAP, soilmoist, LAI.mean, plantHt, pH 
+# 
+# 
+# #--- alternative to removing LT_90day at 3rd step, remove HT_90day
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,20)])) #remove HT_90day
+# vif(M) #Perc_veg_1km still highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
+# vif(M) # MHT highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,14,20)])) #remove MHT
+# vif(M) #Perc_crop_1km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,12,14,20)])) #remove Perc_crop_1km
+# vif(M) #HM_perc highest at 6.95, but Perc_veg_10km not far off at 6.89
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,12,14,18,20)])) #remove HM_perc 
+# vif(M) #Perc_crop_10km
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,11,12,14,18,20)])) #Perc_crop_10km 
+# vif(M) #all <2
+# #Precip_90day, LT_90day, MAP, Perc_veg_10km, soilmoist, LAI.mean, plantHt, pH 
+
+
+# # note, you can either have LT_90day or HT_90day but not both in the final set of vrbls
+
+```
+
+
+### 2d) Climate, Plant, Soil, & Landcover combo CCA
+```{r, include=FALSE}
+# make SbyE for CCA
+SbyE_site_sub2 <- as.matrix(SbyE_site_sub[,-c(1:3,4,7,9:12,14,18,20)])
+head(SbyE_site_sub2)
+#Precip_90day, LT_90day, MAP, Perc_veg_10km, soilmoist, LAI.mean, plantHt, pH
+
+
+# perform CCA
+all_cca <- vegan::cca(SbySvst_site_tr ~ SbyE_site_sub2 + Condition(SbyE_site_geog))
+
+# Permutation test for cca under reduced model (Marginal tests for axes)
+#anova(all_cca, by = "axis", permutations = (nperm=999))    
+# CC1 signif, CC2 semi-signif
+
+#permutation test for the constrained ordination
+all_cca_fit <- envfit(all_cca, SbyE_site_sub2, perm = 999) 
+all_cca_fit #LT_90day,Perc_veg_10km, LAI.mean, plantHt all significant
+
+# permutation test for cca under null model
+anova(all_cca, by = "mar", permutations = 999)
+#significant 0.004
+
+#constrained eigs divided by sum of constrained + unconstrained/residual eigs
+explain_all <- round(all_cca$CCA$eig/sum(c(all_cca$CCA$eig,all_cca$CA$eig)),3)*100
+explain_all
+#CCA1 CCA2 CCA3 CCA4 CCA5 CCA6 CCA7 CCA8 CCA9 
+#18.8 15.6  9.1  8.3  7.1  6.4  5.4  4.5
+
+# dataframe of weighted average sample scores
+all_cca_x <- data.frame(scores(all_cca, display = "wa"))
+all_cca_x$nestSite <- rownames(all_cca_x)
+
+# dataframe of environmental vectors
+all_cca_vec <- data.frame(scores(all_cca, display = "bp"))
+rownames(all_cca_vec) <- c(colnames(SbyE_site_sub2))
+all_cca_vec$vecs <- rownames(all_cca_vec)
+all_cca_vec
+```
+
+
+### 2e) Figure
+```{r, include=FALSE}
+
+cca_sig <- c('LT_90day', 'LAI.mean', 'plantHt', 'Perc_veg_10km')
+all_cca_vec_sig <- all_cca_vec[all_cca_vec$vecs %in% cca_sig, ]
+
+# figure
+CCA_site_all2 <- ggplot() + coord_equal() + 
+    geom_point(data = all_cca_x, aes(x =  CCA1, y =  CCA2, 
+          color = factor(nestSite)) , size = 3) +
+    geom_segment(data = all_cca_vec_sig, 
+                 aes(x = 0, xend = CCA1, y = 0, yend = CCA2),
+                 arrow = arrow(length = unit(0.25, "cm")), size = 0.8,
+                 colour = "gray30", linetype = 1 ) +
+    geom_text(data = all_cca_vec_sig,
+          aes(x = c(0.40+.36, 0.71+.57, 0.76+.36, 0.19-.32),
+              y = c(0.80,  0.04-.04, 0.11+.04, 0.69), label = vecs),
+                 size = 4, colour = "gray30", fontface = 'bold') +
+    scale_colour_manual("", values = site_color[c(1:13,15:16)]) +
+    scale_x_continuous(paste("CCA Axis-1 (", explain_all[1], "%)", sep = "")) +
+    scale_y_continuous(paste("CCA Axis-2 (", explain_all[2], "%)", sep = "")) +
+    guides(colour=guide_legend(ncol=4)) +
+    theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
+          panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
+          axis.title = element_text(size = 12),
+          legend.text=element_text(size=10), legend.title=element_text(size=12),
+          legend.background = element_rect(colour = NA, fill = NA),
+          legend.position = "bottom") 
+
+#tiff("./figures/CCA_all2_SiteLevel.tiff", width=6, height=6, units="in", res=600)
+CCA_site_all2
+#dev.off()
+```
+
+
+
+# 3) Average Between Site dissimilarity & GEE data
+
+
+
+### 3a) Get Between-site dissimilarity calculations
+
+```{r, echo = FALSE, results = 'hide', fig.height= 8, fig.width  = 7.5}
+dist_site_ls <- dist2list(dist_site, tri = TRUE)
+## dist_site_ls <- liste(dist_site, entry = "vst.dist")  ## NOTE simba::liste and simba depreciated
+
+dist_site_ls$crop10X <- SbyE_site$Perc_crop_10km[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$crop10Y <- SbyE_site$Perc_crop_10km[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$crop10 <- abs(dist_site_ls$crop10X - dist_site_ls$crop10Y)
+
+dist_site_ls$veg10X <- SbyE_site$Perc_veg_10km[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$veg10Y <- SbyE_site$Perc_veg_10km[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$veg10 <- abs(dist_site_ls$veg10X - dist_site_ls$veg10Y)
+
+dist_site_ls$crop1X <- SbyE_site$Perc_crop_1km[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$crop1Y <- SbyE_site$Perc_crop_1km[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$crop1 <- abs(dist_site_ls$crop1X - dist_site_ls$crop1Y)
+
+dist_site_ls$veg1X <- SbyE_site$Perc_veg_1km[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$veg1Y <- SbyE_site$Perc_veg_1km[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$veg1 <- abs(dist_site_ls$veg1X - dist_site_ls$veg1Y)
+
+dist_site_ls %>% dplyr::select(-crop10X, -crop10Y, -veg10X, -veg10Y, 
+                               -crop1X, -crop1Y, -veg1X, -veg1Y) -> dist_site_ls
+```
+
+### 3b) Figures - all 4 landacape vrbls
+```{r, echo = FALSE, results = 'hide', fig.height= 8, fig.width  = 7.5}
+p5 <- ggplot(dist_site_ls, aes(x = crop10, y = value)) +
+  geom_point(size = 2, color = '#666666') +
+  geom_smooth(aes(x = crop10, y = value), method=lm, formula = y ~ x, 
+              se = TRUE, color = '#666666', linetype = 'dashed') +
+  scale_y_continuous(" ") +
+  scale_x_continuous("\n") +
+  theme(legend.position="none") +
+  annotate(geom = "text", x = 48, y = 168, label = "B)")
+p6 <- ggplot(dist_site_ls, aes(x = veg10, y = value)) +
+  geom_point(size = 2, color = '#666666') +
+  geom_smooth(aes(x = veg10, y = value), method=lm, formula = y ~ x, 
+              se = TRUE, color = '#666666', linetype = 'dashed') +
+  scale_y_continuous("Dissimilarity Between Sites") +
+  scale_x_continuous("\n") +
+  theme(legend.position="none") +
+  annotate(geom = "text", x = 42.5, y = 168, label = "A)")
+p7 <- ggplot(dist_site_ls, aes(x = crop1, y = value)) +
+  geom_point(size = 2, color = '#E7298A') +
+  geom_smooth(aes(x = crop1, y = value), method=lm, formula = y ~ x, 
+              se = TRUE, color = '#E7298A', linetype = 'dashed') +
+  scale_y_continuous(" ") +
+  scale_x_continuous("Net Difference in\n% Cropland Between Sites") +
+  theme(legend.position="none") +
+  annotate(geom = "text", x = 82, y = 168, label = "D)")
+p8 <- ggplot(dist_site_ls, aes(x = veg1, y = value)) +
+  geom_point(size = 2, color = '#E7298A') +
+  geom_smooth(aes(x = veg1, y = value), method=lm, formula = y ~ x, 
+              se = TRUE, color = '#E7298A', linetype = 'dashed') +
+  scale_y_continuous("Dissimilarity Between Sites") +
+  scale_x_continuous("Net Difference in\n% Vegetation Between Sites") +
+  theme(legend.position="none") +
+  annotate(geom = "text", x = 51, y = 168, label = "C)")
+
+#tiff("./figures/BetaDiv_BwSites_Perc_Crop_Veg.tiff", width=8, height=7.5, units="in", res=600)
+multiplot(p6, p5, p8, p7, cols=2)
+#dev.off()
+```
+
+### 3c) OLS models
+```{r}
+# best subsets approach
+BW1 <- lm(value ~ crop10 + veg10 + crop1 + veg1, data=dist_site_ls)
+
+olsrr::ols_plot_resid_fit(BW1)
+
+olsrr::ols_test_normality(BW1) 
+
+olsrr::ols_test_breusch_pagan(BW1, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(BW1)
+
+# VIFs 2-4
+# Redefine model with worst variable dropped
+BW2 <- lm(value ~ crop10 + veg10 + veg1, data=dist_site_ls)
+olsrr::ols_coll_diag(BW2)
+# VIFs 2-4
+# drop next worst variable
+BW3 <- lm(value ~ crop10 + veg1, data=dist_site_ls)
+olsrr::ols_coll_diag(BW3)
+
+# VIFs < 2 !
+
+olsrr::ols_step_best_subset(BW3)
+
+# best model based on AIC, C(p) has only Perc_veg_1km; but in general Adj. R2 still bad
+
+# run simple linear regression on best model to get P value
+olsrr::ols_regress(value ~ veg1, data=dist_site_ls)   #p = 0.0322
+
+# contrast to P value for model3
+olsrr::ols_regress(BW3)
+```
+
+### 3d) Figure for Supps
+```{r, echo = FALSE, results = 'hide', fig.height= 8, fig.width  = 7.5}
+bwSite <- ggplot(dist_site_ls, aes(x = veg1, y = value)) +
+  geom_point(size = 2, color = '#666666') +
+  geom_smooth(aes(x = veg1, y = value), method=lm, formula = y ~ x, 
+              se = TRUE, color = '#666666', linetype = 1) +
+  scale_y_continuous("Dissimilarity Between Sites", limits = c(0,172)) +
+  scale_x_continuous("Net Difference in\n% Vegetation Between Sites (1-km)") +
+  theme(legend.position="none")
+
+#tiff("./figures/BetaDiv_BwSites_Perc_Veg.tiff", width=4.5, height=4, units="in", res=600)
+bwSite
+#dev.off()
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###### end
