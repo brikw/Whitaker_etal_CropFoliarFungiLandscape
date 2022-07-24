@@ -1,0 +1,7 @@
+#
+# Alias file created 10/14/2020 14:41:10
+#
+TITLE My plant and fungal DB
+DBLIST "/Users/brianawhitaker/Documents/2019-MBLand/db/fungal_db/sh_general_release_dynamic_02.02.2019.fasta" "/Users/brianawhitaker/Documents/2019-MBLand/db/allPlants_db/allPlants.fasta" 
+NSEQ 35715
+LENGTH 19776643

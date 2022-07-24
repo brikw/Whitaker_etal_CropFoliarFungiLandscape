@@ -1,0 +1,116 @@
+//================================================ DATA LAYERS ===========================================================
+//Import USDA NASS Cropland Data Layers
+//Year 2019, 30m resolution
+var CDL = ee.ImageCollection('USDA/NASS/CDL')
+                  .filter(ee.Filter.date('2019-01-01', '2019-12-31')) //2019
+                  .first();
+
+//alternative
+var geometry = ee.Geometry.Point([-76.252579, 36.262307]); //replace for each site; and for each crop, change crop layers used for % same crop
+var geom10 = geometry.buffer(10000) //manually replace 10000, 5000, 1000 km
+
+print(geometry)
+
+
+Map.addLayer(geom10,{},'10km Buffer Zone', false)//Adds the buffer to the Map
+Map.centerObject(geom10,11)//Centers the Map to the buffer at zoom level 11 out of [1,24]
+Map.setOptions('ROADMAP'); //either ROADMAP, SATELLITE, HYBRID, TERRAIN
+
+
+//================================================ CROPLAND ANALYSES ===========================================================
+//filtering image to include all images that intersect field
+var CDLfilter = CDL.clip(geom10);
+// create new variables defining crop landcover and cultivated land inside the filtered geom location
+var cropLandcover = CDLfilter.select('cropland');
+var cropCultivated = CDLfilter.select('cultivated').eq(2); //Value 2 is cultivated
+Map.addLayer(cropLandcover, {}, 'Crop Landcover', false);
+Map.addLayer(cropCultivated, {}, 'Crop Cultivation', false);
+
+
+
+//=========== Calculate % cultivated (jsut to double check things look okay)
+
+// class 1 is non-cultivated, calss 2 is cultivated
+// Calculate percentage cultivated area
+var feature_area = ee.Feature(geom10).geometry().area();
+/*//scale (get the pixel resolution) the projection
+var scl = ee.Number(ee.Image(cropCultivated).select('cultivated').projection().nominalScale())
+var img_area = (ee.Image(cropCultivated).reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom10,
+    'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':scl }))
+var overlap_perc = ee.Number(img_area.get('cultivated')).multiply(scl).multiply(scl).divide(feature_area).multiply(100).format('%.4f')
+print('Percent Cultivated', overlap_perc)
+*/
+
+
+//===== Calculate % landcover that is oceans
+//////////==== NOTE - ocean landcover only messes up the calculations for % non-crop/non-vegetation for two sites, SOY-BEAVT and SOY-PASVT
+
+//print('feature_area', feature_area);
+var oceanLayer = cropLandcover.neq(0);
+Map.addLayer(oceanLayer, {}, 'oceanlayer', false);
+var oceanmasked = cropLandcover.updateMask(oceanLayer);
+Map.addLayer(oceanmasked, {}, 'oceanmasked', false);       
+var ocean_scl = ee.Number(ee.Image(oceanLayer).select('cropland').projection().nominalScale());
+var non_ocean_area = (ee.Image(oceanLayer).reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom10,
+    'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':ocean_scl }));
+var non_ocean_perc = ee.Number(non_ocean_area.get('cropland')).multiply(ocean_scl).multiply(ocean_scl).divide(feature_area).multiply(100)//.format('%.4f');
+var ocean_perc = ee.Number(100).subtract(ee.Number(non_ocean_perc));
+print('% Ocean', ocean_perc)
+
+
+//=========== Calculate % cultivated lands using manual allocation of band values
+
+var singleCDLbands = cropLandcover.select('cropland') //CDLfilter.select('cropland')
+            .remap([1,2,3,4,5,6,10,11,12,13,14,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,66,67,68,69,70,71,72,74,75,76,77,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,254], [1,2,3,4,5,6,10,11,12,13,14,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,66,67,68,69,70,71,72,74,75,76,77,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,254], 0)
+            .rename('mycropland')
+//Create a mask layer where you only want pixels where value is not 0
+var single_mask = singleCDLbands.neq(0);  //neq means 'not equal to'
+//Mask your dataset to remove the 0 values or crop types you are not interested in from earlier
+var singleCDLmasked = singleCDLbands.updateMask(single_mask);
+Map.addLayer(singleCDLmasked, {}, 'Masked - crops', false);            
+//scale (get the pixel resolution) the projection
+var single_scl = ee.Number(ee.Image(single_mask).select('mycropland').projection().nominalScale())
+var single_img_area = (ee.Image(single_mask).select('mycropland').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom10,
+    'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':single_scl }))
+var single_perc = ee.Number(single_img_area.get('mycropland')).multiply(single_scl).multiply(single_scl).divide(feature_area).multiply(100).format('%.4f')
+print('My Percent Cultivated', single_perc)
+
+
+
+//=========== Calculate % non-crop but vegetative lands
+
+
+var vegCDLbands = cropLandcover.select('cropland') //CDLfilter.select('cropland')
+            .remap([61,63,64,141,142,143,152,176,190,195], [61,63,64,141,142,143,152,176,190,195], 0)
+            .rename('myveg')
+//Create a mask layer where you only want pixels where value is not 0
+var veg_mask = vegCDLbands.neq(0);  //neq means 'not equal to'
+//Mask your dataset to remove the 0 values or values you are not interested in
+var vegCDLmasked = vegCDLbands.updateMask(veg_mask);
+Map.addLayer(vegCDLmasked, {}, 'Masked vegetation', false);            
+//scale (get the pixel resolution) the projection
+var veg_scl = ee.Number(ee.Image(veg_mask).select('myveg').projection().nominalScale())
+var veg_img_area = (ee.Image(veg_mask).select('myveg').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom10,
+    'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':veg_scl }))
+var veg_perc = ee.Number(veg_img_area.get('myveg')).multiply(veg_scl).multiply(veg_scl).divide(feature_area).multiply(100).format('%.4f')
+print('My Percent non-crop vegetative', veg_perc)
+
+
+//=========== Calculate % non-crop/non-vegetative 'urban'/'non-source' lands
+
+
+var nonvegCDLbands = cropLandcover.select('cropland') //CDLfilter.select('cropland')
+            .remap([65,81,82,83,87,88,92,111,112,121,122,123,124,131], [65,81,82,83,87,88,92,111,112,121,122,123,124,131], 0)
+            .rename('mynonveg')
+//Create a mask layer where you only want pixels where value is not 0
+var nonveg_mask = nonvegCDLbands.neq(0);  //neq means 'not equal to'
+//Mask your dataset to remove the 0 values or crop types you are not interested in from earlier
+var nonvegCDLmasked = nonvegCDLbands.updateMask(nonveg_mask);
+Map.addLayer(nonvegCDLmasked, {}, 'Masked non-Vegetation', false);            
+//scale (get the pixel resolution) the projection
+var nonveg_scl = ee.Number(ee.Image(nonveg_mask).select('mynonveg').projection().nominalScale())
+var nonveg_img_area = (ee.Image(nonveg_mask).select('mynonveg').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom10,
+    'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':nonveg_scl }))
+var nonveg_perc = ee.Number(nonveg_img_area.get('mynonveg')).multiply(nonveg_scl).multiply(nonveg_scl).divide(feature_area).multiply(100).format('%.4f')
+print('My Percent non-source', nonveg_perc)
+
