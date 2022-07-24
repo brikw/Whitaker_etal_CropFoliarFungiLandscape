@@ -1,0 +1,611 @@
+,asv,direction,domain,conf.d,phylum,conf.p,class,conf.c,order,conf.o,family,conf.f,genus,conf.g,species,conf.s,num
+ASV3,ASV3,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Davidiella,100,,25,3
+ASV6,ASV6,+,Fungi,100,Ascomycota,97,,53,,46,,41,,29,,28,6
+ASV7,ASV7,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporales_Incertae sedis,98,Phoma,98,,68,7
+ASV8,ASV8,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Alternaria,100,Alternaria alternata,73,8
+ASV12,ASV12,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,100,Sporidiobolus,100,Sporobolomyces ruberrimus,94,12
+ASV13,ASV13,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,,22,13
+ASV14,ASV14,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporales_Incertae sedis,87,Phoma,87,,64,14
+ASV15,ASV15,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,Uwebraunia commune,99,15
+ASV16,ASV16,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,Mycosphaerella lateralis,82,16
+ASV17,ASV17,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Davidiella,100,Davidiella macrospora,74,17
+ASV19,ASV19,+,Fungi,100,Ascomycota,83,Dothideomycetes,72,Pleosporales,72,,18,,18,,11,19
+ASV20,ASV20,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,100,,69,,28,20
+ASV21,ASV21,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporales_Incertae sedis,100,Phoma,100,Phoma paspali,100,21
+ASV22,ASV22,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,99,Sporidiobolus,99,,61,22
+ASV24,ASV24,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,98,Phaeosphaeriaceae,84,,59,,59,24
+ASV25,ASV25,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Cystofilobasidiales,100,Cystofilobasidiaceae,100,Udeniomyces,100,Udeniomyces megalosporus,100,25
+ASV26,ASV26,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,95,Phaeosphaeria,95,Phaeosphaeria sp 1 MM_2012,78,26
+ASV27,ASV27,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,100,Sporidiobolus,100,Sporidiobolus pararoseus,100,27
+ASV28,ASV28,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,,61,28
+ASV29,ASV29,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,,64,,64,29
+ASV30,ASV30,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,96,Phaeosphaeriopsis,94,Phaeosphaeria oryzae,90,30
+ASV31,ASV31,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,Mycosphaerella lateralis,96,31
+ASV32,ASV32,+,Fungi,100,Ascomycota,79,,11,,6,,6,,6,,6,32
+ASV33,ASV33,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,94,Phaeosphaeria,94,Phaeosphaeria sp 1 MM_2012,82,33
+ASV34,ASV34,+,Fungi,100,Basidiomycota,98,Exobasidiomycetes,89,Entylomatales,77,Entylomataceae,77,Entyloma,77,,49,34
+ASV35,ASV35,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellales_Incertae sedis,98,Hannaella,97,Hannaella oryzae,97,35
+ASV36,ASV36,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus magnus,99,36
+ASV38,ASV38,+,Fungi,100,Ascomycota,95,Dothideomycetes,77,Capnodiales,77,,21,,21,,21,38
+ASV39,ASV39,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,,25,39
+ASV40,ASV40,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,99,Sporidiobolus,99,Sporobolomyces ruberrimus,73,40
+ASV41,ASV41,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellaceae,97,Cryptococcus,97,Cryptococcus luteolus,97,41
+ASV42,ASV42,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Hannaella,100,Hannaella zeae,100,42
+ASV43,ASV43,+,Fungi,100,Ascomycota,98,Dothideomycetes,95,Pleosporales,93,Pleosporaceae,78,,60,,53,43
+ASV44,ASV44,+,Fungi,100,Basidiomycota,97,Exobasidiomycetes,85,,66,,66,,66,,36,44
+ASV45,ASV45,+,Fungi,100,,63,,27,,27,,27,,12,,11,45
+ASV46,ASV46,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,97,Epicoccum,97,Epicoccum sorghi,97,46
+ASV47,ASV47,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Bullera,100,Cryptococcus cellulolyticus,79,47
+ASV48,ASV48,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,Mycosphaerellaceae,99,Mycosphaerella,91,,65,48
+ASV49,ASV49,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,100,Leptosphaerulina,100,Leptosphaerulina chartarum,100,49
+ASV50,ASV50,+,Fungi,100,Ascomycota,94,Dothideomycetes,92,Pleosporales,91,Pleosporaceae,77,,63,,56,50
+ASV51,ASV51,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Phaeosphaeriopsis,100,Phaeosphaeria oryzae,89,51
+ASV52,ASV52,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,90,,48,52
+ASV54,ASV54,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,100,,69,,25,54
+ASV55,ASV55,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,92,Phaeosphaeria,92,Phaeosphaeria sp 1 MM_2012,77,55
+ASV56,ASV56,+,Fungi,100,Ascomycota,97,Dothideomycetes,95,Pleosporales,95,Phaeosphaeriaceae,87,Phaeosphaeriopsis,81,Phaeosphaeria oryzae,81,56
+ASV57,ASV57,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,100,Dioszegia zsoltii,85,57
+ASV58,ASV58,+,Fungi,100,Ascomycota,81,Dothideomycetes,77,Pleosporales,73,,47,,32,,16,58
+ASV59,ASV59,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Hyponectriaceae,100,Monographella,84,Monographella albescens,84,59
+ASV60,ASV60,+,Fungi,100,Ascomycota,78,Dothideomycetes,70,,68,,38,,24,,20,60
+ASV61,ASV61,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces coprosmae,93,61
+ASV63,ASV63,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,94,Fusarium equiseti,80,63
+ASV64,ASV64,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,97,Phaeosphaeria,97,Phaeosphaeria sp 1 MM_2012,81,64
+ASV65,ASV65,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Bullera,100,Bullera penniseticola,100,65
+ASV66,ASV66,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,99,Phaeosphaeria,99,Phaeosphaeria sp 1 MM_2012,92,66
+ASV67,ASV67,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,Sporobolomyces yunnanensis,100,67
+ASV68,ASV68,+,Fungi,100,,23,,21,,19,,19,,19,,14,68
+ASV69,ASV69,+,Fungi,100,Ascomycota,94,Dothideomycetes,92,Pleosporales,91,Pleosporaceae,78,,65,,59,69
+ASV70,ASV70,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Pseudozyma,100,,65,70
+ASV72,ASV72,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,99,Fusarium cerealis,80,72
+ASV73,ASV73,+,Fungi,100,Ascomycota,95,Dothideomycetes,83,Capnodiales,83,,46,,38,,15,73
+ASV74,ASV74,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Davidiella,99,,59,74
+ASV75,ASV75,+,Fungi,100,Ascomycota,78,Dothideomycetes,72,,63,,37,,13,,13,75
+ASV76,ASV76,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideales,100,Dothioraceae,100,Kabatiella,100,,42,76
+ASV77,ASV77,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellaceae,98,Cryptococcus,98,,68,77
+ASV78,ASV78,+,Fungi,100,Basidiomycota,99,Tremellomycetes,97,Tremellales,97,Tremellales_Incertae sedis,97,Hannaella,96,Hannaella coprosmaensis,76,78
+ASV79,ASV79,+,Fungi,100,Basidiomycota,98,Tremellomycetes,93,Tremellales,93,Tremellales_Incertae sedis,93,Bullera,91,Bullera variabilis,91,79
+ASV80,ASV80,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Hannaella,100,Hannaella coprosmaensis,100,80
+ASV81,ASV81,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,98,Phaeosphaeriopsis,98,Phaeosphaeria oryzae,91,81
+ASV82,ASV82,+,Fungi,100,,63,,17,,17,,10,,9,,8,82
+ASV83,ASV83,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Phaeosphaeria,100,,52,83
+ASV84,ASV84,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellales_Incertae sedis,99,Kockovaella,95,,36,84
+ASV85,ASV85,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Cystofilobasidiales,100,Cystofilobasidiaceae,100,Udeniomyces,100,Udeniomyces pyricola,100,85
+ASV86,ASV86,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Pseudozyma,100,Pseudozyma aphidis,90,86
+ASV87,ASV87,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus victoriae,100,87
+ASV89,ASV89,+,Fungi,100,Basidiomycota,98,Tremellomycetes,98,Tremellales,98,Tremellales_Incertae sedis,96,Kockovaella,91,,37,89
+ASV90,ASV90,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces vermiculatus,90,90
+ASV91,ASV91,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Hannaella,100,Hannaella sinensis,100,91
+ASV92,ASV92,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,98,Phaeosphaeria,98,Phaeosphaeria herpotrichoides,93,92
+ASV93,ASV93,+,Fungi,100,Basidiomycota,100,Tremellomycetes,99,Tremellales,99,Tremellales_Incertae sedis,99,Hannaella,98,Hannaella sinensis,98,93
+ASV94,ASV94,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Dissoconium,100,Dissoconium aciculare,88,94
+ASV95,ASV95,+,Fungi,100,Ascomycota,76,Dothideomycetes,70,,68,,41,,24,,22,95
+ASV96,ASV96,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,98,Phaeosphaeriaceae,84,,59,,59,96
+ASV97,ASV97,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus aureus,99,97
+ASV98,ASV98,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus oeirensis,100,98
+ASV99,ASV99,+,Fungi,100,Ascomycota,93,,65,,65,,46,,38,,21,99
+ASV100,ASV100,+,Fungi,100,Ascomycota,94,Dothideomycetes,92,Pleosporales,91,Pleosporaceae,78,,65,,59,100
+ASV101,ASV101,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellales_Incertae sedis,99,Hannaella,99,,53,101
+ASV102,ASV102,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Ophiosphaerella,100,Ophiosphaerella agrostis,100,102
+ASV103,ASV103,+,Fungi,100,Ascomycota,97,Dothideomycetes,95,Pleosporales,95,Phaeosphaeriaceae,94,Phaeosphaeriopsis,90,Phaeosphaeria oryzae,89,103
+ASV104,ASV104,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,100,Leptosphaerulina,82,Leptosphaerulina australis,82,104
+ASV105,ASV105,+,Fungi,100,Basidiomycota,99,Exobasidiomycetes,87,Entylomatales,77,Entylomataceae,77,Entyloma,77,,40,105
+ASV106,ASV106,+,Fungi,100,Basidiomycota,99,Tremellomycetes,92,Tremellales,91,Tremellales_Incertae sedis,91,Hannaella,90,,64,106
+ASV107,ASV107,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Dissoconium,100,Dissoconium aciculare,99,107
+ASV108,ASV108,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,98,Phaeosphaeriopsis,89,Phaeosphaeria oryzae,86,108
+ASV109,ASV109,+,Fungi,100,Basidiomycota,99,Tremellomycetes,97,Tremellales,97,Tremellales_Incertae sedis,96,Hannaella,96,Hannaella oryzae,96,109
+ASV110,ASV110,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,Mycosphaerellaceae,96,,36,,18,110
+ASV111,ASV111,+,Fungi,100,Ascomycota,94,,34,,34,,34,,30,,22,111
+ASV112,ASV112,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,99,Dioszegia hungarica,97,112
+ASV113,ASV113,+,Fungi,100,Ascomycota,98,Dothideomycetes,95,Pleosporales,95,Phaeosphaeriaceae,94,Phaeosphaeriopsis,86,Phaeosphaeria oryzae,83,113
+ASV114,ASV114,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Auriculibuller,100,Auriculibuller fuscus,100,114
+ASV115,ASV115,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,,57,,29,,29,115
+ASV117,ASV117,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Bullera,100,Bullera penniseticola,100,117
+ASV118,ASV118,+,Fungi,100,Ascomycota,95,Dothideomycetes,93,Pleosporales,89,,35,,34,,33,118
+ASV119,ASV119,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,,57,119
+ASV120,ASV120,+,Fungi,100,,67,,29,,25,,8,,8,,8,120
+ASV121,ASV121,+,Fungi,100,Ascomycota,79,,61,,44,,30,,30,,30,121
+ASV122,ASV122,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,94,Exobasidiomycetidae_Incertae sedis,94,Tilletiopsis,94,Tilletiopsis pallescens,94,122
+ASV123,ASV123,+,Fungi,100,Basidiomycota,99,Tremellomycetes,95,Tremellales,95,Tremellales_Incertae sedis,95,Bullera,93,Bullera variabilis,93,123
+ASV125,ASV125,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,,60,,32,125
+ASV127,ASV127,+,Fungi,100,Ascomycota,94,Dothideomycetes,86,Pleosporales,86,,49,,46,,29,127
+ASV128,ASV128,+,Fungi,100,Basidiomycota,98,Exobasidiomycetes,85,Entylomatales,71,Entylomataceae,71,Entyloma,71,,28,128
+ASV129,ASV129,+,Fungi,100,Ascomycota,86,Dothideomycetes,73,Pleosporales,73,,23,,23,,18,129
+ASV130,ASV130,+,Fungi,100,Ascomycota,88,Dothideomycetes,84,Pleosporales,83,Phaeosphaeriaceae,75,,24,,24,130
+ASV131,ASV131,+,Fungi,100,Ascomycota,93,Dothideomycetes,74,,69,,51,,51,,51,131
+ASV132,ASV132,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,99,Plectosphaerellaceae,99,Plectosphaerella,96,,28,132
+ASV133,ASV133,+,Fungi,100,Ascomycota,92,,60,,57,,42,,37,,17,133
+ASV134,ASV134,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,99,,62,134
+ASV135,ASV135,+,Fungi,100,Ascomycota,87,Dothideomycetes,80,Pleosporales,72,,46,,17,,17,135
+ASV136,ASV136,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporales_Incertae sedis,98,Phoma,98,,63,136
+ASV139,ASV139,+,Fungi,100,Ascomycota,90,,66,,66,,51,,45,,23,139
+ASV140,ASV140,+,Fungi,100,Ascomycota,81,,9,,6,,6,,6,,6,140
+ASV141,ASV141,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideales,100,Dothioraceae,100,Kabatiella,100,,60,141
+ASV142,ASV142,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideales,100,Dothioraceae,100,Kabatiella,100,,68,142
+ASV143,ASV143,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,100,,68,143
+ASV144,ASV144,+,Fungi,100,Ascomycota,83,,24,,17,,17,,7,,6,144
+ASV145,ASV145,+,Fungi,100,Basidiomycota,80,,56,,56,,56,,56,,26,145
+ASV146,ASV146,+,Fungi,100,Basidiomycota,99,Tremellomycetes,96,Tremellales,96,Tremellales_Incertae sedis,96,Hannaella,95,Hannaella coprosmaensis,72,146
+ASV147,ASV147,+,Fungi,100,Basidiomycota,91,Tremellomycetes,73,Tremellales,70,,66,,66,,40,147
+ASV148,ASV148,+,Fungi,100,,66,,28,,25,,8,,8,,8,148
+ASV150,ASV150,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,99,Tremellaceae,99,Cryptococcus,99,Cryptococcus macerans,97,150
+ASV151,ASV151,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,99,Trichosphaeriales_Incertae sedis,99,Khuskia,99,,61,151
+ASV154,ASV154,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Bullera,100,Bullera penniseticola,100,154
+ASV155,ASV155,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Ophiosphaerella,100,Ophiosphaerella agrostis,100,155
+ASV156,ASV156,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Hannaella,100,Hannaella zeae,100,156
+ASV157,ASV157,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Setosphaeria,100,Exserohilum rostratum,100,157
+ASV158,ASV158,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,Mycosphaerellaceae,96,,42,,22,158
+ASV159,ASV159,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,94,Fusarium equiseti,76,159
+ASV161,ASV161,+,Fungi,100,Basidiomycota,90,,59,,45,,43,,22,,11,161
+ASV162,ASV162,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Ustilago,100,Pseudozyma prolifica,100,162
+ASV163,ASV163,+,Fungi,100,Basidiomycota,79,,28,,28,,24,,14,,11,163
+ASV166,ASV166,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces coprosmae,87,166
+ASV167,ASV167,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Alternaria,100,Alternaria longissima,100,167
+ASV168,ASV168,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,96,Phaeosphaeria,96,Phaeosphaeria sp 1 MM_2012,84,168
+ASV170,ASV170,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus macerans,100,170
+ASV171,ASV171,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,99,Mycosphaerella nyssicola,99,171
+ASV172,ASV172,+,Fungi,100,Ascomycota,77,,69,,67,,28,,19,,12,172
+ASV173,ASV173,+,Fungi,100,Ascomycota,72,,66,,57,,19,,17,,13,173
+ASV174,ASV174,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Filobasidiales,100,Filobasidiaceae,100,Filobasidium,100,Filobasidium floriforme,100,174
+ASV175,ASV175,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,71,,57,,9,175
+ASV176,ASV176,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus chernovii,100,176
+ASV177,ASV177,+,Fungi,100,Basidiomycota,98,Tremellomycetes,95,Tremellales,95,Tremellales_Incertae sedis,95,Hannaella,94,Hannaella coprosmaensis,74,177
+ASV178,ASV178,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,96,Phaeosphaeria,96,Phaeosphaeria sp 1 MM_2012,75,178
+ASV179,ASV179,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,96,Epicoccum,96,Epicoccum sorghi,96,179
+ASV180,ASV180,+,Fungi,100,,66,,31,,25,,8,,8,,8,180
+ASV181,ASV181,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Leptosphaeriaceae,100,Paraphoma,100,Paraphoma chrysanthemicola,100,181
+ASV182,ASV182,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Ophiosphaerella,100,Ophiosphaerella agrostis,100,182
+ASV183,ASV183,+,Fungi,100,Ascomycota,92,Dothideomycetes,89,Pleosporales,89,,58,,37,,35,183
+ASV184,ASV184,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,95,Phaeosphaeriopsis,86,Phaeosphaeria oryzae,73,184
+ASV185,ASV185,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Cystofilobasidiales,100,Cystofilobasidiaceae,100,Udeniomyces,77,Udeniomyces pannonicus,77,185
+ASV186,ASV186,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,98,Fusarium equiseti,91,186
+ASV187,ASV187,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,100,Trichosphaeriales_Incertae sedis,100,Nigrospora,83,Nigrospora sphaerica,81,187
+ASV188,ASV188,+,Fungi,100,Basidiomycota,75,,10,,9,,9,,9,,9,188
+ASV190,ASV190,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,98,Myrothecium,97,Myrothecium verrucaria,80,190
+ASV193,ASV193,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,100,Glomerellaceae,100,Glomerella,100,,57,193
+ASV195,ASV195,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,100,Sporidiobolus,100,Sporobolomyces koalae,100,195
+ASV196,ASV196,+,Fungi,100,Ascomycota,100,Pezizomycotina_Incertae sedis,100,Pezizomycotina_Incertae sedis,100,Pezizomycotina_Incertae sedis,100,Torula,100,Torula caligans,100,196
+ASV197,ASV197,+,Fungi,100,Ascomycota,85,,27,,18,,18,,4,,4,197
+ASV198,ASV198,+,Fungi,100,Ascomycota,96,Dothideomycetes,94,Pleosporales,93,Didymellaceae,83,Leptosphaerulina,83,Leptosphaerulina chartarum,83,198
+ASV199,ASV199,+,Fungi,100,Ascomycota,99,Dothideomycetes,89,Capnodiales,89,,60,,57,,57,199
+ASV201,ASV201,+,Fungi,100,Basidiomycota,98,Tremellomycetes,97,Tremellales,97,Tremellales_Incertae sedis,96,Dioszegia,91,,47,201
+ASV202,ASV202,+,Fungi,100,Basidiomycota,99,Tremellomycetes,99,Tremellales,99,Tremellaceae,95,Cryptococcus,95,Cryptococcus sp LCF_08,91,202
+ASV203,ASV203,+,Fungi,100,Basidiomycota,88,,30,,30,,29,,29,,22,203
+ASV205,ASV205,+,Fungi,100,Basidiomycota,100,,68,,60,,60,,60,,60,205
+ASV206,ASV206,+,Fungi,100,Ascomycota,85,,9,,8,,3,,3,,3,206
+ASV209,ASV209,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus victoriae,100,209
+ASV210,ASV210,+,Fungi,100,Ascomycota,86,Dothideomycetes,81,Pleosporales,80,Phaeosphaeriaceae,72,,55,,50,210
+ASV211,ASV211,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,96,Phaeosphaeria,96,,65,211
+ASV213,ASV213,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,99,Exobasidiomycetidae_Incertae sedis,99,Tilletiopsis,99,Tilletiopsis pallescens,99,213
+ASV214,ASV214,+,Fungi,100,Basidiomycota,81,,46,,44,,41,,25,,6,214
+ASV216,ASV216,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus geniculatus,100,216
+ASV219,ASV219,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Edenia,100,Edenia gomezpompae,100,219
+ASV220,ASV220,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus sp LRB_2012a,100,220
+ASV221,ASV221,+,Fungi,100,Basidiomycota,71,,30,,26,,8,,8,,8,221
+ASV222,ASV222,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,,53,,50,,44,222
+ASV223,ASV223,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,100,Trichosphaeriales_Incertae sedis,100,Khuskia,97,,65,223
+ASV226,ASV226,+,Fungi,100,,63,,26,,23,,7,,7,,7,226
+ASV227,ASV227,+,Fungi,100,Ascomycota,78,,32,,12,,12,,11,,11,227
+ASV231,ASV231,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,Teratosphaeriaceae,96,Devriesia,95,Devriesia pseudoamericana,95,231
+ASV232,ASV232,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,100,,67,232
+ASV233,ASV233,+,Fungi,100,Ascomycota,100,Dothideomycetes,89,Capnodiales,88,,62,,61,,61,233
+ASV236,ASV236,+,Fungi,100,Ascomycota,83,,54,,38,,29,,29,,29,236
+ASV238,ASV238,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces ruber,80,238
+ASV239,ASV239,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,95,Exobasidiomycetidae_Incertae sedis,95,Tilletiopsis,95,Tilletiopsis pallescens,95,239
+ASV240,ASV240,+,Fungi,100,Ascomycota,78,,8,,6,,6,,6,,6,240
+ASV241,ASV241,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus sp LRB_2012a,100,241
+ASV242,ASV242,+,Fungi,100,Basidiomycota,97,Microbotryomycetes,88,Sporidiobolales,88,Sporidiobolales_Incertae sedis,88,Sporobolomyces,88,Sporobolomyces ruber,86,242
+ASV246,ASV246,+,Fungi,100,Basidiomycota,93,Tremellomycetes,88,Tremellales,82,Tremellaceae,81,Cryptococcus,81,,39,246
+ASV247,ASV247,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,99,Cochliobolus sativus,73,247
+ASV248,ASV248,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,97,Hannaella,95,Hannaella zeae,95,248
+ASV249,ASV249,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus sp LRB_2012a,99,249
+ASV250,ASV250,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Ophiosphaerella,100,Ophiosphaerella agrostis,100,250
+ASV252,ASV252,+,Fungi,100,Ascomycota,76,,14,,14,,14,,14,,13,252
+ASV254,ASV254,+,Fungi,100,Ascomycota,76,,27,,27,,25,,25,,22,254
+ASV256,ASV256,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Cystofilobasidiales,100,Cystofilobasidiaceae,100,Udeniomyces,100,Udeniomyces megalosporus,100,256
+ASV257,ASV257,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,,66,257
+ASV258,ASV258,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Ustilago,83,,60,258
+ASV259,ASV259,+,Fungi,100,Ascomycota,82,,52,,47,,37,,32,,29,259
+ASV260,ASV260,+,Fungi,100,Ascomycota,87,Dothideomycetes,83,Pleosporales,73,,66,,55,,29,260
+ASV262,ASV262,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Bipolaris oryzae,100,262
+ASV264,ASV264,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,100,Paraphaeosphaeria,100,Paraphaeosphaeria michotii,100,264
+ASV265,ASV265,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporales_Incertae sedis,100,Phoma,100,Phoma radicina,100,265
+ASV266,ASV266,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,,51,,49,,43,266
+ASV267,ASV267,+,Fungi,100,Ascomycota,99,Dothideomycetes,87,Capnodiales,87,,67,,65,,4,267
+ASV268,ASV268,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus cynodontis,83,268
+ASV269,ASV269,+,Fungi,100,Ascomycota,90,,29,,18,,18,,15,,14,269
+ASV270,ASV270,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,100,Sarocladium,73,Acremonium kiliense,73,270
+ASV271,ASV271,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideales,100,Dothioraceae,100,Kabatiella,100,,48,271
+ASV272,ASV272,+,Fungi,100,Ascomycota,85,Pezizomycotina_Incertae sedis,71,Pezizomycotina_Incertae sedis,71,Pezizomycotina_Incertae sedis,71,Torula,71,Torula caligans,71,272
+ASV273,ASV273,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,99,Cercospora zeae_maydis,74,273
+ASV274,ASV274,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,,48,274
+ASV275,ASV275,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,100,Fusarium avenaceum,86,275
+ASV277,ASV277,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus wieringae,100,277
+ASV279,ASV279,+,Fungi,100,Basidiomycota,97,Tremellomycetes,93,Tremellales,93,Tremellales_Incertae sedis,93,Dioszegia,89,,54,279
+ASV280,ASV280,+,Fungi,100,Ascomycota,96,Dothideomycetes,96,Pleosporales,94,,38,,38,,38,280
+ASV281,ASV281,+,Fungi,100,Ascomycota,77,,16,,16,,16,,15,,12,281
+ASV283,ASV283,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Curvularia,100,Curvularia trifolii,100,283
+ASV284,ASV284,+,Fungi,100,Ascomycota,97,Eurotiomycetes,95,Chaetothyriales,95,Chaetothyriales_Incertae sedis,95,Strelitziana,95,Strelitziana mali,82,284
+ASV286,ASV286,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,100,Exobasidiomycetidae_Incertae sedis,100,Tilletiopsis,100,Tilletiopsis pallescens,100,286
+ASV287,ASV287,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Pseudozyma,100,,69,287
+ASV288,ASV288,+,Fungi,100,Ascomycota,91,,65,,65,,55,,44,,24,288
+ASV289,ASV289,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Taphrina,94,,37,289
+ASV290,ASV290,+,Fungi,100,Ascomycota,100,Dothideomycetes,97,Capnodiales,97,Teratosphaeriaceae,97,Devriesia,97,Devriesia pseudoamericana,97,290
+ASV291,ASV291,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Alternaria,100,Alternaria longissima,100,291
+ASV292,ASV292,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolaceae,100,Sporidiobolus,100,Sporobolomyces ruberrimus,94,292
+ASV294,ASV294,+,Fungi,100,Ascomycota,93,Dothideomycetes,84,Pleosporales,83,Phaeosphaeriaceae,76,,54,,28,294
+ASV295,ASV295,+,Fungi,100,Ascomycota,90,Dothideomycetes,84,Pleosporales,82,,36,,35,,35,295
+ASV296,ASV296,+,Fungi,100,Ascomycota,81,Dothideomycetes,71,,69,,34,,18,,16,296
+ASV297,ASV297,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,100,Trichosphaeriales_Incertae sedis,100,,50,,50,297
+ASV298,ASV298,+,Fungi,100,Ascomycota,87,,40,,25,,10,,10,,7,298
+ASV300,ASV300,+,Fungi,100,Basidiomycota,70,,27,,27,,27,,18,,17,300
+ASV302,ASV302,+,Fungi,100,Ascomycota,81,Dothideomycetes,77,Pleosporales,75,,58,,58,,58,302
+ASV304,ASV304,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Bipolaris zeicola,86,304
+ASV306,ASV306,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces vermiculatus,89,306
+ASV307,ASV307,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,Capnodiales_Incertae sedis,98,Toxicocladosporium,98,Toxicocladosporium pseudoveloxum,98,307
+ASV308,ASV308,+,Fungi,100,,61,,43,,21,,6,,6,,5,308
+ASV309,ASV309,+,Fungi,100,Ascomycota,92,Dothideomycetes,86,Pleosporales,86,Phaeosphaeriaceae,79,,19,,15,309
+ASV310,ASV310,+,Fungi,100,Basidiomycota,89,,58,,45,,43,,22,,11,310
+ASV311,ASV311,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,,49,311
+ASV312,ASV312,+,Fungi,100,Basidiomycota,75,,9,,8,,8,,8,,8,312
+ASV313,ASV313,+,Fungi,100,Basidiomycota,99,Tremellomycetes,98,Tremellales,98,Tremellaceae,96,Cryptococcus,96,Cryptococcus rajasthanensis,87,313
+ASV314,ASV314,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Pseudocercospora,99,,50,314
+ASV315,ASV315,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,99,Cryptococcus,99,Cryptococcus sp LRB_2012a,99,315
+ASV316,ASV316,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Phaeosphaeria,100,Phaeosphaeria nodorum,89,316
+ASV318,ASV318,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodotorula,100,Rhodotorula nothofagi,100,318
+ASV319,ASV319,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus flavus,99,319
+ASV322,ASV322,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,99,Exobasidiomycetidae_Incertae sedis,99,Tilletiopsis,99,Tilletiopsis pallescens,99,322
+ASV323,ASV323,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,100,Acremonium,100,Acremonium fusidioides,100,323
+ASV325,ASV325,+,Fungi,100,Basidiomycota,93,Tremellomycetes,77,,64,,60,,60,,38,325
+ASV326,ASV326,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus victoriae,99,326
+ASV327,ASV327,+,Fungi,100,,54,,23,,16,,16,,16,,12,327
+ASV329,ASV329,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriaceae,100,Cyphellophora,100,,45,329
+ASV333,ASV333,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,,62,333
+ASV334,ASV334,+,Fungi,100,Ascomycota,90,,28,,16,,16,,6,,6,334
+ASV336,ASV336,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,99,Myrothecium,99,Myrothecium roridum,99,336
+ASV338,ASV338,+,Fungi,100,Ascomycota,85,Dothideomycetes,77,,64,,25,,19,,19,338
+ASV339,ASV339,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriaceae,100,Cyphellophora,100,Cyphellophora suttonii,76,339
+ASV340,ASV340,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,98,Phaeosphaeriopsis,93,Phaeosphaeria oryzae,87,340
+ASV341,ASV341,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriaceae,100,Cyphellophora,100,,45,341
+ASV342,ASV342,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,Mycosphaerellaceae,99,Mycosphaerella,96,,41,342
+ASV343,ASV343,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Dissoconium,100,,59,343
+ASV344,ASV344,+,Fungi,100,Ascomycota,98,Dothideomycetes,98,Pleosporales,98,Didymellaceae,92,Leptosphaerulina,92,Leptosphaerulina chartarum,92,344
+ASV346,ASV346,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,92,,51,346
+ASV347,ASV347,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,100,Paraphaeosphaeria,100,Paraphaeosphaeria michotii,100,347
+ASV348,ASV348,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Hannaella,100,Hannaella kunmingensis,100,348
+ASV349,ASV349,+,Fungi,100,Ascomycota,93,Dothideomycetes,92,Pleosporales,90,,42,,42,,41,349
+ASV350,ASV350,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Lalaria,100,Lalaria inositophila,100,350
+ASV351,ASV351,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces ruber,79,351
+ASV352,ASV352,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,100,Plectosphaerellaceae,100,Lectera,100,Lectera colletotrichoides,100,352
+ASV353,ASV353,+,Fungi,100,Ascomycota,95,,26,,26,,26,,26,,26,353
+ASV354,ASV354,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus macerans,100,354
+ASV355,ASV355,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,97,Phaeosphaeria,97,Phaeosphaeria sp 1 MM_2012,85,355
+ASV356,ASV356,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,99,Plectosphaerellaceae,99,Plectosphaerella,98,,67,356
+ASV357,ASV357,+,Fungi,100,,63,,35,,33,,8,,8,,8,357
+ASV361,ASV361,+,Fungi,100,Basidiomycota,97,Tremellomycetes,96,Tremellales,96,,39,,35,,25,361
+ASV364,ASV364,+,Fungi,100,Ascomycota,96,,69,,54,,38,,38,,22,364
+ASV365,ASV365,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,100,Dioszegia takashimae,89,365
+ASV367,ASV367,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Bionectriaceae,99,Bionectria,99,Bionectria epichloe,99,367
+ASV368,ASV368,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,,61,,38,368
+ASV369,ASV369,+,Fungi,100,Ascomycota,88,Dothideomycetes,73,,59,,24,,12,,12,369
+ASV370,ASV370,+,Fungi,100,Ascomycota,90,,30,,24,,24,,24,,24,370
+ASV371,ASV371,+,Fungi,100,Ascomycota,100,Dothideomycetes,95,Capnodiales,95,,59,,58,,18,371
+ASV372,ASV372,+,Fungi,100,Ascomycota,97,Dothideomycetes,95,Pleosporales,91,,37,,36,,35,372
+ASV373,ASV373,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus flavescens,99,373
+ASV374,ASV374,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,99,Plectosphaerellaceae,99,Gibellulopsis,98,Gibellulopsis nigrescens,97,374
+ASV375,ASV375,+,Fungi,100,Ascomycota,100,Leotiomycetes,100,Erysiphales,100,Erysiphaceae,100,Blumeria,100,Blumeria graminis,100,375
+ASV380,ASV380,+,Fungi,100,Ascomycota,94,,38,,31,,31,,27,,27,380
+ASV382,ASV382,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,97,Myrothecium,96,,57,382
+ASV383,ASV383,+,Fungi,100,Ascomycota,88,Dothideomycetes,86,Pleosporales,84,Phaeosphaeriaceae,71,,52,,48,383
+ASV384,ASV384,+,Fungi,100,Ascomycota,81,,62,,44,,30,,30,,30,384
+ASV387,ASV387,+,Fungi,100,,5,,5,,5,,5,,5,,4,387
+ASV388,ASV388,+,Fungi,100,Ascomycota,88,Dothideomycetes,86,Pleosporales,86,Phaeosphaeriaceae,71,,52,,48,388
+ASV389,ASV389,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Auriculibuller,100,Auriculibuller fuscus,100,389
+ASV390,ASV390,+,Fungi,100,Ascomycota,92,Dothideomycetes,89,Pleosporales,89,Phaeosphaeriaceae,80,,20,,16,390
+ASV391,ASV391,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Edenia,100,Edenia gomezpompae,100,391
+ASV392,ASV392,+,Fungi,100,Basidiomycota,100,Tremellomycetes,96,Tremellales,96,Tremellaceae,91,Cryptococcus,91,Cryptococcus dimennae,91,392
+ASV393,ASV393,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Leucosporidiales,100,Leucosporidiaceae,100,Leucosporidiella,100,Leucosporidiella fragaria,94,393
+ASV394,ASV394,+,Fungi,100,Basidiomycota,98,Tremellomycetes,97,Tremellales,97,Tremellaceae,91,Cryptococcus,91,Cryptococcus luteolus,90,394
+ASV397,ASV397,+,Fungi,100,Ascomycota,77,,25,,14,,14,,4,,2,397
+ASV398,ASV398,+,Fungi,100,Ascomycota,100,Dothideomycetes,89,Capnodiales,89,,66,,65,,7,398
+ASV400,ASV400,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,91,Cochliobolus lunatus,76,400
+ASV402,ASV402,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Taphrina,94,,40,402
+ASV403,ASV403,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,97,Phaeosphaeriopsis,77,Phaeosphaeria oryzae,74,403
+ASV404,ASV404,+,Fungi,100,Ascomycota,96,,46,,45,,25,,4,,2,404
+ASV405,ASV405,+,Fungi,100,,69,,42,,42,,26,,26,,5,405
+ASV406,ASV406,+,Fungi,100,Ascomycota,99,Dothideomycetes,86,Capnodiales,86,,69,,65,,7,406
+ASV412,ASV412,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus tephrensis,75,412
+ASV413,ASV413,+,Fungi,100,Ascomycota,93,,35,,26,,26,,16,,16,413
+ASV415,ASV415,+,Fungi,100,Ascomycota,90,Dothideomycetes,71,Pleosporales,71,,35,,23,,14,415
+ASV416,ASV416,+,Fungi,100,,64,,27,,23,,9,,8,,8,416
+ASV417,ASV417,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,Zygophiala wisconsinensis,100,417
+ASV418,ASV418,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Exobasidiomycetidae_Incertae sedis,100,Exobasidiomycetidae_Incertae sedis,100,Tilletiopsis,100,Tilletiopsis pallescens,100,418
+ASV421,ASV421,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus rajasthanensis,99,421
+ASV422,ASV422,+,Fungi,100,Basidiomycota,96,Tremellomycetes,93,Tremellales,93,Tremellales_Incertae sedis,93,Bullera,92,Bullera variabilis,92,422
+ASV424,ASV424,+,Fungi,100,Basidiomycota,92,Tremellomycetes,76,,15,,15,,15,,15,424
+ASV427,ASV427,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Lewia,100,,27,427
+ASV428,ASV428,+,Fungi,100,Basidiomycota,98,Tremellomycetes,98,Tremellales,98,Tremellaceae,97,Cryptococcus,97,Cryptococcus luteolus,95,428
+ASV432,ASV432,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,,55,432
+ASV434,ASV434,+,Fungi,100,,57,,38,,26,,9,,9,,8,434
+ASV436,ASV436,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Hyponectriaceae,98,Microdochium,95,Microdochium bolleyi,95,436
+ASV437,ASV437,+,Fungi,100,Ascomycota,90,,30,,23,,22,,21,,21,437
+ASV438,ASV438,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Pleospora,100,Pleospora alfalfae,88,438
+ASV439,ASV439,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,,45,,45,439
+ASV441,ASV441,+,Fungi,100,,62,,19,,16,,9,,9,,7,441
+ASV443,ASV443,+,Fungi,100,Ascomycota,96,Dothideomycetes,94,Pleosporales,89,,32,,32,,31,443
+ASV444,ASV444,+,Fungi,100,,42,,35,,12,,12,,11,,11,444
+ASV445,ASV445,+,Fungi,100,Ascomycota,94,,38,,29,,29,,25,,25,445
+ASV447,ASV447,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Ramichloridium,93,Ramichloridium cerophilum,93,447
+ASV448,ASV448,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,100,Paraphaeosphaeria,100,Paraphaeosphaeria michotii,100,448
+ASV449,ASV449,+,Fungi,100,Basidiomycota,100,Agaricostilbomycetes,100,Agaricostilbales,100,Agaricostilbaceae,100,Bensingtonia,100,Bensingtonia miscanthi,100,449
+ASV450,ASV450,+,Fungi,100,Ascomycota,75,,51,,50,,30,,30,,30,450
+ASV451,ASV451,+,Fungi,100,Ascomycota,79,,64,,62,,52,,32,,30,451
+ASV453,ASV453,+,Fungi,100,,61,,10,,10,,10,,10,,6,453
+ASV455,ASV455,+,Fungi,100,Ascomycota,100,Dothideomycetes,90,Capnodiales,90,Mycosphaerellaceae,89,Dissoconium,72,,55,455
+ASV456,ASV456,+,Fungi,100,Ascomycota,97,Dothideomycetes,93,Capnodiales,93,Mycosphaerellaceae,91,,58,,11,456
+ASV461,ASV461,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,,22,461
+ASV462,ASV462,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,Sporobolomyces yunnanensis,100,462
+ASV466,ASV466,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,100,Dioszegia changbaiensis,99,466
+ASV468,ASV468,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Filobasidiales,100,Filobasidiaceae,100,Filobasidium,100,Filobasidium floriforme,100,468
+ASV469,ASV469,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,83,Cryptococcus,83,,66,469
+ASV471,ASV471,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodotorula,100,Rhodotorula ingeniosa,91,471
+ASV473,ASV473,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Lalaria,100,Lalaria inositophila,100,473
+ASV476,ASV476,+,Fungi,100,Ascomycota,99,Dothideomycetes,86,Pleosporales,82,,57,,33,,27,476
+ASV477,ASV477,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,99,Ustilaginales,99,Ustilaginaceae,99,Ustilago,80,,55,477
+ASV478,ASV478,+,Fungi,100,Ascomycota,95,Dothideomycetes,81,Pleosporales,80,Lophiostomataceae,70,Tetraploa,70,Tetraploa aristata,70,478
+ASV480,ASV480,+,Fungi,100,Chytridiomycota,70,Chytridiomycetes,70,,65,,65,,62,,47,480
+ASV481,ASV481,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,100,Mycosphaerella nyssicola,100,481
+ASV482,ASV482,+,Fungi,100,Ascomycota,100,Dothideomycetes,98,Capnodiales,98,Mycosphaerellaceae,98,Mycosphaerella,96,,46,482
+ASV483,ASV483,+,Fungi,100,Ascomycota,98,Eurotiomycetes,98,Chaetothyriales,98,Chaetothyriales_Incertae sedis,98,Strelitziana,98,Strelitziana mali,88,483
+ASV486,ASV486,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Hyponectriaceae,99,Microdochium,97,Microdochium bolleyi,97,486
+ASV487,ASV487,+,Fungi,100,Ascomycota,100,Leotiomycetes,100,Helotiales,100,Sclerotiniaceae,100,Botryotinia,85,,66,487
+ASV488,ASV488,+,Fungi,100,Ascomycota,91,,32,,17,,13,,11,,11,488
+ASV491,ASV491,+,Fungi,100,Ascomycota,93,,47,,44,,9,,6,,6,491
+ASV492,ASV492,+,Fungi,100,Basidiomycota,99,Tremellomycetes,96,Tremellales,96,Tremellales_Incertae sedis,96,Kockovaella,95,,52,492
+ASV493,ASV493,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,,52,493
+ASV494,ASV494,+,Fungi,100,,67,,27,,26,,22,,22,,18,494
+ASV496,ASV496,+,Fungi,100,Ascomycota,94,Dothideomycetes,91,Pleosporales,87,Phaeosphaeriaceae,78,,23,,23,496
+ASV497,ASV497,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,,68,,57,,39,,38,497
+ASV498,ASV498,+,Fungi,100,Basidiomycota,98,Agaricostilbomycetes,84,Agaricostilbales,84,Chionosphaeraceae,84,Kurtzmanomyces,84,,48,498
+ASV499,ASV499,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,84,Phaeosphaeria,84,Phaeosphaeria sp 1 MM_2012,72,499
+ASV503,ASV503,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus intermedius,99,503
+ASV506,ASV506,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,100,Paraphaeosphaeria,100,Paraphaeosphaeria michotii,100,506
+ASV507,ASV507,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Amphisphaeriaceae,100,Pestalotiopsis,100,Pestalotiopsis aquatica,90,507
+ASV509,ASV509,+,Fungi,100,Basidiomycota,78,,55,,54,,46,,46,,14,509
+ASV510,ASV510,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,98,,61,510
+ASV511,ASV511,+,Fungi,100,Ascomycota,94,Dothideomycetes,93,Pleosporales,91,Phaeosphaeriaceae,76,,57,,36,511
+ASV513,ASV513,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Pseudozyma,97,Pseudozyma tsukubaensis,97,513
+ASV515,ASV515,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,100,Trichosphaeriales_Incertae sedis,100,Khuskia,90,,46,515
+ASV516,ASV516,+,Fungi,100,Ascomycota,81,,29,,16,,16,,14,,14,516
+ASV520,ASV520,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Leptosphaeriaceae,100,Paraphoma,100,Paraphoma chrysanthemicola,100,520
+ASV522,ASV522,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Xylariales_Incertae sedis,100,Phomatospora,100,Dinemasporium strigosum,100,522
+ASV523,ASV523,+,Fungi,100,Ascomycota,92,,41,,37,,25,,14,,2,523
+ASV524,ASV524,+,Fungi,100,Ascomycota,81,,23,,17,,17,,11,,7,524
+ASV525,ASV525,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,100,Glomerellaceae,100,Glomerella,100,,67,525
+ASV527,ASV527,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Taphrina,92,,35,527
+ASV528,ASV528,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Lalaria,100,Lalaria inositophila,100,528
+ASV531,ASV531,+,Fungi,100,Ascomycota,94,,31,,31,,19,,19,,11,531
+ASV532,ASV532,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,96,Bipolaris spicifera,92,532
+ASV534,ASV534,+,Fungi,100,Basidiomycota,99,Cystobasidiomycetes,89,Cystobasidiales,89,Cystobasidiaceae,89,Occultifur,89,Occultifur externus,89,534
+ASV536,ASV536,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodotorula,100,,66,536
+ASV538,ASV538,+,Fungi,100,Ascomycota,96,,41,,32,,32,,28,,28,538
+ASV539,ASV539,+,Fungi,100,Ascomycota,100,Leotiomycetes,100,Helotiales,100,Sclerotiniaceae,100,Botryotinia,87,,50,539
+ASV540,ASV540,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Nectriaceae,100,Gibberella,91,Fusarium kyushuense,78,540
+ASV542,ASV542,+,Fungi,100,Basidiomycota,76,Agaricomycetes,76,,51,,14,,10,,9,542
+ASV544,ASV544,+,Fungi,100,Ascomycota,75,,57,,10,,10,,10,,8,544
+ASV546,ASV546,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Trichosphaeriales,100,Trichosphaeriales_Incertae sedis,100,,50,,50,546
+ASV549,ASV549,+,Fungi,100,Ascomycota,91,Dothideomycetes,88,Pleosporales,83,Phaeosphaeriaceae,71,,67,,32,549
+ASV551,ASV551,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Eurotiales,100,Trichocomaceae,100,Petromyces,100,Aspergillus flavus,89,551
+ASV552,ASV552,+,Fungi,100,Basidiomycota,97,Tremellomycetes,92,Tremellales,92,Tremellales_Incertae sedis,92,Bullera,91,Bullera variabilis,91,552
+ASV553,ASV553,+,Fungi,100,,12,,12,,7,,7,,7,,5,553
+ASV555,ASV555,+,Fungi,100,Basidiomycota,83,,65,,65,,57,,57,,33,555
+ASV556,ASV556,+,Fungi,100,Ascomycota,99,Dothideomycetes,82,Capnodiales,82,Mycosphaerellaceae,77,,59,,8,556
+ASV557,ASV557,+,Fungi,100,Ascomycota,98,Dothideomycetes,96,Pleosporales,95,,56,,56,,56,557
+ASV561,ASV561,+,Fungi,100,Ascomycota,84,Dothideomycetes,73,Pleosporales,73,,43,,43,,43,561
+ASV562,ASV562,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriales_Incertae sedis,100,Strelitziana,100,,56,562
+ASV563,ASV563,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriaceae,100,Cyphellophora,100,,38,563
+ASV564,ASV564,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus intermedius,100,564
+ASV565,ASV565,+,Fungi,100,Ascomycota,96,Dothideomycetes,96,Pleosporales,88,Phaeosphaeriaceae,70,,62,,41,565
+ASV566,ASV566,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,Capnodiales_Incertae sedis,99,Toxicocladosporium,99,Toxicocladosporium pseudoveloxum,99,566
+ASV568,ASV568,+,Fungi,100,Ascomycota,96,,48,,48,,48,,47,,32,568
+ASV569,ASV569,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Entylomatales,100,Entylomataceae,100,Entyloma,100,,42,569
+ASV570,ASV570,+,Fungi,100,Ascomycota,92,Dothideomycetes,84,,59,,59,,59,,44,570
+ASV576,ASV576,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Filobasidiales,100,Filobasidiaceae,100,Filobasidium,100,Filobasidium floriforme,100,576
+ASV577,ASV577,+,Fungi,100,Ascomycota,95,Dothideomycetes,91,Pleosporales,90,,56,,56,,56,577
+ASV578,ASV578,+,Fungi,100,Basidiomycota,99,Microbotryomycetes,79,Sporidiobolales,79,Sporidiobolales_Incertae sedis,79,Rhodotorula,74,,37,578
+ASV579,ASV579,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus tephrensis,87,579
+ASV580,ASV580,+,Fungi,100,Basidiomycota,77,Agaricomycetes,74,,50,,22,,14,,14,580
+ASV581,ASV581,+,Fungi,100,,5,,5,,5,,5,,5,,3,581
+ASV585,ASV585,+,Fungi,100,,36,,30,,12,,12,,10,,10,585
+ASV587,ASV587,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Ustilago,100,Ustilago bullata,99,587
+ASV588,ASV588,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Entylomatales,100,Entylomataceae,100,Entyloma,100,,43,588
+ASV590,ASV590,+,Fungi,100,Ascomycota,95,,55,,55,,55,,55,,40,590
+ASV591,ASV591,+,Fungi,100,Ascomycota,85,,51,,48,,36,,36,,36,591
+ASV595,ASV595,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Cystofilobasidiales,100,Cystofilobasidiaceae,100,Itersonilia,99,Itersonilia perplexans,99,595
+ASV596,ASV596,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Hyponectriaceae,100,Monographella,99,Microdochium majus,81,596
+ASV598,ASV598,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus laurentii,100,598
+ASV599,ASV599,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,,51,599
+ASV600,ASV600,+,Fungi,100,Ascomycota,84,,11,,10,,4,,4,,3,600
+ASV601,ASV601,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Eurotiales,100,Trichocomaceae,100,Penicillium,99,Penicillium oxalicum,97,601
+ASV602,ASV602,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Clavicipitaceae,100,Claviceps,100,Claviceps purpurea,100,602
+ASV603,ASV603,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Dissoconium,100,Dissoconium aciculare,94,603
+ASV605,ASV605,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Herpotrichiellaceae,96,Phialophora,96,Phialophora sessilis,96,605
+ASV607,ASV607,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Ramichloridium,92,Ramichloridium cerophilum,92,607
+ASV608,ASV608,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,Taphrina,83,Taphrina carpini,79,608
+ASV612,ASV612,+,Fungi,100,Ascomycota,90,Dothideomycetes,78,Pleosporales,76,Lophiostomataceae,74,Massarina,74,Massarina igniaria,71,612
+ASV614,ASV614,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Ustilago,100,Ustilago trichophora,95,614
+ASV616,ASV616,+,Fungi,100,Ascomycota,87,,24,,10,,10,,6,,3,616
+ASV617,ASV617,+,Fungi,100,Ascomycota,95,Dothideomycetes,93,Pleosporales,92,,67,,64,,28,617
+ASV618,ASV618,+,Fungi,100,Ascomycota,99,Dothideomycetes,94,Capnodiales,94,,69,,41,,28,618
+ASV619,ASV619,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,96,Bipolaris spicifera,94,619
+ASV620,ASV620,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,,44,,42,620
+ASV621,ASV621,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,,46,,33,,33,621
+ASV622,ASV622,+,Fungi,100,Basidiomycota,100,Cystobasidiomycetes,100,Erythrobasidiales,100,Erythrobasidiales_Incertae sedis,100,Erythrobasidium,100,,59,622
+ASV624,ASV624,+,Fungi,100,,69,,54,,42,,10,,10,,10,624
+ASV625,ASV625,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces sasicola,74,625
+ASV628,ASV628,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus pallescens,99,628
+ASV631,ASV631,+,Fungi,100,Ascomycota,90,Dothideomycetes,86,Pleosporales,86,,52,,30,,17,631
+ASV632,ASV632,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideomycetes_Incertae sedis,100,Dothideomycetes_Incertae sedis,100,Peltaster,100,Peltaster fructicola,100,632
+ASV635,ASV635,+,Fungi,100,Ascomycota,98,Dothideomycetes,97,Pleosporales,86,Phaeosphaeriaceae,84,Phaeosphaeria,84,Phaeosphaeria phragmitis,82,635
+ASV636,ASV636,+,Fungi,100,Basidiomycota,95,Tremellomycetes,94,Tremellales,94,Tremellales_Incertae sedis,93,Dioszegia,88,,47,636
+ASV637,ASV637,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,100,Glomerellaceae,100,Glomerella,100,Glomerella magna,81,637
+ASV638,ASV638,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,Mycosphaerellaceae,97,,52,,29,638
+ASV639,ASV639,+,Fungi,100,Ascomycota,98,Leotiomycetes,85,,41,,41,,41,,19,639
+ASV640,ASV640,+,Fungi,100,Ascomycota,100,Dothideomycetes,96,Capnodiales,96,Teratosphaeriaceae,72,,36,,22,640
+ASV643,ASV643,+,Fungi,100,Basidiomycota,95,Tremellomycetes,77,,12,,12,,12,,12,643
+ASV644,ASV644,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Phaeosphaeriaceae,100,Phaeosphaeria,100,,65,644
+ASV645,ASV645,+,Fungi,100,,58,,12,,12,,4,,4,,4,645
+ASV648,ASV648,+,Fungi,100,Basidiomycota,98,Agaricomycetes,98,Agaricales,98,Mycenaceae,94,,46,,46,648
+ASV649,ASV649,+,Fungi,100,Ascomycota,100,Dothideomycetes,99,Capnodiales,99,,37,,29,,29,649
+ASV650,ASV650,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,Schizothyrium pomi,90,650
+ASV652,ASV652,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,Cochliobolus heterostrophus,99,652
+ASV656,ASV656,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Lewia,100,,25,656
+ASV657,ASV657,+,Fungi,100,,67,,59,,47,,28,,14,,10,657
+ASV661,ASV661,+,Fungi,100,Ascomycota,85,Sordariomycetes,75,,47,,17,,11,,9,661
+ASV663,ASV663,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Agaricales,100,Strophariaceae,96,Psilocybe,96,Psilocybe montana,73,663
+ASV666,ASV666,+,Fungi,100,,48,,20,,20,,11,,7,,7,666
+ASV667,ASV667,+,Fungi,100,Basidiomycota,91,Agaricomycetes,88,,20,,9,,9,,9,667
+ASV669,ASV669,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodotorula,100,Rhodotorula nothofagi,100,669
+ASV670,ASV670,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Curvularia,71,,44,670
+ASV672,ASV672,+,Fungi,100,Ascomycota,91,Dothideomycetes,77,Dothideomycetes_Incertae sedis,70,Dothideomycetes_Incertae sedis,70,Rhizopycnis,70,Rhizopycnis vagum,70,672
+ASV673,ASV673,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,Zygophiala wisconsinensis,87,673
+ASV675,ASV675,+,Fungi,100,Ascomycota,89,Dothideomycetes,85,Pleosporales,85,,50,,31,,17,675
+ASV678,ASV678,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Sporisorium,91,,68,678
+ASV680,ASV680,+,Fungi,100,Ascomycota,75,,14,,10,,8,,8,,7,680
+ASV682,ASV682,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,97,,61,682
+ASV686,ASV686,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Leucosporidiales,100,Leucosporidiaceae,100,Leucosporidiella,99,Leucosporidiella fragaria,93,686
+ASV688,ASV688,+,Fungi,100,Ascomycota,94,,41,,31,,31,,29,,29,688
+ASV689,ASV689,+,Fungi,100,Ascomycota,94,Dothideomycetes,92,Pleosporales,92,Lophiostomataceae,90,Lophiostoma,90,Lophiostoma semiliberum,77,689
+ASV691,ASV691,+,Fungi,100,,24,,14,,13,,4,,3,,2,691
+ASV692,ASV692,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,100,Acremonium,99,Acremonium implicatum,99,692
+ASV693,ASV693,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Tilletiales,100,Tilletiaceae,100,Tilletia,100,Tilletia moliniae,97,693
+ASV698,ASV698,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,,69,698
+ASV699,ASV699,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriaceae,100,Cyphellophora,100,,66,699
+ASV700,ASV700,+,Fungi,100,Basidiomycota,95,Tremellomycetes,90,Tremellales,90,,42,,42,,42,700
+ASV701,ASV701,+,Fungi,100,Basidiomycota,99,Microbotryomycetes,99,Sporidiobolales,99,Sporidiobolales_Incertae sedis,99,,55,,55,701
+ASV702,ASV702,+,Fungi,100,Ascomycota,99,Dothideomycetes,94,Capnodiales,94,,57,,56,,8,702
+ASV705,ASV705,+,Fungi,100,Ascomycota,88,Dothideomycetes,77,Pleosporales,77,,31,,16,,13,705
+ASV710,ASV710,+,Fungi,100,Basidiomycota,79,,55,,55,,55,,54,,51,710
+ASV711,ASV711,+,Fungi,100,,49,,44,,29,,9,,9,,7,711
+ASV713,ASV713,+,Fungi,100,Ascomycota,97,,54,,54,,54,,54,,42,713
+ASV718,ASV718,+,Fungi,100,Ascomycota,96,Dothideomycetes,89,Pleosporales,88,Phaeosphaeriaceae,73,,69,,34,718
+ASV719,ASV719,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus flavescens,99,719
+ASV720,ASV720,+,Fungi,100,Ascomycota,99,Eurotiomycetes,94,Chaetothyriales,91,,67,,67,,37,720
+ASV721,ASV721,+,Fungi,100,Basidiomycota,99,Tremellomycetes,94,Tremellales,94,Tremellales_Incertae sedis,94,Bullera,93,Bullera variabilis,93,721
+ASV722,ASV722,+,Fungi,100,Ascomycota,75,,58,,40,,23,,23,,23,722
+ASV724,ASV724,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Auriculariales,100,Auriculariales_Incertae sedis,100,Exidia,100,Exidia glandulosa,100,724
+ASV727,ASV727,+,Fungi,100,Basidiomycota,84,,62,,61,,61,,54,,38,727
+ASV728,ASV728,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Schizothyriaceae,100,Zygophiala,100,Schizothyrium pomi,100,728
+ASV729,ASV729,+,Fungi,100,Ascomycota,77,,15,,15,,15,,15,,14,729
+ASV731,ASV731,+,Fungi,100,Ascomycota,100,Dothideomycetes,97,Capnodiales,97,,53,,50,,26,731
+ASV733,ASV733,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,100,Paraphaeosphaeria,100,Paraphaeosphaeria michotii,100,733
+ASV749,ASV749,+,Fungi,100,Ascomycota,95,Dothideomycetes,82,Pleosporales,81,Lophiostomataceae,72,Tetraploa,72,Tetraploa aristata,72,749
+ASV752,ASV752,+,Fungi,100,Ascomycota,88,Dothideomycetes,71,,60,,16,,13,,13,752
+ASV758,ASV758,+,Fungi,100,,40,,25,,16,,10,,9,,8,758
+ASV759,ASV759,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Russulales,100,Stereaceae,100,Stereum,100,Stereum hirsutum,96,759
+ASV761,ASV761,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Leptosphaeriaceae,100,Paraphoma,100,Paraphoma chrysanthemicola,100,761
+ASV762,ASV762,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Didymellaceae,100,Leptosphaerulina,100,Leptosphaerulina chartarum,100,762
+ASV770,ASV770,+,Fungi,100,Ascomycota,88,Dothideomycetes,78,Pleosporales,71,,47,,34,,20,770
+ASV774,ASV774,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Curvularia,82,,45,774
+ASV779,ASV779,+,Fungi,100,Basidiomycota,81,,66,,53,,50,,50,,31,779
+ASV780,ASV780,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Leptosphaeriaceae,99,Paraphoma,99,Paraphoma chrysanthemicola,99,780
+ASV781,ASV781,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodosporidium,99,Rhodosporidium azoricum,97,781
+ASV784,ASV784,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Polyporales,100,Polyporaceae,100,Trichaptum,100,Trichaptum biforme,100,784
+ASV786,ASV786,+,Fungi,100,Basidiomycota,98,Agaricomycetes,96,,67,,67,,67,,67,786
+ASV788,ASV788,+,Fungi,100,Ascomycota,100,Dothideomycetes,97,Capnodiales,96,,55,,52,,35,788
+ASV793,ASV793,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,100,Mycosphaerella,97,,21,793
+ASV794,ASV794,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Montagnulaceae,90,Paraconiothyrium,90,,49,794
+ASV801,ASV801,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriales_Incertae sedis,100,Strelitziana,100,Strelitziana africana,100,801
+ASV804,ASV804,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,99,Cochliobolus pallescens,98,804
+ASV806,ASV806,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Bionectriaceae,99,Bionectria,99,Bionectria epichloe,99,806
+ASV808,ASV808,+,Fungi,100,Ascomycota,84,,23,,13,,13,,11,,5,808
+ASV811,ASV811,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Cochliobolus,100,,67,811
+ASV817,ASV817,+,Fungi,100,Ascomycota,98,Sordariomycetes,87,,16,,16,,16,,9,817
+ASV819,ASV819,+,Fungi,100,Basidiomycota,100,Tremellomycetes,99,Tremellales,99,Tremellaceae,99,Cryptococcus,99,,62,819
+ASV820,ASV820,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Agaricales,100,Strophariaceae,94,Psilocybe,94,Psilocybe montana,86,820
+ASV823,ASV823,+,Fungi,100,Ascomycota,91,,55,,46,,46,,32,,24,823
+ASV825,ASV825,+,Fungi,100,Ascomycota,100,Taphrinomycetes,100,Taphrinales,100,Taphrinaceae,100,,66,,63,825
+ASV826,ASV826,+,Fungi,100,Ascomycota,97,Taphrinomycetes,95,Taphrinales,95,Taphrinaceae,95,Taphrina,75,,48,826
+ASV827,ASV827,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Leucosporidiales,100,Leucosporidiaceae,100,Leucosporidiella,72,,58,827
+ASV828,ASV828,+,Fungi,100,Ascomycota,96,Pezizomycotina_Incertae sedis,96,Pezizomycotina_Incertae sedis,96,Pezizomycotina_Incertae sedis,96,Torula,96,Torula caligans,96,828
+ASV831,ASV831,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellales_Incertae sedis,100,Dioszegia,100,,36,831
+ASV834,ASV834,+,Fungi,100,Ascomycota,99,,58,,58,,58,,57,,43,834
+ASV839,ASV839,+,Fungi,100,Ascomycota,89,,44,,44,,44,,44,,18,839
+ASV840,ASV840,+,Fungi,100,Ascomycota,95,Dothideomycetes,87,Pleosporales,86,Lophiostomataceae,73,Massarina,73,Massarina igniaria,71,840
+ASV848,ASV848,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Sporobolomyces,100,Sporobolomyces gracilis,99,848
+ASV854,ASV854,+,Fungi,100,Basidiomycota,73,,19,,19,,19,,19,,10,854
+ASV855,ASV855,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideomycetes_Incertae sedis,100,Dothideomycetes_Incertae sedis,100,Peltaster,100,Peltaster fructicola,100,855
+ASV870,ASV870,+,Fungi,100,Ascomycota,92,Dothideomycetes,91,Pleosporales,89,,40,,40,,39,870
+ASV873,ASV873,+,Fungi,100,Ascomycota,88,,63,,57,,33,,29,,29,873
+ASV874,ASV874,+,Fungi,100,Ascomycota,82,,60,,56,,45,,45,,45,874
+ASV878,ASV878,+,Fungi,100,Basidiomycota,97,Tremellomycetes,97,Tremellales,97,Tremellaceae,97,Cryptococcus,97,Cryptococcus paraflavus,97,878
+ASV880,ASV880,+,Fungi,100,Basidiomycota,100,Ustilaginomycetes,100,Ustilaginales,100,Ustilaginaceae,100,Pseudozyma,76,Pseudozyma churashimaensis,76,880
+ASV882,ASV882,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Russulales,100,Stereaceae,100,Stereum,100,Stereum hirsutum,77,882
+ASV883,ASV883,+,Fungi,100,Ascomycota,100,Sordariomycetes,92,,42,,42,,22,,22,883
+ASV884,ASV884,+,Fungi,100,Basidiomycota,96,Tremellomycetes,93,Tremellales,93,Tremellales_Incertae sedis,93,Bullera,92,Bullera variabilis,92,884
+ASV885,ASV885,+,Fungi,100,,33,,13,,13,,9,,9,,9,885
+ASV889,ASV889,+,Fungi,100,Basidiomycota,90,,68,,67,,62,,62,,34,889
+ASV897,ASV897,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Leptosphaeriaceae,100,Paraphoma,100,Paraphoma chrysanthemicola,100,897
+ASV898,ASV898,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,95,Sporobolomyces,77,,69,898
+ASV904,ASV904,+,Fungi,100,Ascomycota,79,,61,,44,,31,,31,,31,904
+ASV905,ASV905,+,Fungi,100,Ascomycota,98,Dothideomycetes,97,Pleosporales,85,Phaeosphaeriaceae,83,Phaeosphaeria,83,Phaeosphaeria phragmitis,81,905
+ASV907,ASV907,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Corticiales,100,Corticiaceae,100,Waitea,100,Rhizoctonia zeae,100,907
+ASV911,ASV911,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Phaeosphaeriaceae,97,Phaeosphaeria,92,,67,911
+ASV912,ASV912,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,96,Myrothecium,95,Myrothecium roridum,80,912
+ASV916,ASV916,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Sordariomycetidae_Incertae sedis,94,Apiosporaceae,94,Arthrinium,94,Arthrinium phaeospermum,91,916
+ASV924,ASV924,+,Fungi,100,,5,,5,,5,,5,,5,,4,924
+ASV927,ASV927,+,Fungi,100,Ascomycota,99,,59,,59,,59,,57,,43,927
+ASV930,ASV930,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Lophiostomataceae,99,Lophiostoma,99,,62,930
+ASV931,ASV931,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Dothideales,100,Dothioraceae,100,Hormonema,100,Hormonema prunorum,100,931
+ASV934,ASV934,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,,39,,29,,29,934
+ASV936,ASV936,+,Fungi,100,Ascomycota,99,Dothideomycetes,96,Pleosporales,95,,55,,55,,55,936
+ASV937,ASV937,+,Fungi,100,Basidiomycota,100,Tremellomycetes,100,Tremellales,100,Tremellaceae,100,Cryptococcus,100,Cryptococcus dimennae,100,937
+ASV940,ASV940,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Russulales,100,Peniophoraceae,100,Peniophora,95,,47,940
+ASV942,ASV942,+,Fungi,100,Ascomycota,100,Sordariomycetes,94,,57,,56,,56,,41,942
+ASV946,ASV946,+,Fungi,100,Ascomycota,94,Dothideomycetes,90,Pleosporales,88,Lophiostomataceae,83,Tetraploa,82,Tetraploa aristata,82,946
+ASV948,ASV948,+,Fungi,100,Ascomycota,98,Dothideomycetes,97,Pleosporales,86,Phaeosphaeriaceae,84,Phaeosphaeria,84,Phaeosphaeria phragmitis,82,948
+ASV950,ASV950,+,Fungi,100,Ascomycota,73,,25,,24,,23,,23,,22,950
+ASV951,ASV951,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Agaricales,100,Schizophyllaceae,100,Schizophyllum,100,Schizophyllum commune,100,951
+ASV954,ASV954,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Agaricales,99,,57,,46,,42,954
+ASV955,ASV955,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Pleosporales,100,Pleosporaceae,100,Pyrenophora,100,Drechslera biseptata,100,955
+ASV961,ASV961,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,99,Hypocreales_Incertae sedis,98,Acremonium,78,Acremonium implicatum,74,961
+ASV964,ASV964,+,Fungi,100,Ascomycota,92,Dothideomycetes,74,,41,,41,,41,,41,964
+ASV966,ASV966,+,Fungi,100,Ascomycota,100,Dothideomycetes,100,Capnodiales,100,Mycosphaerellaceae,99,Mycosphaerella,99,,54,966
+ASV977,ASV977,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,100,Hyponectriaceae,99,Microdochium,98,Microdochium bolleyi,98,977
+ASV981,ASV981,+,Fungi,100,Ascomycota,96,,60,,56,,13,,12,,12,981
+ASV982,ASV982,+,Fungi,100,Ascomycota,86,,68,,47,,47,,47,,47,982
+ASV988,ASV988,+,Fungi,100,Ascomycota,100,Sordariomycetes,83,,33,,32,,32,,18,988
+ASV989,ASV989,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Polyporales,100,Meruliaceae,92,Phlebia,92,Phlebia subochracea,90,989
+ASV993,ASV993,+,Fungi,100,Basidiomycota,85,Agaricomycetes,76,,59,,9,,9,,7,993
+ASV994,ASV994,+,Fungi,100,Ascomycota,99,Dothideomycetes,99,Pleosporales,99,Leptosphaeriaceae,97,Leptosphaeria,97,Leptosphaeria lindquistii,96,994
+ASV995,ASV995,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Agaricales,100,Schizophyllaceae,100,Schizophyllum,100,Schizophyllum commune,99,995
+ASV997,ASV997,+,Fungi,100,Ascomycota,100,Dothideomycetes,97,Capnodiales,97,,51,,48,,44,997
+ASV998,ASV998,+,Fungi,100,Basidiomycota,84,,69,,37,,5,,4,,4,998
+ASV1009,ASV1009,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,99,Hypocreales_Incertae sedis,97,Myrothecium,96,Myrothecium leucotrichum,96,1009
+ASV1024,ASV1024,+,Fungi,100,Ascomycota,91,,44,,11,,11,,3,,3,1024
+ASV1031,ASV1031,+,Fungi,100,,26,,5,,5,,3,,3,,3,1031
+ASV1033,ASV1033,+,Fungi,100,Basidiomycota,100,Microbotryomycetes,100,Sporidiobolales,100,Sporidiobolales_Incertae sedis,100,Rhodotorula,100,Rhodotorula ingeniosa,94,1033
+ASV1057,ASV1057,+,Fungi,100,Ascomycota,98,Dothideomycetes,98,Capnodiales,81,Mycosphaerellaceae,81,Septoria,81,Septoria arundinacea,81,1057
+ASV1060,ASV1060,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Russulales,100,Peniophoraceae,100,,61,,61,1060
+ASV1063,ASV1063,+,Fungi,100,Ascomycota,71,,18,,12,,9,,7,,7,1063
+ASV1064,ASV1064,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Diaporthales,100,Diaporthaceae,100,Diaporthe,100,Phomopsis longicolla,96,1064
+ASV1066,ASV1066,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Polyporales,100,Steccherinaceae,100,Irpex,100,Irpex lacteus,99,1066
+ASV1067,ASV1067,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,100,Entylomatales,100,Entylomataceae,100,Entyloma,100,,31,1067
+ASV1076,ASV1076,+,Fungi,100,Ascomycota,97,,67,,67,,67,,67,,43,1076
+ASV1079,ASV1079,+,Fungi,100,Ascomycota,97,Dothideomycetes,84,Pleosporales,84,Phaeosphaeriaceae,71,,18,,15,1079
+ASV1086,ASV1086,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Xylariales,98,,58,,40,,40,1086
+ASV1087,ASV1087,+,Fungi,100,Basidiomycota,92,Tremellomycetes,84,Tremellales,77,Tremellaceae,74,Cryptococcus,74,,29,1087
+ASV1090,ASV1090,+,Fungi,100,,56,,30,,30,,30,,13,,6,1090
+ASV1110,ASV1110,+,Fungi,100,Basidiomycota,100,Exobasidiomycetes,99,Tilletiales,99,Tilletiaceae,99,Tilletia,99,Tilletia moliniae,75,1110
+ASV1112,ASV1112,+,Fungi,100,Ascomycota,95,Dothideomycetes,89,Pleosporales,89,Lophiostomataceae,79,Massarina,79,Massarina igniaria,77,1112
+ASV1113,ASV1113,+,Fungi,100,Ascomycota,85,Dothideomycetes,75,Pleosporales,75,Lophiostomataceae,71,Lophiostoma,70,,45,1113
+ASV1117,ASV1117,+,Fungi,100,Ascomycota,99,Sordariomycetes,98,,63,,56,,30,,30,1117
+ASV1118,ASV1118,+,Fungi,100,Ascomycota,100,Sordariomycetes,100,Hypocreales,100,Hypocreales_Incertae sedis,100,Emericellopsis,100,,37,1118
+ASV1123,ASV1123,+,Fungi,100,Ascomycota,78,,50,,45,,24,,24,,24,1123
+ASV1124,ASV1124,+,Fungi,100,Ascomycota,78,,63,,62,,53,,38,,14,1124
+ASV1127,ASV1127,+,Fungi,100,Basidiomycota,86,Agaricomycetes,74,,60,,60,,28,,28,1127
+ASV1131,ASV1131,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Polyporales,99,,51,,51,,51,1131
+ASV1136,ASV1136,+,Fungi,100,Basidiomycota,88,Agaricomycetes,74,,35,,6,,6,,6,1136
+ASV1181,ASV1181,+,Fungi,100,Ascomycota,100,Eurotiomycetes,100,Chaetothyriales,100,Chaetothyriales_Incertae sedis,100,Strelitziana,100,Strelitziana africana,100,1181
+ASV1196,ASV1196,+,Fungi,100,Basidiomycota,100,Agaricomycetes,100,Polyporales,100,Meruliaceae,100,Phlebia,100,Mycoacia fuscoatra,100,1196
+ASV1227,ASV1227,+,Fungi,100,Basidiomycota,95,Agaricomycetes,94,,55,,29,,28,,14,1227
