@@ -472,14 +472,14 @@ pcoa_site <- ggplot() + coord_equal() +
     scale_x_continuous(paste("PCoA 1 (", explainvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", explainvar2, "%)", sep = "")) +
     #scale_shape_manual("", values = c(17, 1,10,16, 5,9,18, 0,7,15)) +
-    theme(axis.title = element_text(size = 14) ) +
-    annotate(geom = "text", x = c(-24.5+10, -6.6+10, 35.6-10, -5.1+10), 
-                            y = c(-25.4, 9.0, -11.6, 27.4), 
+    theme(axis.title = element_text(size = 16) ) +
+    annotate(geom = "text", x = c(-24.5+10, -6.6+11, 35.6-13, -5.1+11), 
+                            y = c(-25.4, 9.0, -11.6, 27.4), size = 6,
              label = levels(pcoa.dat$species), colour = spp_color) +
-    annotate(geom = "text", x = -30, y = 35, label = "A)", size = 5)
+    annotate(geom = "text", x = -30, y = 35, label = "A)", size = 6)
 pcoa_site
 
-#tiff("./figures/PCoA_site.tiff", width=6, height=6, units="in", res=600)
+#tiff("./figures/PCoA_site.tiff", width=5.3, height=5.3, units="in", res=600)
 pcoa_site
 #dev.off()
 ```
@@ -800,7 +800,7 @@ for(g in levels(soy.dat$nestSiteVar)){
 
 
 ## set ggplot2 theme
-theme_set(theme_bw(base_size=14)) 
+theme_set(theme_bw(base_size=16)) 
 theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
 
 
@@ -818,94 +818,92 @@ swch.gxe <- ggplot() + #coord_equal() +
     scale_colour_manual("", values = swc_color, 
           guide = guide_legend(override.aes = list(alpha = 0) ) ) +  #
     scale_x_continuous(paste("PCoA 1 (", swchvar1, "%)", sep = "")) +
-    scale_y_continuous(paste("PCoA 2 (", swchvar2, "%)", sep = "")) +
+    scale_y_continuous(paste("PCoA 2 (", swchvar2, "%)", sep = ""), limits = c(-32,43)) +
     annotate(geom = "text", x = c(-1.8, 43.9, -10.7, -31.4), 
                             y = c(-26.9+5, 15.4+8, -16.6+8, 28.0-8), 
           label = levels(swch.dat$site), colour = swc_color) +
-    theme(legend.position = "bottom", axis.title = element_text(size = 14), 
-          legend.text = element_text(color = "transparent")) +
-    annotate(geom = "text", x = -39, y = 38, label = "E)", size = 5)
-
+    annotate(geom = "text", x = -38, y = 40, label = "E)", size = 7)
 
 crn.gxe <- ggplot() + #coord_equal() + 
     geom_path(data = ellipses.crn, aes(x = V1, y = V2, 
           group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
           size = 0.9, show.legend = TRUE) +
     geom_point(data = crn.dat, aes(x = V1, y = V2, 
-          shape = factor(OVT.Variety), color = site) , size = 2) +
+          shape = factor(variety.rep), color = site) , size = 2) +
     #guides(shape = 'none', color = 'none') +
-    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(crn_color, each=4) ) +
-    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
     guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
            linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", crnvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", crnvar2, "%)", sep = "")) +
-    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
-         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
-         legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom") +
     annotate(geom = "text", x = c(-24.7, -24.2, 11.3, 35.6), 
                             y = c(7+10, 2.7-7, -23.7+11, 14.3-11), 
              label = levels(crn.dat$site), colour = crn_color) +
-    annotate(geom = "text", x = -31, y = 22, label = "B)", size = 5)
+    annotate(geom = "text", x = -29, y = 20, label = "B)", size = 7)
 
 wht.gxe <- ggplot() + #coord_equal() + 
     geom_path(data = ellipses.wht, aes(x = V1, y = V2, 
           group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
           size = 0.9, show.legend = TRUE) +
     geom_point(data = wht.dat, aes(x = V1, y = V2, 
-          shape = factor(OVT.Variety), color = site) , size = 2) +
+          shape = factor(variety.rep), color = site) , size = 2) +
     #guides(shape = 'none', color = 'none') +
-    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(wht_color, each=4) ) +
-    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
     guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
            linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", whtvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", whtvar2, "%)", sep = "")) +
-    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
-         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
-         legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom") +
     annotate(geom = "text", x = c(-22.6, -13.0, 9.3, 26.4), 
                             y = c(-7.4-6, 16.0-10, -15.6+6, 6.9+8), 
              label = levels(wht.dat$site), colour = wht_color) +
-    annotate(geom = "text", x = -30, y = 20, label = "D)", size = 5)
+    annotate(geom = "text", x = -28.5, y = 18.5, label = "D)", size = 7)
   
 soy.gxe <- ggplot() + #coord_equal() + 
     geom_path(data = ellipses.soy, aes(x = V1, y = V2, 
           group = nestSiteVar, colour = nestSiteVar, linetype = nestSiteVar), 
           size = 0.9, show.legend = TRUE) +
     geom_point(data = soy.dat, aes(x = V1, y = V2, 
-          shape = factor(OVT.Variety), color = site) , size = 2) +
+          shape = factor(variety.rep), color = site) , size = 2) +
     #guides(shape = 'none', color = 'none') +
-    scale_shape_manual("", values = rep(c(17, 16, 15), 4) ) +
+    scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(soy_color, each=4) ) +
-    scale_linetype_manual("", values = rep(c(1,2,3),4) ) +
+    scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
     guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
            linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", soyvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", soyvar2, "%)", sep = "")) +
-    theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 14),
-         legend.text=element_text(size=13.5), legend.title=element_text(size=12),
-         legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom") +
     annotate(geom = "text", x = c(-17.3, -12.9, 14.6, 15.6), 
                             y = c(1.6+11, -0.8+12, -11.1-7, 10.2+9), 
              label = levels(soy.dat$site), colour = soy_color) +
-    annotate(geom = "text", x = -21, y = 19.5, label = "C)", size = 5)
+    annotate(geom = "text", x = -20, y = 18, label = "C)", size = 7)
 
-```
+crn.gxe2 <- crn.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+         legend.text=element_text(size=16), legend.title=element_text(size=16),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom")
+soy.gxe2 <- soy.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+         legend.text=element_text(size=16), legend.title=element_text(size=16),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom")
+wht.gxe2 <- wht.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+         legend.text=element_text(size=16), legend.title=element_text(size=16),
+         legend.background = element_rect(colour = NA, fill = NA),
+         legend.position = "bottom")
+swch.gxe2 <- swch.gxe + theme(legend.position = "bottom", axis.title = element_text(size = 16), 
+          legend.text = element_text(color = "transparent"))
 
-```{r, echo = FALSE, results = 'hide', fig.height = 7, fig.width = 7}
 #tiff("./figures/Swch_PCoA_by_site.tiff", width=6, height=6, units="in", res=600)
 #swch.gxe
 #dev.off()
 
-#tiff("./figures/GxE_by_spp.tiff", width=9, height=8, units="in", res=600)
-multiplot(crn.gxe, soy.gxe, wht.gxe, swch.gxe, cols = 2)
-#dev.off()
+#width 7.9
+tiff("./figures/GxE_by_spp.tiff", width=7.9, height=7, units="in", res=600)
+multiplot(crn.gxe2, soy.gxe2, wht.gxe2, swch.gxe2, cols = 2)
+dev.off()
 ```
 
 ```{r, echo = FALSE, results = 'hide'}
