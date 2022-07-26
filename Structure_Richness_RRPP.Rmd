@@ -797,8 +797,9 @@ for(g in levels(soy.dat$nestSiteVar)){
     veganCovEllipse(cov.wt(cbind(V1, V2),
          wt=rep(1/length(V1),length(V1)))$cov, 
          center=c(mean(V1), mean(V2)))   )) , nestSiteVar=g))   } 
+```
 
-
+```{r, echo = FALSE, results = 'hide', fig.keep = 'none'}
 ## set ggplot2 theme
 theme_set(theme_bw(base_size=16)) 
 theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
@@ -815,8 +816,8 @@ swch.gxe <- ggplot() + #coord_equal() +
           show.legend = TRUE) +
     geom_point(data = swch.dat, aes(x = V1, y = V2, 
           color = factor(site)) , size = 2) +
-    scale_colour_manual("", values = swc_color, 
-          guide = guide_legend(override.aes = list(alpha = 0) ) ) +  #
+    scale_colour_manual("", values = swc_color ) +  #, guide = guide_legend(override.aes = list(alpha = 0) )
+    guides(colour = 'none') +
     scale_x_continuous(paste("PCoA 1 (", swchvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", swchvar2, "%)", sep = ""), limits = c(-32,43)) +
     annotate(geom = "text", x = c(-1.8+15, 43.9, -10.7, -31.4), 
@@ -830,12 +831,12 @@ crn.gxe <- ggplot() + #coord_equal() +
           size = 0.9, show.legend = TRUE) +
     geom_point(data = crn.dat, aes(x = V1, y = V2, 
           shape = factor(variety.rep), color = site) , size = 2) +
-    #guides(shape = 'none', color = 'none') +
+    guides(shape = 'none', color = 'none', linetype = 'none') +
     scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(crn_color, each=4) ) +
     scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
-    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
-           linetype = 'none', colour = 'none' ) +
+    #guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+    #       linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", crnvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", crnvar2, "%)", sep = "")) +
     annotate(geom = "text", x = c(-24.7+8, -24.2, 11.3, 35.6), 
@@ -849,12 +850,12 @@ wht.gxe <- ggplot() + #coord_equal() +
           size = 0.9, show.legend = TRUE) +
     geom_point(data = wht.dat, aes(x = V1, y = V2, 
           shape = factor(variety.rep), color = site) , size = 2) +
-    #guides(shape = 'none', color = 'none') +
+    guides(shape = 'none', color = 'none', linetype = 'none') +
     scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(wht_color, each=4) ) +
     scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
-    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
-           linetype = 'none', colour = 'none' ) +
+    #guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+    #       linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", whtvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", whtvar2, "%)", sep = "")) +
     annotate(geom = "text", x = c(-22.6, -13.0, 9.3, 26.4), 
@@ -868,12 +869,12 @@ soy.gxe <- ggplot() + #coord_equal() +
           size = 0.9, show.legend = TRUE) +
     geom_point(data = soy.dat, aes(x = V1, y = V2, 
           shape = factor(variety.rep), color = site) , size = 2) +
-    #guides(shape = 'none', color = 'none') +
+    guides(shape = 'none', color = 'none', linetype = 'none') +
     scale_shape_manual("Variety", values = rep(c(17, 16, 15), 4) ) +
     scale_colour_manual(values = rep(soy_color, each=4) ) +
     scale_linetype_manual("Variety", values = rep(c(1,2,3),4) ) +
-    guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
-           linetype = 'none', colour = 'none' ) +
+    #guides(shape = guide_legend(override.aes = list(linetype = c(1,2,3))),
+    #       linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", soyvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", soyvar2, "%)", sep = "")) +
     annotate(geom = "text", x = c(-17.3, -12.9+5, 14.6, 15.6-3), 
