@@ -604,7 +604,7 @@ all_cca_vec_sig <- all_cca_vec[all_cca_vec$vecs %in% cca_sig, ]
 # figure
 CCA_site_all2 <- ggplot() + coord_equal() + 
     geom_point(data = all_cca_x, aes(x =  CCA1, y =  CCA2, 
-          color = factor(nestSite)) , size = 3) +
+          color = factor(nestSite)) , size = 5) +
     geom_segment(data = all_cca_vec_sig, 
                  aes(x = 0, xend = CCA1, y = 0, yend = CCA2),
                  arrow = arrow(length = unit(0.25, "cm")), size = 0.8,
@@ -612,19 +612,20 @@ CCA_site_all2 <- ggplot() + coord_equal() +
     geom_text(data = all_cca_vec_sig,
           aes(x = c(0.40+.36, 0.71+.57, 0.76+.36, 0.19-.32),
               y = c(0.80,  0.04-.04, 0.11+.04, 0.69), label = vecs),
-                 size = 4, colour = "gray30", fontface = 'bold') +
+                 size = 6, colour = "gray30", fontface = 'bold') +
     scale_colour_manual("", values = site_color[c(1:13,15:16)]) +
     scale_x_continuous(paste("CCA Axis-1 (", explain_all[1], "%)", sep = "")) +
     scale_y_continuous(paste("CCA Axis-2 (", explain_all[2], "%)", sep = "")) +
     guides(colour=guide_legend(ncol=4)) +
     theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
           panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
-          axis.title = element_text(size = 12),
-          legend.text=element_text(size=10), legend.title=element_text(size=12),
+          axis.title = element_text(size = 16), axis.text = element_text(size =14),
+          legend.text=element_text(size=16), legend.title=element_text(size=12),
           legend.background = element_rect(colour = NA, fill = NA),
-          legend.position = "bottom") 
+          legend.position = "bottom", legend.margin=margin(0,0,0,0), 
+          legend.box.margin=margin(-10,-10,-6,10)) 
 
-#tiff("./figures/CCA_all2_SiteLevel.tiff", width=6, height=6, units="in", res=600)
+#tiff("./figures/CCA_all2_SiteLevel.tiff", width=8.97, height=8.97, units="in", res=600)
 CCA_site_all2
 #dev.off()
 ```

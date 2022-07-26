@@ -479,7 +479,7 @@ pcoa_site <- ggplot() + coord_equal() +
     annotate(geom = "text", x = -30, y = 35, label = "A)", size = 6)
 pcoa_site
 
-#tiff("./figures/PCoA_site.tiff", width=5.3, height=5.3, units="in", res=600)
+#tiff("./figures/PCoA_site.tiff", width=6.2, height=6.2, units="in", res=600)
 pcoa_site
 #dev.off()
 ```
@@ -819,9 +819,9 @@ swch.gxe <- ggplot() + #coord_equal() +
           guide = guide_legend(override.aes = list(alpha = 0) ) ) +  #
     scale_x_continuous(paste("PCoA 1 (", swchvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", swchvar2, "%)", sep = ""), limits = c(-32,43)) +
-    annotate(geom = "text", x = c(-1.8, 43.9, -10.7, -31.4), 
-                            y = c(-26.9+5, 15.4+8, -16.6+8, 28.0-8), 
-          label = levels(swch.dat$site), colour = swc_color) +
+    annotate(geom = "text", x = c(-1.8+15, 43.9, -10.7, -31.4), 
+                            y = c(-26.9+5, 15.4+9, -16.6+9, 28.0-10), 
+          label = levels(swch.dat$site), colour = swc_color, size = 5) +
     annotate(geom = "text", x = -38, y = 40, label = "E)", size = 7)
 
 crn.gxe <- ggplot() + #coord_equal() + 
@@ -838,9 +838,9 @@ crn.gxe <- ggplot() + #coord_equal() +
            linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", crnvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", crnvar2, "%)", sep = "")) +
-    annotate(geom = "text", x = c(-24.7, -24.2, 11.3, 35.6), 
+    annotate(geom = "text", x = c(-24.7+8, -24.2, 11.3, 35.6), 
                             y = c(7+10, 2.7-7, -23.7+11, 14.3-11), 
-             label = levels(crn.dat$site), colour = crn_color) +
+             label = levels(crn.dat$site), colour = crn_color, size = 5) +
     annotate(geom = "text", x = -29, y = 20, label = "B)", size = 7)
 
 wht.gxe <- ggplot() + #coord_equal() + 
@@ -858,8 +858,8 @@ wht.gxe <- ggplot() + #coord_equal() +
     scale_x_continuous(paste("PCoA 1 (", whtvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", whtvar2, "%)", sep = "")) +
     annotate(geom = "text", x = c(-22.6, -13.0, 9.3, 26.4), 
-                            y = c(-7.4-6, 16.0-10, -15.6+6, 6.9+8), 
-             label = levels(wht.dat$site), colour = wht_color) +
+                            y = c(-7.4-6, 16.0-12.5, -15.6+9, 6.9+8), 
+             label = levels(wht.dat$site), colour = wht_color, size = 5) +
     annotate(geom = "text", x = -28.5, y = 18.5, label = "D)", size = 7)
   
 soy.gxe <- ggplot() + #coord_equal() + 
@@ -876,34 +876,38 @@ soy.gxe <- ggplot() + #coord_equal() +
            linetype = 'none', colour = 'none' ) +
     scale_x_continuous(paste("PCoA 1 (", soyvar1, "%)", sep = "")) +
     scale_y_continuous(paste("PCoA 2 (", soyvar2, "%)", sep = "")) +
-    annotate(geom = "text", x = c(-17.3, -12.9, 14.6, 15.6), 
+    annotate(geom = "text", x = c(-17.3, -12.9+5, 14.6, 15.6-3), 
                             y = c(1.6+11, -0.8+12, -11.1-7, 10.2+9), 
-             label = levels(soy.dat$site), colour = soy_color) +
+             label = levels(soy.dat$site), colour = soy_color, size = 5) +
     annotate(geom = "text", x = -20, y = 18, label = "C)", size = 7)
 
-crn.gxe2 <- crn.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+crn.gxe2 <- crn.gxe + theme(legend.key.width = unit(.8, "cm"), axis.title = element_text(size = 16),
          legend.text=element_text(size=16), legend.title=element_text(size=16),
          legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom")
-soy.gxe2 <- soy.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+         legend.position = "bottom", legend.margin=margin(0,0,0,0), 
+         legend.box.margin=margin(-10,-10,-6,10))
+soy.gxe2 <- soy.gxe + theme(legend.key.width = unit(.8, "cm"), axis.title = element_text(size = 16),
          legend.text=element_text(size=16), legend.title=element_text(size=16),
          legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom")
-wht.gxe2 <- wht.gxe + theme(legend.key.width = unit(.6, "cm"), axis.title = element_text(size = 16),
+         legend.position = "bottom", legend.margin=margin(0,0,0,0), 
+         legend.box.margin=margin(-10,-10,-6,10))
+wht.gxe2 <- wht.gxe + theme(legend.key.width = unit(.8, "cm"), axis.title = element_text(size = 16),
          legend.text=element_text(size=16), legend.title=element_text(size=16),
          legend.background = element_rect(colour = NA, fill = NA),
-         legend.position = "bottom")
+         legend.position = "bottom", legend.margin=margin(0,0,0,0), 
+         legend.box.margin=margin(-10,-10,-6,10))
 swch.gxe2 <- swch.gxe + theme(legend.position = "bottom", axis.title = element_text(size = 16), 
-          legend.text = element_text(color = "transparent"))
+          legend.text = element_text(color = "transparent"), legend.margin=margin(0,0,0,0), 
+         legend.box.margin=margin(-10,-10,-6,10))
 
 #tiff("./figures/Swch_PCoA_by_site.tiff", width=6, height=6, units="in", res=600)
 #swch.gxe
 #dev.off()
 
 #width 7.9
-tiff("./figures/GxE_by_spp.tiff", width=7.9, height=7, units="in", res=600)
+#tiff("./figures/GxE_by_spp.tiff", width=7.9, height=7, units="in", res=600)
 multiplot(crn.gxe2, soy.gxe2, wht.gxe2, swch.gxe2, cols = 2)
-dev.off()
+#dev.off()
 ```
 
 ```{r, echo = FALSE, results = 'hide'}

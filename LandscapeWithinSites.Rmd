@@ -347,28 +347,30 @@ land_A <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
        aes(x = percentage, y = Rich_nosing, colour = site)) +
   geom_smooth(aes(x = percentage, y = Rich_nosing), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=.2) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=.8) +
   scale_y_continuous("Avg. Within Site Richness", limits = c(0,90)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 3, y = 84.65, label = "A)")
+  theme(legend.position="none", 
+        axis.title = element_text(size = 16), axis.text = element_text(size =14)) +
+  annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 6)
 
 land_B <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
        aes(x = percentage, y = mean, colour = site)) +
   geom_smooth(aes(x = percentage, y = mean), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 2) +
-  geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=.2) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=.8) +
   scale_y_continuous("Avg. Within Site Dissimilarity", limits = c(0,65)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 3, y = 61, label = "B)")
+  theme(legend.position="none", 
+        axis.title = element_text(size = 16), axis.text = element_text(size =14)) +
+  annotate(geom = "text", x = 3, y = 61, label = "B)", size = 6)
 
 
-#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=7.5, height=4, units="in", res=600)
+#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=13.2, height=7.04, units="in", res=600)
 multiplot(land_A, land_B, cols=2)
 #dev.off()
 
