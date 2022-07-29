@@ -353,8 +353,8 @@ land_A <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 16), axis.text = element_text(size =14)) +
-  annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 6)
+        axis.title = element_text(size = 28), axis.text = element_text(size = 28)) +
+  annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 9)
 
 land_B <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
        aes(x = percentage, y = mean, colour = site)) +
@@ -366,8 +366,8 @@ land_B <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 16), axis.text = element_text(size =14)) +
-  annotate(geom = "text", x = 3, y = 61, label = "B)", size = 6)
+        axis.title = element_text(size = 28), axis.text = element_text(size =28)) +
+  annotate(geom = "text", x = 3, y = 61, label = "B)", size = 9)
 
 
 #tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=13.2, height=7.04, units="in", res=600)
