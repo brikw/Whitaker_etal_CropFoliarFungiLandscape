@@ -151,8 +151,8 @@ env_corr <- subset(RichLU, select=c( Perc_crop_10km, Perc_veg_10km, Perc_crop_1k
 cor(env_corr)
 # all are strongly correlated, likely to be collinear and will need to drop some from model
 
-#tiff("./figures/Corrplot Landcover factors.tiff", width=5.5, height=3, units="in", res=600)
-corrplot::corrplot(cor(env_corr), method="number", type="lower", order="hclust", tl.pos = 'l',
+#tiff("./figures/Corrplot Landcover factors.tiff", width=7, height=4.36, units="in", res=600)
+corrplot::corrplot(cor(env_corr), method="number", type="lower", order="hclust", #tl.pos = 'l',
                    tl.col = 'black', tl.cex = .9, cl.cex = 0.8, number.cex = .9)
 #dev.off()
 ```
@@ -160,15 +160,26 @@ corrplot::corrplot(cor(env_corr), method="number", type="lower", order="hclust",
 # Check Crop Differences in landcover
 ```{r}
 p1 <- ggplot(RichLU, aes(y=Perc_crop_10km, x=species, color = species)) +
-      geom_point(size = 3) + guides(color = "none")
+      geom_violin() + geom_jitter(size = 3, width = 0.05) + guides(color = "none") +
+      scale_color_manual(values = spp_color) + 
+      annotate(geom = "text", x = .7, y = 58, label = "C)", size = 5.5)
 p2 <- ggplot(RichLU, aes(y=Perc_crop_1km, x=species, color = species)) +
-      geom_point(size = 3) + guides(color = "none")
-p3 <- ggplot(RichLU, aes(y=Perc_veg_10km, x=species, color = species)) +
-      geom_point(size = 3) + guides(color = "none")
-p4 <- ggplot(RichLU, aes(y=Perc_veg_1km, x=species, color = species)) +
-      geom_point(size = 3) + guides(color = "none")
+      geom_violin() + geom_jitter(size = 3, width = 0.05) + guides(color = "none") +
+      scale_color_manual(values = spp_color) + 
+      annotate(geom = "text", x = .7, y = 95, label = "D)", size = 5.5)
 
-multiplot(p1,p2,p3,p4, cols = 2)
+p3 <- ggplot(RichLU, aes(y=Perc_veg_10km, x=species, color = species)) +
+      geom_violin() + geom_jitter(size = 3, width = 0.05) + guides(color = "none") +
+      scale_color_manual(values = spp_color) + 
+      annotate(geom = "text", x = .7, y = 70, label = "A)", size = 5.5)
+p4 <- ggplot(RichLU, aes(y=Perc_veg_1km, x=species, color = species)) +
+      geom_violin() + geom_jitter(size = 3, width = 0.05) + guides(color = "none") +
+      scale_color_manual(values = spp_color) + 
+      annotate(geom = "text", x = .7, y = 51.3, label = "B)", size = 5.5)
+
+#tiff("./figures/Distribution Landcover factors.tiff", width=6.5, height=5.5, units="in", res=600)
+multiplot(p3,p4,p1,p2, cols = 2)
+#dev.off()
 ```
 
 # RICHNESS
