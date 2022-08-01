@@ -269,49 +269,73 @@ olsrr::ols_step_best_subset(model7)
 # WITHIN SITE HETEROGENEITY
 ### Define regression model and check assumptions
 ```{r}
-model7 <- lm(mean ~ Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km, data=RichLU)
+# Define initial model
+model8 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + 
+                 Precip_90day + LT_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
 
-olsrr::ols_plot_resid_fit(model7)
+olsrr::ols_plot_resid_fit(model8)
 
-olsrr::ols_test_normality(model7) 
+olsrr::ols_test_normality(model8) 
 
-olsrr::ols_test_breusch_pagan(model7, rhs=TRUE, multiple=TRUE) 
+olsrr::ols_test_breusch_pagan(model8, rhs=TRUE, multiple=TRUE) 
 
-olsrr::ols_coll_diag(model4)
-```
-
-```{r}
-# vif's are 3-7, need to drop variables
-# Redefine model with worst variable dropped
-model8 <-lm(mean ~ Perc_crop_10km + Perc_crop_1km + Perc_veg_1km, data=RichLU)
 olsrr::ols_coll_diag(model8)
 ```
 
 ```{r}
-# vif's are still 3-5
-# drop next worst variable
-model9 <- lm(mean ~ Perc_crop_10km + Perc_veg_1km, data=RichLU)
+model9 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
 olsrr::ols_coll_diag(model9)
 
-# both factors have vif's under 2!
+model10 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+olsrr::ols_coll_diag(model10)
+
+model11 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+olsrr::ols_coll_diag(model11)
+
+model12 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
+                 #Perc_crop_10km +  
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+olsrr::ols_coll_diag(model12)
+
+model13 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
+                 #Perc_crop_10km +  Perc_crop_1km + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+olsrr::ols_coll_diag(model13)
+
+```
+
+```{r}
+model14 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
+                 #Perc_crop_10km +  Perc_crop_1km + plantHt + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean + pH, data=RichLU)
+olsrr::ols_coll_diag(model14)
+
+# all factors have vif's under 2!
 ```
 
 ### Regression
 ```{r}
-olsrr::ols_step_best_subset(model9)
+olsrr::ols_step_best_subset(model14)
 
-# best model based on AIC, C(p) has only Perc_veg_1km; also has best Adj.R2
+# final three models all competitive for best model, possibly model 2 and 3 best, model 2 highest Adj R2
 ```
-
-
-```{r}
-# run simple linear regression on best model to get P value
-olsrr::ols_regress(mean ~ Perc_veg_1km, data=RichLU)
-
-# contrast to P value for model3
-olsrr::ols_regress(model9)
-```
-
 
 
 
