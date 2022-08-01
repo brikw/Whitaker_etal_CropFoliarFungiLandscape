@@ -643,8 +643,36 @@ CCA_site_all2
 
 ```{r, echo = FALSE, results = 'hide', fig.height= 8, fig.width  = 7.5}
 dist_site_ls <- dist2list(dist_site, tri = TRUE)
-## dist_site_ls <- liste(dist_site, entry = "vst.dist")  ## NOTE simba::liste and simba depreciated
+dist_site_ls %>% filter(col != 'WHT-PASVT') %>% filter(row != 'WHT-PASVT') -> dist_site_ls
+dim(test) #105 comps
 
+#recent climate
+dist_site_ls$pr90X <- SbyE_site$Precip_90day[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$pr90Y <- SbyE_site$Precip_90day[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$pr90 <- abs(dist_site_ls$pr90X - dist_site_ls$pr90Y)
+
+dist_site_ls$lt90X <- SbyE_site$LT_90day[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$lt90Y <- SbyE_site$LT_90day[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$lt90 <- abs(dist_site_ls$lt90X - dist_site_ls$lt90Y)
+
+dist_site_ls$ht90X <- SbyE_site$HT_90day[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$ht90Y <- SbyE_site$HT_90day[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$ht90 <- abs(dist_site_ls$ht90X - dist_site_ls$ht90Y)
+
+#historic climate
+dist_site_ls$mapX <- SbyE_site$MAP[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$mapY <- SbyE_site$MAP[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$map <- abs(dist_site_ls$mapX - dist_site_ls$mapY)
+
+dist_site_ls$mltX <- SbyE_site$MLT[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$mltY <- SbyE_site$MLT[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$mlt <- abs(dist_site_ls$mltX - dist_site_ls$mltY)
+
+dist_site_ls$mhtX <- SbyE_site$MHT[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$mhtY <- SbyE_site$MHT[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$mht <- abs(dist_site_ls$mhtX - dist_site_ls$mhtY)
+
+# landcover
 dist_site_ls$crop10X <- SbyE_site$Perc_crop_10km[match(dist_site_ls$col, SbyE_site$nestSite)]
 dist_site_ls$crop10Y <- SbyE_site$Perc_crop_10km[match(dist_site_ls$row, SbyE_site$nestSite)]
 dist_site_ls$crop10 <- abs(dist_site_ls$crop10X - dist_site_ls$crop10Y)
@@ -661,54 +689,37 @@ dist_site_ls$veg1X <- SbyE_site$Perc_veg_1km[match(dist_site_ls$col, SbyE_site$n
 dist_site_ls$veg1Y <- SbyE_site$Perc_veg_1km[match(dist_site_ls$row, SbyE_site$nestSite)]
 dist_site_ls$veg1 <- abs(dist_site_ls$veg1X - dist_site_ls$veg1Y)
 
-dist_site_ls %>% dplyr::select(-crop10X, -crop10Y, -veg10X, -veg10Y, 
-                               -crop1X, -crop1Y, -veg1X, -veg1Y) -> dist_site_ls
+# soil
+dist_site_ls$moistX <- SbyE_site$soilmoist[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$moistY <- SbyE_site$soilmoist[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$moist <- abs(dist_site_ls$moistX - dist_site_ls$moistY)
+
+dist_site_ls$hmX <- SbyE_site$HM_perc[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$hmY <- SbyE_site$HM_perc[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$hm <- abs(dist_site_ls$hmX - dist_site_ls$hmY)
+
+dist_site_ls$phX <- SbyE_site$pH[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$phY <- SbyE_site$pH[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$ph <- abs(dist_site_ls$phX - dist_site_ls$phY)
+
+# plant
+dist_site_ls$laiX <- SbyE_site$LAI.mean[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$laiY <- SbyE_site$LAI.mean[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$lai <- abs(dist_site_ls$laiX - dist_site_ls$laiY)
+
+dist_site_ls$hgtX <- SbyE_site$plantHt[match(dist_site_ls$col, SbyE_site$nestSite)]
+dist_site_ls$hgtY <- SbyE_site$plantHt[match(dist_site_ls$row, SbyE_site$nestSite)]
+dist_site_ls$hgt <- abs(dist_site_ls$hgtX - dist_site_ls$hgtY)
+
+dist_site_ls %>% dplyr::select(-ends_with("X"), -ends_with("Y")) -> dist_site_ls
 ```
 
-### 3b) Figures - all 4 landacape vrbls
-```{r, echo = FALSE, results = 'hide', fig.height= 8, fig.width  = 7.5}
-p5 <- ggplot(dist_site_ls, aes(x = crop10, y = value)) +
-  geom_point(size = 2, color = '#666666') +
-  geom_smooth(aes(x = crop10, y = value), method=lm, formula = y ~ x, 
-              se = TRUE, color = '#666666', linetype = 'dashed') +
-  scale_y_continuous(" ") +
-  scale_x_continuous("\n") +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 48, y = 168, label = "B)")
-p6 <- ggplot(dist_site_ls, aes(x = veg10, y = value)) +
-  geom_point(size = 2, color = '#666666') +
-  geom_smooth(aes(x = veg10, y = value), method=lm, formula = y ~ x, 
-              se = TRUE, color = '#666666', linetype = 'dashed') +
-  scale_y_continuous("Dissimilarity Between Sites") +
-  scale_x_continuous("\n") +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 42.5, y = 168, label = "A)")
-p7 <- ggplot(dist_site_ls, aes(x = crop1, y = value)) +
-  geom_point(size = 2, color = '#E7298A') +
-  geom_smooth(aes(x = crop1, y = value), method=lm, formula = y ~ x, 
-              se = TRUE, color = '#E7298A', linetype = 'dashed') +
-  scale_y_continuous(" ") +
-  scale_x_continuous("Net Difference in\n% Cropland Between Sites") +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 82, y = 168, label = "D)")
-p8 <- ggplot(dist_site_ls, aes(x = veg1, y = value)) +
-  geom_point(size = 2, color = '#E7298A') +
-  geom_smooth(aes(x = veg1, y = value), method=lm, formula = y ~ x, 
-              se = TRUE, color = '#E7298A', linetype = 'dashed') +
-  scale_y_continuous("Dissimilarity Between Sites") +
-  scale_x_continuous("Net Difference in\n% Vegetation Between Sites") +
-  theme(legend.position="none") +
-  annotate(geom = "text", x = 51, y = 168, label = "C)")
-
-#tiff("./figures/BetaDiv_BwSites_Perc_Crop_Veg.tiff", width=8, height=7.5, units="in", res=600)
-multiplot(p6, p5, p8, p7, cols=2)
-#dev.off()
-```
-
-### 3c) OLS models
+### 3b) OLS models
 ```{r}
 # best subsets approach
-BW1 <- lm(value ~ crop10 + veg10 + crop1 + veg1, data=dist_site_ls)
+BW1 <- lm(value ~ pr90 + lt90 + ht90 + map + mlt + mht +
+              crop10 + veg10 + crop1 + veg1 +
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
 
 olsrr::ols_plot_resid_fit(BW1)
 
@@ -717,27 +728,47 @@ olsrr::ols_test_normality(BW1)
 olsrr::ols_test_breusch_pagan(BW1, rhs=TRUE, multiple=TRUE) 
 
 olsrr::ols_coll_diag(BW1)
+```
 
-# VIFs 2-4
-# Redefine model with worst variable dropped
-BW2 <- lm(value ~ crop10 + veg10 + veg1, data=dist_site_ls)
+```{r}
+BW2 <- lm(value ~ pr90 + lt90 + map + mlt + mht + #ht90 +
+              crop10 + veg10 + crop1 + veg1 +
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
 olsrr::ols_coll_diag(BW2)
-# VIFs 2-4
-# drop next worst variable
-BW3 <- lm(value ~ crop10 + veg1, data=dist_site_ls)
+
+BW3 <- lm(value ~ pr90 + lt90 + map + mlt + mht + #ht90 + crop10 + 
+              veg10 + crop1 + veg1 +
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
 olsrr::ols_coll_diag(BW3)
 
-# VIFs < 2 !
+BW4 <- lm(value ~ pr90 + lt90 + map + mlt + mht + #ht90 + crop10 + veg1 +
+              veg10 + crop1 + 
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
+olsrr::ols_coll_diag(BW4)
 
-olsrr::ols_step_best_subset(BW3)
+BW5 <- lm(value ~ pr90 + lt90 + map + mlt + mht + #ht90 + crop10 + veg1 + crop1 +
+              veg10 +  
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
+olsrr::ols_coll_diag(BW5)
 
-# best model based on AIC, C(p) has only Perc_veg_1km; but in general Adj. R2 still bad
+BW6 <- lm(value ~ pr90 + lt90 + map +  mht + #ht90 + crop10 + veg1 + crop1 + mlt +
+              veg10 +  
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
+olsrr::ols_coll_diag(BW6)
+```
 
-# run simple linear regression on best model to get P value
-olsrr::ols_regress(value ~ veg1, data=dist_site_ls)   #p = 0.0322
+```{r}
+BW7 <- lm(value ~ lt90 + map +  mht + #ht90 + crop10 + veg1 + crop1 + mlt + pr90 + 
+              veg10 +  
+              moist + hm + ph + lai + hgt, data=dist_site_ls)
+olsrr::ols_coll_diag(BW7)
+```
 
-# contrast to P value for model3
-olsrr::ols_regress(BW3)
+```{r}
+olsrr::ols_step_best_subset(BW7)
+
+
+
 ```
 
 ### 3d) Figure for Supps
