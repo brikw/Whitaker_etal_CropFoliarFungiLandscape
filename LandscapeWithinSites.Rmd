@@ -25,7 +25,8 @@ This document reports on the landscape-level analyses from the NC Microbiome Lan
 
 
 ```{r, include=FALSE} 
-x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "viridis", "car", 'olsrr', 'reshape2')  
+x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "viridis", "car", 
+     'olsrr', 'reshape2', 'egg')  
 lapply(x, require, character.only = TRUE)
 
 #add 'not in' function
@@ -337,39 +338,25 @@ olsrr::ols_step_best_subset(model14)
 # final three models all competitive for best model, possibly model 2 and 3 best, model 2 highest Adj R2
 ```
 
-
+* Models with LT_90day and Perc_veg_1km the best models for both richness and w/in site beta-div
+* For richness, MAP also a contender. For w/in site beta-div Precip_90day also a contender
 
 # FIGURES
 ```{r}
 # make long format data
-
-names(RichLU)
-head(RichLU)
-
 RichLU_long <- melt(RichLU, id.vars = c('site', 'mean', 'ci', 
-                    'Longitude', 'Latitude', 'Rich_nosing', 'Rich_nosing_ci',
-                    'Rich_sing', 'Rich_sing_ci'), 
-  measure.vars = c('Perc_crop_10km', 'Perc_veg_10km', 'Perc_crop_1km', 'Perc_veg_1km'),
-  variable.name = 'landcover.type', value.name = 'percentage')
-
-RichLU_long$scale <- as.factor(unname(sapply(RichLU_long$landcover.type,  function(x) strsplit(as.character(x), "_")[[1]][3] )) )
-RichLU_long$type <- as.factor(unname(sapply(RichLU_long$landcover.type,  function(x) strsplit(as.character(x), "_")[[1]][2] )) )
-
-levels(RichLU_long$type) <- c("Cropland", "Vegetation")
-
-# then reverse order for figure
-RichLU_long$type <- factor(RichLU_long$type, levels = c("Vegetation", "Cropland"))
-
-
+                    'Rich_nosing', 'Rich_nosing_ci'), 
+  measure.vars = c('Perc_veg_1km', 'LT_90day'),
+  variable.name = 'sig_vars', value.name = 'values')
 ```
 
 ```{r}
-land_A <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
-       aes(x = percentage, y = Rich_nosing, colour = site)) +
-  geom_smooth(aes(x = percentage, y = Rich_nosing), method=lm, formula = y ~ x,
+rich_veg1km <- ggplot(RichLU_long[RichLU_long$sig_vars == "Perc_veg_1km",],
+       aes(x = values, y = Rich_nosing, colour = site)) +
+  geom_smooth(aes(x = values, y = Rich_nosing), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
   geom_point(size = 4) +
-  geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=.8) +
+  geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=1.4) +
   scale_y_continuous("Avg. Within Site Richness", limits = c(0,90)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
@@ -377,22 +364,52 @@ land_A <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
         axis.title = element_text(size = 28), axis.text = element_text(size = 28)) +
   annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 9)
 
-land_B <- ggplot(RichLU_long[RichLU_long$landcover.type == "Perc_veg_1km",],
-       aes(x = percentage, y = mean, colour = site)) +
-  geom_smooth(aes(x = percentage, y = mean), method=lm, formula = y ~ x,
+rich_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
+       aes(x = values, y = Rich_nosing, colour = site)) +
+  geom_smooth(aes(x = values, y = Rich_nosing), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
   geom_point(size = 4) +
-  geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=.8) +
+  geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=.5) +
+  scale_y_continuous("Avg. Within Site Richness", limits = c(0,90)) +
+  scale_x_continuous(expression(atop("90-day Low Temperature", 
+                            paste("(",~degree, "C)", sep = ""))), 
+                                limits = c(-5.5,11)) +
+  scale_color_manual("", values = site_color) +
+  theme(legend.position="none", 
+        axis.title = element_text(size = 28), axis.text = element_text(size = 28)) +
+  annotate(geom = "text", x = -5, y = 84.65, label = "B)", size = 9)
+
+bdiv_veg1km <- ggplot(RichLU_long[RichLU_long$sig_vars == "Perc_veg_1km",],
+       aes(x = values, y = mean, colour = site)) +
+  geom_smooth(aes(x = values, y = mean), method=lm, formula = y ~ x,
+              se = TRUE, color = '#666666', linetype = 1) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=1.4) +
   scale_y_continuous("Avg. Within Site Dissimilarity", limits = c(0,65)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
         axis.title = element_text(size = 28), axis.text = element_text(size =28)) +
-  annotate(geom = "text", x = 3, y = 61, label = "B)", size = 9)
+  annotate(geom = "text", x = 3, y = 61, label = "C)", size = 9)
+
+bdiv_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
+       aes(x = values, y = mean, colour = site)) +
+  geom_smooth(aes(x = values, y = mean), method=lm, formula = y ~ x,
+              se = TRUE, color = '#666666', linetype = 1) +
+  geom_point(size = 4) +
+  geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=.5) +
+  scale_y_continuous("Avg. Within Site Dissimilarity", limits = c(0,65)) +
+  scale_x_continuous(expression(atop("90-day Low Temperature", 
+                            paste("(",~degree, "C)", sep = ""))), 
+                                limits = c(-5.5,11)) +
+  scale_color_manual("", values = site_color) +
+  theme(legend.position="none", 
+        axis.title = element_text(size = 28), axis.text = element_text(size =28)) +
+  annotate(geom = "text", x = -5, y = 61, label = "D)", size = 9)
 
 
-#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=13.2, height=7.04, units="in", res=600)
-multiplot(land_A, land_B, cols=2)
+#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=13.2, height=13.2, units="in", res=600)
+ggarrange(rich_veg1km, rich_lt, bdiv_veg1km, bdiv_lt, widths = c(1,1))
 #dev.off()
 
 ```
