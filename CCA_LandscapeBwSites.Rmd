@@ -354,6 +354,11 @@ SbyE_site <- data.frame(
     # plot level, but with some missing values, no SWCH or WHT-PASVT
     Yield = c(tapply(SbyE_gee$Yield, SbyE_gee$nestSite, mean_protected))
     )
+SbyE_site$species <- as.factor(unname(sapply(
+  SbyE_site$nestSite,  function(x) strsplit(as.character(x), "-")[[1]][1] )) )
+
+
+#write.csv(SbyE_site, "./data/MBLand_SbyE_site_2022-08-01.csv")
 
 # tidbits for MS
 # height and Yield correlated for sites we have that data on 
@@ -368,8 +373,6 @@ summary(lm(test2$Yield ~ test2$plantHt))  #significant
 cor(test2$Yield, test2$LAI.mean) 
 #0.25992 # much lower
 
-SbyE_site$species <- as.factor(unname(sapply(
-  SbyE_site$nestSite,  function(x) strsplit(as.character(x), "-")[[1]][1] )) )
 tapply(SbyE_site$LAI.mean, SbyE_site$species, mean)
 #      CRN       SOY      SWCH       WHT 
 # 5.582045  6.273517 10.075545  4.896249 
