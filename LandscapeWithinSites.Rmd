@@ -93,18 +93,25 @@ colnames(sam_rich)
 
 
 ```{r, include=FALSE}
-gee <- read.csv("./data/MBLand_SiteData_GEE.csv", stringsAsFactors = TRUE)
-#colnames(gee)
-gee2 <- gee %>% dplyr::select("Species_Site", "Longitude", "Latitude", 
-            "Perc_crop_10km", "Perc_veg_10km", "Perc_crop_1km", "Perc_veg_1km")
+SbyE_site <- read.csv("./data/MBLand_SbyE_site_2022-08-01.csv", 
+                      row.names = 1, stringsAsFactors = TRUE)
+#str(SbyE_site)
+SbyE_site2 <- SbyE_site %>% dplyr::select(-CEC, -P.soil, -K.soil, -Ca.soil, 
+        -Mg.soil, -Mn.soil, -Zn.soil, -Cu.soil, -Yield)
+        #%>% filter(nestSite != 'WHT-PASVT')
+names(SbyE_site2)
+
 
 vst.means2 <- read.csv("./data/MBLand_CommDistance_VST_means.csv", 
                        row.names = 1, stringsAsFactors = TRUE)
 
 # merge datasets, as in 4-MBLand_CommAnalyses code
-vst_gee <- merge(vst.means2, gee2, by.x = 'site', by.y = 'Species_Site', all.x = TRUE, all.y = FALSE)
+vst_gee <- merge(vst.means2, SbyE_site2, by.x = 'site', by.y = 'nestSite', all.x = TRUE, all.y = FALSE)
 dim(vst_gee)
+```
 
+
+```{r, include=FALSE}
 # subset sam_rich, remove tassel
 sam_rich2 <- sam_rich %>% filter(leaf.type != "Tassel")
 sam_rich2$nestSite <- as.factor(paste(sam_rich2$species, sam_rich2$site, sep ="-"))
