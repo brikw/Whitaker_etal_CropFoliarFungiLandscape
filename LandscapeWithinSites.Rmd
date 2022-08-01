@@ -266,57 +266,6 @@ olsrr::ols_step_best_subset(model7)
 
 
 
-
-
-# RICHNESS
-## WITH SINGLETONS
-### Define regression model and check assumptions
-```{r}
-model4 <- lm(Rich_sing ~ Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km, data=RichLU)
-
-olsrr::ols_plot_resid_fit(model4)
-
-olsrr::ols_test_normality(model4) 
-
-olsrr::ols_test_breusch_pagan(model4, rhs=TRUE, multiple=TRUE) 
-
-olsrr::ols_coll_diag(model4)
-```
-
-```{r}
-# vif's are 3-7, need to drop variables
-# Redefine model with worst variable dropped
-model5 <-lm(Rich_sing ~ Perc_crop_10km + Perc_crop_1km + Perc_veg_1km, data=RichLU)
-olsrr::ols_coll_diag(model5)
-```
-
-```{r}
-# vif's are still 3-5
-# drop next worst variable
-model6 <- lm(Rich_sing ~ Perc_crop_10km + Perc_veg_1km, data=RichLU)
-olsrr::ols_coll_diag(model6)
-
-# both factors have vif's under 2!
-```
-
-### Regression w/ singletons
-```{r}
-olsrr::ols_step_best_subset(model6)
-
-# best model based on AIC, C(p) has only Perc_veg_1km; also has best Adj.R2
-```
-
-
-```{r}
-# run simple linear regression on best model to get P value
-olsrr::ols_regress(Rich_sing ~ Perc_veg_1km, data=RichLU)
-
-# contrast to P value for model3
-olsrr::ols_regress(model6)
-```
-
-
-
 # WITHIN SITE HETEROGENEITY
 ### Define regression model and check assumptions
 ```{r}
