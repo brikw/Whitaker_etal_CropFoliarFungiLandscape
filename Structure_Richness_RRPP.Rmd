@@ -474,8 +474,8 @@ pcoa_site <- ggplot() + coord_equal() +
     #scale_shape_manual("", values = c(17, 1,10,16, 5,9,18, 0,7,15)) +
     theme(axis.title = element_text(size = 20), axis.text = element_text(size =20) ) +
     annotate(geom = "text", x = c(-24.5+10, -6.6+11, 35.6-13, -5.1+11), 
-                            y = c(-25.4, 9.0, -11.6, 27.4), size = 6,
-             label = levels(pcoa.dat$species), colour = spp_color) +
+                            y = c(-25.4, 9.0, -11.6-2, 27.4), size = 6,
+             label = c("Corn", "Soy", "Switchgrass", "Wheat"), colour = spp_color) +
     annotate(geom = "text", x = -30, y = 35, label = "A)", size = 7)
 pcoa_site
 
