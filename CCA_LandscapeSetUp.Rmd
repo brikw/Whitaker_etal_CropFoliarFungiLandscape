@@ -619,7 +619,7 @@ CCA_site_all2 <- ggplot() + coord_equal() +
     scale_colour_manual("", values = site_color[c(1:13,15:16)]) +
     scale_x_continuous(paste("CCA Axis-1 (", explain_all[1], "%)", sep = "")) +
     scale_y_continuous(paste("CCA Axis-2 (", explain_all[2], "%)", sep = "")) +
-    guides(colour = 'none') + #guides(colour=guide_legend(ncol=4)) +
+    guides(colour=guide_legend(ncol=4)) + #guides(colour = 'none') + 
     theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
           panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
           axis.title = element_text(size = 24), axis.text = element_text(size =24),
@@ -632,7 +632,6 @@ CCA_site_all2 <- ggplot() + coord_equal() +
 CCA_site_all2
 #dev.off()
 ```
-
 
 
 
