@@ -190,19 +190,20 @@ multiplot(p3,p4,p1,p2, cols = 2)
 #dev.off()
 ```
 
-# RICHNESS
-## NO SINGLETONS
+# WITH SOIL PROPERTIES
+
+## RICHNESS - NO SINGLETONS
 ### Define regression model and check assumptions
 * Note - too many vars in orig model. Followed pattern as for CCAs. Elev, MLT, and MHT had very high regular correlations, so removed them before starting VIF removal
 ```{r}
 colnames(RichLU)
-RichLU %>% filter(site != 'WHT-PASVT') -> RichLU
+RichLU %>% filter(site != 'WHT-PASVT') -> RichLU2
 
 # Define initial model
 model1 <- lm(Rich_nosing ~  #Lat.N + Lon.W + Elev +  MLT + MHT + 
                  Precip_90day + LT_90day + HT_90day + MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU2)
 Anova(model1)
 olsrr::ols_plot_resid_fit(model1)
 
@@ -218,32 +219,32 @@ olsrr::ols_coll_diag(model1)
 model2 <- lm(Rich_nosing ~  #HT_90day +
                  Precip_90day + LT_90day +  MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU2)
 olsrr::ols_coll_diag(model2)
 
 model3 <- lm(Rich_nosing ~  #HT_90day + HM_perc + 
                  Precip_90day + LT_90day +  MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model3)
 
 model4 <- lm(Rich_nosing ~  #HT_90day + HM_perc + Perc_veg_10km + 
                  Precip_90day + LT_90day +  MAP + 
                  Perc_crop_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model4)
 
 model5 <- lm(Rich_nosing ~  #HT_90day + HM_perc + Perc_veg_10km + Perc_crop_10km + 
                  Precip_90day + LT_90day +  MAP + 
                  Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model5)
 
 model6 <- lm(Rich_nosing ~  #HT_90day + HM_perc + Perc_veg_10km + Perc_crop_10km +
                  #Perc_crop_1km + 
                  Precip_90day + LT_90day +  MAP + 
                  Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model6)
 ```
 
@@ -252,7 +253,7 @@ model7 <- lm(Rich_nosing ~  #HT_90day + HM_perc + Perc_veg_10km + Perc_crop_10km
                  #Perc_crop_1km + plantHt + 
                  Precip_90day + LT_90day +  MAP + 
                  Perc_veg_1km +
-                 soilmoist + LAI.mean + pH, data=RichLU)
+                 soilmoist + LAI.mean + pH, data=RichLU2)
 olsrr::ols_coll_diag(model7)
 
 # all factors have vif's under 2
@@ -267,14 +268,14 @@ olsrr::ols_step_best_subset(model7)
 
 
 
-# WITHIN SITE HETEROGENEITY
+## WITHIN SITE HETEROGENEITY
 ### Define regression model and check assumptions
 ```{r}
 # Define initial model
 model8 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + 
                  Precip_90day + LT_90day + HT_90day + MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU2)
 
 olsrr::ols_plot_resid_fit(model8)
 
@@ -289,33 +290,33 @@ olsrr::ols_coll_diag(model8)
 model9 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + 
                  Precip_90day + LT_90day + MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=RichLU2)
 olsrr::ols_coll_diag(model9)
 
 model10 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + 
                  Precip_90day + LT_90day + MAP + 
                  Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model10)
 
 model11 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
                  Precip_90day + LT_90day + MAP + 
                  Perc_crop_10km + Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model11)
 
 model12 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
                  #Perc_crop_10km +  
                  Precip_90day + LT_90day + MAP + 
                  Perc_crop_1km + Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model12)
 
 model13 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + Perc_veg_10km + 
                  #Perc_crop_10km +  Perc_crop_1km + 
                  Precip_90day + LT_90day + MAP + 
                  Perc_veg_1km +
-                 soilmoist + LAI.mean + plantHt + pH, data=RichLU)
+                 soilmoist + LAI.mean + plantHt + pH, data=RichLU2)
 olsrr::ols_coll_diag(model13)
 
 ```
@@ -325,7 +326,7 @@ model14 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + HM_perc + 
                  #Perc_crop_10km +  Perc_crop_1km + plantHt + 
                  Precip_90day + LT_90day + MAP + 
                  Perc_veg_1km +
-                 soilmoist + LAI.mean + pH, data=RichLU)
+                 soilmoist + LAI.mean + pH, data=RichLU2)
 olsrr::ols_coll_diag(model14)
 
 # all factors have vif's under 2!
@@ -341,10 +342,156 @@ olsrr::ols_step_best_subset(model14)
 * Models with LT_90day and Perc_veg_1km the best models for both richness and w/in site beta-div
 * For richness, MAP also a contender. For w/in site beta-div Precip_90day also a contender
 
+
+# NO SOIL PROPERTIES
+
+* use dataset with WHT-PASVT site, but remove test of soil properties
+* Note - too many vars in orig model. Followed pattern as for CCAs. Elev, MLT, and MHT had very high regular correlations, so removed them before starting VIF removal
+
+## RICHNESS - NO SINGLETONS
+```{r}
+# 
+colnames(RichLU)
+RichLU %>% dplyr::select(-HM_perc, -pH) -> RichLU3
+colnames(RichLU3)
+cor(RichLU3[,c(11:14,17:23)])>0.90
+
+# Define initial model
+model15 <- lm(Rich_nosing ~  #Lat.N + Lon.W + Elev +  MLT + MHT + 
+                 Precip_90day + LT_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+Anova(model15)
+olsrr::ols_plot_resid_fit(model15)
+
+olsrr::ols_test_normality(model15) 
+
+olsrr::ols_test_breusch_pagan(model15, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(model15)
+```
+
+
+
+HT90day
+
+```{r}
+# Redefine model with worst variable dropped
+model16 <- lm(Rich_nosing ~  #HT_90day +
+                 Precip_90day + LT_90day +  MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model16)
+
+model17 <- lm(Rich_nosing ~  #HT_90day + Perc_veg_10km
+                 Precip_90day + LT_90day +  MAP + 
+                 Perc_crop_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model17)
+
+model18 <- lm(Rich_nosing ~  #HT_90day + Perc_veg_10km + Perc_crop_10km
+                 Precip_90day + LT_90day +  MAP + 
+                 Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model18)
+
+model19 <- lm(Rich_nosing ~  #HT_90day + Perc_veg_10km + Perc_crop_10km + Perc_crop_1km + 
+                 Precip_90day + LT_90day +  MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model19)
+
+```
+
+```{r}
+model20 <- lm(Rich_nosing ~  #HT_90day + Perc_veg_10km + Perc_crop_10km + Perc_crop_1km + plantHt
+                 Precip_90day + LT_90day +  MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean, data=RichLU3)
+olsrr::ols_coll_diag(model20)
+# all factors have vif's under 2
+```
+
+### Regression no singletons
+```{r}
+olsrr::ols_step_best_subset(model20)
+
+# final three models all competitive for best model, model 2 and 3 best, model 2 tiny bit highest Adj R2
+```
+
+
+## WITHIN SITE HETEROGENEITY
+### Define regression model and check assumptions
+```{r}
+# Define initial model
+model21 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + 
+                 Precip_90day + LT_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+
+olsrr::ols_plot_resid_fit(model21)
+
+olsrr::ols_test_normality(model21) 
+
+olsrr::ols_test_breusch_pagan(model21, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(model21)
+```
+
+```{r}
+model22 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model22)
+
+model23 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + Perc_veg_10km + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model23)
+
+model24 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + Perc_veg_10km + Perc_crop_10km + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model24)
+
+model25 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + Perc_veg_10km + Perc_crop_10km + Perc_crop_1km + 
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt, data=RichLU3)
+olsrr::ols_coll_diag(model25)
+
+```
+
+
+```{r}
+model26 <- lm(mean ~  #Lat.N + Lon.W + Elev +  MLT + MHT + HT_90day + Perc_veg_10km + Perc_crop_10km + Perc_crop_1km + plantHt
+                 Precip_90day + LT_90day + MAP + 
+                 Perc_veg_1km +
+                 soilmoist + LAI.mean, data=RichLU3)
+olsrr::ols_coll_diag(model26)
+
+# all factors have vif's under 2!
+```
+
+### Regression
+```{r}
+olsrr::ols_step_best_subset(model26)
+
+# final four models all competitive for best model, model 2 and 3 best, model 2 highest Adj R2 & lowest AIC
+```
+
+
+
+
+
+
 # FIGURES
 ```{r}
 # make long format data
-RichLU_long <- melt(RichLU, id.vars = c('site', 'mean', 'ci', 
+RichLU_long <- melt(RichLU3, id.vars = c('site', 'mean', 'ci', 
                     'Rich_nosing', 'Rich_nosing_ci'), 
   measure.vars = c('Perc_veg_1km', 'LT_90day'),
   variable.name = 'sig_vars', value.name = 'values')
