@@ -402,6 +402,11 @@ plotDispEsts(dds_land_site)
 SbySvst_site <- getVarianceStabilizedData(dds_land_site)
 SbySvst_site <- t(SbySvst_site) 
 dist_site <- stats::dist(SbySvst_site, method="euclidean")
+
+#transposed version of vst for all 16 site SbyS
+range(SbySvst_site)  #-4.981611 15.125305
+SbySvst_site_tr <- SbySvst_site+5
+
 ```
 
 ```{r,include=FALSE}
@@ -450,16 +455,25 @@ PCoA_sitelevel
 
 ```
 
+## with SOIL PROPERTIES
+
 ### 2c) Organize & Examine VIFs
 
 ```{r, include=FALSE}
-# SbyE, drop high interannual variability soil measures, and WHT-PASVT
+#geog for full 16 site SbyE
+SbyE_site_geog <- as.matrix(SbyE_site[,2:3])
+## subset to exclude high interannual variability soil measures
 SbyE_site_sub <- SbyE_site %>% 
   dplyr::select(-CEC, -P.soil, -K.soil, -Ca.soil, -Mg.soil,
-                -Mn.soil, -Zn.soil, -Cu.soil, -Yield) %>%
-  filter(nestSite != 'WHT-PASVT')
+                -Mn.soil, -Zn.soil, -Cu.soil, -Yield) 
+
+## subset to exclude WHT-PASVT (missing soil data)
+SbyE_site_sub2 <- SbyE_site_sub %>% filter(nestSite != 'WHT-PASVT')
 #geog
-SbyE_site_geog <- as.matrix(SbyE_site_sub[,2:3])
+SbyE_site_geog2 <- as.matrix(SbyE_site_sub2[,2:3])
+
+# then remove the two soil properties with missing data in wht-pasvt from full 16-site dataframe
+SbyE_site_sub <- SbyE_site_sub %>% dplyr::select(-HM_perc, -pH)
 ```
 
 ```{r, include=FALSE}
@@ -479,13 +493,13 @@ SbySvst_site2 <- getVarianceStabilizedData(dds_land_site2)
 SbySvst_site2 <- t(SbySvst_site2) 
 
 range(SbySvst_site2)  #-4.932503 15.220863
-SbySvst_site_tr <- SbySvst_site2+5
+SbySvst_site_tr2 <- SbySvst_site2+5
 
 ```
 
 #### Examine VIFs
 ```{r, include=FALSE}
-#names(SbyE_site_sub)
+#names(SbyE_site_sub2)
 #"nestSite"       "Lat.N"         "Lon.W"          "Elev"          
 #"Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
 #"MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km" 
@@ -493,21 +507,21 @@ SbySvst_site_tr <- SbySvst_site2+5
 #"plantHt"        "HM_perc"       "pH"
 
 # ## evaluate VIF -- test correlaaitons
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,20)]))
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,20)]))
 # vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9,20)])) #remove MLT
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,9,20)])) #remove MLT
 # vif(M) #failed 
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,20)])) #remove HT_90day
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9,20)])) #remove HT_90day
 # vif(M) #Perc_veg_1km still highest
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
 # vif(M) # MHT highest
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,14,20)])) #remove MHT
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9:10,14,20)])) #remove MHT
 # vif(M) #Perc_crop_1km highest
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,12,14,20)])) #remove Perc_crop_1km
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9:10,12,14,20)])) #remove Perc_crop_1km
 # vif(M) #HM_perc highest at 6.95, but Perc_veg_10km not far off at 6.89
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,12,14,18,20)])) #remove HM_perc 
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9:10,12,14,18,20)])) #remove HM_perc 
 # vif(M) #Perc_crop_10km
-# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9:10,11,12,14,18,20)])) #Perc_crop_10km 
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub2[,-c(1:3,7,9:10,11,12,14,18,20)])) #Perc_crop_10km 
 # vif(M) #all <2
 # #Precip_90day, LT_90day, MAP, Perc_veg_10km, soilmoist, LAI.mean, plantHt, pH 
 
@@ -517,13 +531,13 @@ SbySvst_site_tr <- SbySvst_site2+5
 ### 2d) Climate, Plant, Soil, & Landcover combo CCA
 ```{r, include=FALSE}
 # make SbyE for CCA
-SbyE_site_sub2 <- as.matrix(SbyE_site_sub[,-c(1:3,7,9:12,14,18,20)]) #4
+SbyE_site_sub2 <- as.matrix(SbyE_site_sub2[,-c(1:3,7,9:12,14,18,20)]) #4
 head(SbyE_site_sub2)
 #Elev Precip_90day, LT_90day, MAP, Perc_veg_10km, soilmoist, LAI.mean, plantHt, pH
 
 
 # perform CCA
-all_cca <- vegan::cca(SbySvst_site_tr ~ SbyE_site_sub2 + Condition(SbyE_site_geog))
+all_cca <- vegan::cca(SbySvst_site_tr2 ~ SbyE_site_sub2 + Condition(SbyE_site_geog2))
 
 # Permutation test for cca under reduced model (Marginal tests for axes)
 #anova(all_cca, by = "axis", permutations = (nperm=999))    
@@ -554,8 +568,81 @@ all_cca_vec$vecs <- rownames(all_cca_vec)
 all_cca_vec
 ```
 
+## without SOIL PROPERTIES
 
-### 2e) Figure
+### 2e) Organize & Examine VIFs
+```{r, include=FALSE}
+
+# names(SbyE_site_sub)
+# "nestSite"       "Lat.N"         "Lon.W"          "Elev"
+# "Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
+# "MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km"
+# "Perc_veg_10km"  "Perc_veg_1km"  "soilmoist"      "LAI.mean"
+# "plantHt"        "species"
+# 
+# ## evaluate VIF -- test correlaaitons
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,18)]))
+# vif(M) #MLT highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,9,18)])) #remove MLT
+# vif(M) #HT_90day highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,18)])) #remove HT_90day
+# vif(M) #Perc_veg_10km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,13,18)])) #remove Perc_veg_10km
+# vif(M) #MHT highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,10,13,18)])) #remove MHT
+# vif(M) #Perc_crop_10km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,10,11,13,18)])) #remove Perc_crop_10km
+# vif(M) #Perc_crop_1km highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,10,11,12,13,18)])) #remove Perc_crop_1km
+# vif(M) #plantHt highest
+# M <- lm(Elev ~., data = as.data.frame(SbyE_site_sub[,-c(1:3,7,9,10,11,12,13,17,18)])) #remove plantHt
+# vif(M) # alll VIF <2
+# # #Precip_90day, LT_90day, MAP, Perc_veg_1km, soilmoist, LAI.mean
+# # (different from 15-site subset, Veg-1km instead 10km and no plantHt remains to test)
+
+```
+
+### 2f) Climate, Plant, Soil, & Landcover combo CCA
+```{r, include=FALSE}
+# make SbyE for CCA
+SbyE_site_sub <- as.matrix(SbyE_site_sub[,-c(1:3,7,9:13,17,18)]) #4
+head(SbyE_site_sub)
+#Elev Precip_90day, LT_90day, MAP, Perc_veg_1km, soilmoist, LAI.mean
+
+
+# perform CCA
+all_cca_16 <- vegan::cca(SbySvst_site_tr ~ SbyE_site_sub + Condition(SbyE_site_geog))
+
+# Permutation test for cca under reduced model (Marginal tests for axes)
+#anova(all_cca_16, by = "axis", permutations = (nperm=999))    
+# CC1 signif
+
+#permutation test for the constrained ordination
+all_cca_fit_16 <- envfit(all_cca_16, SbyE_site_sub, perm = 999) 
+all_cca_fit_16 #LT_90day and LAI.mean only significant
+
+# permutation test for cca under null model
+anova(all_cca_16, by = "mar", permutations = 999)
+#significant 0.007
+
+#constrained eigs divided by sum of constrained + unconstrained/residual eigs
+explain_all_16 <- round(all_cca_16$CCA$eig/sum(c(all_cca_16$CCA$eig,all_cca_16$CA$eig)),3)*100
+explain_all_16
+# CCA1 CCA2 CCA3 CCA4 CCA5 CCA6 CCA7 
+# 16.6 13.3  8.6  6.7  6.5  5.4  4.7 
+
+# dataframe of weighted average sample scores
+all_cca_x_16 <- data.frame(scores(all_cca_16, display = "wa"))
+all_cca_x_16$nestSite <- rownames(all_cca_x_16)
+
+# dataframe of environmental vectors
+all_cca_vec_16 <- data.frame(scores(all_cca_16, display = "bp"))
+rownames(all_cca_vec_16) <- c(colnames(SbyE_site_sub))
+all_cca_vec_16$vecs <- rownames(all_cca_vec_16)
+all_cca_vec_16
+```
+
+### 2g) Figure
 ```{r, include=FALSE}
 
 cca_sig <- c('LT_90day', 'LAI.mean', 'plantHt', 'Perc_veg_10km')
@@ -590,97 +677,136 @@ CCA_site_all2
 #dev.off()
 ```
 
-### 2f) No SWCH version of CCA
+#### 16-site Without SOIL PROPERTIES version
+```{r, include=FALSE}
+
+cca_sig_16 <- c('LT_90day', 'LAI.mean')
+all_cca_vec_sig_16 <- all_cca_vec_16[all_cca_vec_16$vecs %in% cca_sig_16, ]
+
+# figure
+CCA_site_all_16 <- ggplot() + coord_equal() + 
+    geom_point(data = all_cca_x_16, aes(x =  CCA1, y =  CCA2, 
+          color = factor(nestSite)) , size = 5) +
+    geom_segment(data = all_cca_vec_sig_16, 
+                 aes(x = 0, xend = CCA1, y = 0, yend = CCA2),
+                 arrow = arrow(length = unit(0.25, "cm")), size = 0.8,
+                 colour = "gray30", linetype = 1 ) +
+    geom_text(data = all_cca_vec_sig_16,
+          aes(x = c(0.89+.45, 0.71+.45),
+              y = c(0.39,    -0.52), label = vecs),
+                 size = 8, colour = "gray30", fontface = 'bold') +
+    scale_colour_manual("", values = site_color) +
+    scale_x_continuous(paste("CCA Axis-1 (", explain_all_16[1], "%)", sep = "")) +
+    scale_y_continuous(paste("CCA Axis-2 (", explain_all_16[2], "%)", sep = "")) +
+    guides(colour=guide_legend(ncol=4)) + #guides(colour = 'none') + 
+    theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
+          panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
+          axis.title = element_text(size = 24), axis.text = element_text(size =24),
+          legend.text=element_text(size=17), legend.title=element_blank(),
+          legend.background = element_rect(colour = NA, fill = NA),
+          legend.position = "bottom", legend.margin=margin(0,0,0,0), 
+          legend.box.margin=margin(-10,-10,-6,10)) 
+
+#tiff("./figures/CCA_all_SiteLevel_16sites.tiff", width=8.97, height=8.97, units="in", res=600)
+CCA_site_all_16
+#dev.off()
+```
+
+
+
+
+
+### 2h) No SWCH version of CCA
 ```{r, include = FALSE}
-SbyE_site_sub %>% dplyr::filter(species != 'SWCH') -> noSwch_cca
-noSwch_cca <- droplevels(noSwch_cca)
-
-# cor(noSwch_cca[,-c(1:3,20)])
-# these ones are highest correlations
-# MLT Elev 
-# LT_90day HT_90day
-# Perc_crop_1km Perc_veg_1km
-
-# names(noSwch_cca)
-# "nestSite"       "Lat.N"         "Lon.W"          "Elev"
-# "Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
-# "MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km"
-# "Perc_veg_10km"  "Perc_veg_1km"  "soilmoist"      "LAI.mean"
-# "plantHt"        "HM_perc"       "pH"             "species"
-
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,20)]))
-# vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,9,20)])) #remove MLT
-# vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,20)])) #remove HT_90day
-# vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
-# vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:10,14,20)])) #remove MHT 
-# vif(M) #failed
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:11,14,20)])) #remove Perc_crop_10km 
-# vif(M) #failed
+# SbyE_site_sub2 %>% dplyr::filter(species != 'SWCH') -> noSwch_cca
+# noSwch_cca <- droplevels(noSwch_cca)
 # 
-# # all of these failed, so followed same order as full dataset for variable removal 
-# #  (which was based in part on strenght of cor() matrix output)
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14,20)])) #remove Perc_crop_1km 
-# vif(M) # soilmoist highest
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,20)])) #remove soilmoist 
-# vif(M) # HM_perc highest
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,18,20)])) #remove HM_perc 
-# vif(M) # MAP highest
-# M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])) #remove MAP 
-# vif(M) # all <2
-#  # Precip_90day      LT_90day Perc_veg_10km      LAI.mean       plantHt            pH 
-#  #     1.777599      1.603290      1.397612      1.627784      1.821604      1.798825 
-# ## ++ Elev
-
-## organize data subsets
-noSwch_cca2 <- as.matrix(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])
-noSwch_geog <- SbyE_site_geog[c(1:8,13:15),]
-ps_site_noSwch <- subset_samples(ps_land_site, 
-                             sample_names(ps_land_site) != "WHT-PASVT" &
-                             sample_names(ps_land_site) != "SWCH-CCRS" &
-                             sample_names(ps_land_site) != "SWCH-OTRS" &
-                             sample_names(ps_land_site) != "SWCH-SHFA" &
-                             sample_names(ps_land_site) != "SWCH-WBFL" )
-ps_site_noSwch <- filter_taxa(ps_site_noSwch, function(x) sum(x) > 0, TRUE)
-#447  taxa across 11 samples
-dds_site_noSwch <- phyloseq_to_deseq2(ps_site_noSwch, ~ 1)
-gmMeans_land2 <- apply(counts(dds_site_noSwch), 1, gm_mean_protected)
-dds_site_noSwch <- estimateSizeFactors(dds_site_noSwch, type = 'ratio', geoMeans = gmMeans_land2)
-dds_site_noSwch <- estimateDispersions(dds_site_noSwch)
-#rowData(dds_site_noSwch)
-#sizeFactors(dds_site_noSwch)
-plotDispEsts(dds_site_noSwch)
-SbySvst_noSwch <- getVarianceStabilizedData(dds_site_noSwch)
-SbySvst_noSwch <- t(SbySvst_noSwch) 
-
-range(SbySvst_noSwch)  #-4.447807 14.589271
-SbySvst_noSwch_tr <- SbySvst_noSwch+5
-
-
-
-## CCA
-noSwch_dat_cca <- vegan::cca(SbySvst_noSwch_tr ~ noSwch_cca2 + Condition(noSwch_geog))
-
-# # Permutation test for cca under reduced model (Marginal tests for axes)
-# anova(noSwch_dat_cca, by = "axis", permutations = (nperm=999))
-# no signif axes
-
-#permutation test for the constrained ordination
-all_cca_fit <- envfit(noSwch_dat_cca, noSwch_cca2, perm = 999) 
-all_cca_fit #LT_90day, plantHt only significant
-
-# permutation test for cca under null model
-anova(noSwch_dat_cca, by = "mar", permutations = 999)
-#not significant
-
-#constrained eigs divided by sum of constrained + unconstrained/residual eigs
-explain_all <- round(noSwch_dat_cca$CCA$eig/sum(c(noSwch_dat_cca$CCA$eig,noSwch_dat_cca$CA$eig)),3)*100
-explain_all
-# CCA1 CCA2 CCA3 CCA4 CCA5 CCA6 CCA7 
-# 28.6 14.5 11.1 10.2  9.5  8.6  7.0 
+# # cor(noSwch_cca[,-c(1:3,20)])
+# # these ones are highest correlations
+# # MLT Elev 
+# # LT_90day HT_90day
+# # Perc_crop_1km Perc_veg_1km
+# 
+# # names(noSwch_cca)
+# # "nestSite"       "Lat.N"         "Lon.W"          "Elev"
+# # "Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
+# # "MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km"
+# # "Perc_veg_10km"  "Perc_veg_1km"  "soilmoist"      "LAI.mean"
+# # "plantHt"        "HM_perc"       "pH"             "species"
+# 
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,20)]))
+# # vif(M) #failed
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,9,20)])) #remove MLT
+# # vif(M) #failed
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,20)])) #remove HT_90day
+# # vif(M) #failed
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
+# # vif(M) #failed
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:10,14,20)])) #remove MHT 
+# # vif(M) #failed
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:11,14,20)])) #remove Perc_crop_10km 
+# # vif(M) #failed
+# # 
+# # # all of these failed, so followed same order as full dataset for variable removal 
+# # #  (which was based in part on strenght of cor() matrix output)
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14,20)])) #remove Perc_crop_1km 
+# # vif(M) # soilmoist highest
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,20)])) #remove soilmoist 
+# # vif(M) # HM_perc highest
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,18,20)])) #remove HM_perc 
+# # vif(M) # MAP highest
+# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])) #remove MAP 
+# # vif(M) # all <2
+# #  # Precip_90day      LT_90day Perc_veg_10km      LAI.mean       plantHt            pH 
+# #  #     1.777599      1.603290      1.397612      1.627784      1.821604      1.798825 
+# # ## ++ Elev
+# 
+# ## organize data subsets
+# noSwch_cca2 <- as.matrix(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])
+# noSwch_geog <- SbyE_site_geog2[c(1:8,13:15),]
+# ps_site_noSwch <- subset_samples(ps_land_site, 
+#                              sample_names(ps_land_site) != "WHT-PASVT" &
+#                              sample_names(ps_land_site) != "SWCH-CCRS" &
+#                              sample_names(ps_land_site) != "SWCH-OTRS" &
+#                              sample_names(ps_land_site) != "SWCH-SHFA" &
+#                              sample_names(ps_land_site) != "SWCH-WBFL" )
+# ps_site_noSwch <- filter_taxa(ps_site_noSwch, function(x) sum(x) > 0, TRUE)
+# #447  taxa across 11 samples
+# dds_site_noSwch <- phyloseq_to_deseq2(ps_site_noSwch, ~ 1)
+# gmMeans_land2 <- apply(counts(dds_site_noSwch), 1, gm_mean_protected)
+# dds_site_noSwch <- estimateSizeFactors(dds_site_noSwch, type = 'ratio', geoMeans = gmMeans_land2)
+# dds_site_noSwch <- estimateDispersions(dds_site_noSwch)
+# #rowData(dds_site_noSwch)
+# #sizeFactors(dds_site_noSwch)
+# plotDispEsts(dds_site_noSwch)
+# SbySvst_noSwch <- getVarianceStabilizedData(dds_site_noSwch)
+# SbySvst_noSwch <- t(SbySvst_noSwch) 
+# 
+# range(SbySvst_noSwch)  #-4.447807 14.589271
+# SbySvst_noSwch_tr <- SbySvst_noSwch+5
+# 
+# 
+# 
+# ## CCA
+# noSwch_dat_cca <- vegan::cca(SbySvst_noSwch_tr ~ noSwch_cca2 + Condition(noSwch_geog))
+# 
+# # # Permutation test for cca under reduced model (Marginal tests for axes)
+# # anova(noSwch_dat_cca, by = "axis", permutations = (nperm=999))
+# # no signif axes
+# 
+# #permutation test for the constrained ordination
+# all_cca_fit <- envfit(noSwch_dat_cca, noSwch_cca2, perm = 999) 
+# all_cca_fit #LT_90day, plantHt only significant
+# 
+# # permutation test for cca under null model
+# anova(noSwch_dat_cca, by = "mar", permutations = 999)
+# #not significant
+# 
+# #constrained eigs divided by sum of constrained + unconstrained/residual eigs
+# explain_all <- round(noSwch_dat_cca$CCA$eig/sum(c(noSwch_dat_cca$CCA$eig,noSwch_dat_cca$CA$eig)),3)*100
+# explain_all
+# # CCA1 CCA2 CCA3 CCA4 CCA5 CCA6 CCA7 
+# # 28.6 14.5 11.1 10.2  9.5  8.6  7.0 
 
 ```
 
