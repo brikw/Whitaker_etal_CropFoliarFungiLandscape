@@ -1,6 +1,7 @@
 # "Foliar fungal communities depend on crop identity and neighboring vegetation in agroecosystems"
 ### Whitaker, B.K., Heiniger, R., Hawkes, C.V.
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6984309.svg)](https://doi.org/10.5281/zenodo.6984309)
 
 This repository includes the R code, data files, small scripts, and a metadata file to supplement the manuscript by Whitaker et al. "Foliar fungal communities depend on crop identity and neighboring vegetation in agroecosystems".
 
