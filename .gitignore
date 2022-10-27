@@ -22,3 +22,6 @@ data/MBLand_landscape_RRPP_swch.RData
 
 # all lulu log files
 lulu.log*
+
+# all rmd html output
+*.html
