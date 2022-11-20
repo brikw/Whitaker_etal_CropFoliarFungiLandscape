@@ -152,7 +152,7 @@ taxa %>% dplyr::rename(Kingdom = domain, Phylum = phylum, Class = class, Order =
 #taxa_table$Species
 
 #write.table(taxa_table, "./data/MBLand_taxa_table.txt", row.names = FALSE, quote = FALSE)
-# NOTE - MASSIVELY MANUALLY EDITED, converted to excel with color coding, re-saved as MBLand_taxa.taxa.txt to match funguild naming convention, just in case
+# NOTE - MASSIVELY MANUALLY EDITED, converted to excel with color coding, re-saved as MBLand_taxa.taxa.txt to match funguild naming convention
 ```
 
 ```{r}
@@ -172,22 +172,28 @@ table(FG_results$trophicMode[FG_results$confidenceRanking=='Highly Probable'])
 table(FG_results$trophicMode[FG_results$confidenceRanking=='Probable']) 
 #probable: 98 Pathotroph, 86 Saprotroph, 3 Symbiotroph, 
 #probable:(mixed) 85 Pathotroph-Saprotroph, 4 Pathotroph-Symbiotroph, 11 Saprotroph-Symbiotroph, 7 Pathotroph-Saprotroph-Symbiotroph (catchall)
+```
 
-
+### Visualize results
+```{r}
 FG_results %>% 
-    filter(confidenceRanking == 'Highly Probable' | confidenceRanking == 'Probable') %>% 
-    filter(trophicMode == "Pathotroph" | trophicMode == "Saprotroph" | trophicMode == "Symbiotroph" |
-           trophicMode == "Pathotroph-Saprotroph" | 
-           trophicMode == "Pathotroph-Symbiotroph" | 
-           trophicMode == "Saprotroph-Symbiotroph") -> FG_sub
+    filter(confidenceRanking == 'Highly Probable' | 
+           confidenceRanking == 'Probable') %>%
+    filter(trophicMode != "Pathotroph-Saprotroph-Symbiotroph") -> FG_sub         #%>% 
+    # filter(trophicMode == "Pathotroph" | 
+    #        trophicMode == "Saprotroph" | 
+    #        trophicMode == "Symbiotroph" |
+    #        trophicMode == "Pathotroph-Saprotroph" | 
+    #        trophicMode == "Pathotroph-Symbiotroph" | 
+    #        trophicMode == "Saprotroph-Symbiotroph") -> FG_sub
 dim(FG_results); dim(FG_sub)
 
 ```
 
-* Out of 595 ASVs, 206 have either highly probable or probable confident trophicModes as one thing only: either patho, sapro, or symbio troph. 309 ASVs have either single or mixed triphicMode categoeies
+* Out of 595 ASVs, 206 have either highly probable or probable confident trophicModes as one thing only: either patho, sapro, or symbio troph. 309 ASVs have either single or mixed triphicMode categoeies. 316 ASVs have single, double or triple guild assignments
 
 ```{r}
-#subest ps_land to only have highly probable/probable confident at one class of trophicMode 
+#subest ps_land to only have highly probable/probable confident
 conf_FG <- droplevels(FG_sub$OTU)
 
 #colnames(ps_land@sam_data)[4]
@@ -195,10 +201,10 @@ colnames(ps_land@sam_data)[4] <- "crop"  #change name to avoid issues with tax_t
 #colnames(ps_land@sam_data)
 my_sub <- subset(otu_table(ps_land), rownames(otu_table(ps_land)) %in% conf_FG)
 ps_FG <- merge_phyloseq(my_sub, tax_table(ps_land), sample_data(ps_land), refseq(ps_land))
-ps_FG #206 ASVs/taxa #309 ASVs with mixed
+ps_FG #309 ASVs
 
 
-#suubset funguild output for use as a tax_table()
+#subset funguild output for use as a tax_table()
 FG_sub %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, Species, taxon, trophicMode, confidenceRanking, guild, growthForm) -> FG_sub_sub
 rownames(FG_sub_sub) <- FG_sub_sub$OTU
 FG_sub_sub %>% select(-OTU) -> FG_sub_sub
@@ -209,16 +215,17 @@ colnames(FG_sub_sub)
 merge_phyloseq(otu_table(ps_FG), sample_data(ps_FG), refseq(ps_FG), tax_table(as.matrix(FG_sub_sub))) -> ps_new
 
 #head(ps_new@tax_table)
+
+# tidy melt
+dat <- tidy_psmelt(ps_new)
+
 ```
 
-### visualize
 ```{r}
-dat <- tidy_psmelt(ps_new)
-#ggplot(dat, aes(x=trophicMode, y = Abundance, fill=crop)) + geom_violin() + geom_point() + scale_y_continuous(trans='sqrt')
-```
-```{r}
-ggplot(dat, aes(x = trophicMode, y = Abundance)) + geom_bar(stat="identity") +
-    theme(axis.text.x=element_text(angle=60,hjust=1))
+ggplot(dat, aes(x=trophicMode, y = Abundance, fill=crop)) + 
+    geom_bar(stat="identity") + scale_y_continuous(trans='sqrt') +
+    theme(axis.text.x=element_text(angle=60,hjust=1)) +
+    scale_fill_manual("Site", values = spp_color)
 # most ASVs ID-ed as saprotrophs overall
 ```
 ```{r}
@@ -239,11 +246,32 @@ ggplot(dat, aes(x = crop, y = Abundance, fill = Order)) + geom_bar(stat="identit
 # switchgrass and corn have the most assignments overall
 ```
 ```{r, fig.width = 9}
-ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) + geom_bar(stat="identity") +
+ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) +
+    geom_bar(stat="identity") +
     facet_grid(.~trophicMode) + scale_fill_manual("Site", values = site_color) +
     theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") 
 # moderate differences across sites within crops
 
+```
+
+```{r}
+dim(dat)  #59019=191*309 
+dim(FG_sub)
+dat$trophicMode <- factor(dat$trophicMode)
+dat$myTrophicMode <- dat$trophicMode
+levels(dat$myTrophicMode) <- list(
+    "Patho-other" = c("Pathotroph", "Pathotroph-Saprotroph"),
+    "Symbio-other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
+    "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"))
+ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) +
+    geom_bar(stat="identity") +
+    facet_grid(.~myTrophicMode) + 
+    scale_fill_manual("Site", values = site_color) +
+    theme(axis.text.x=element_text(angle=60,hjust=1), 
+          legend.position = "bottom") 
+
+
+#i think something like this will work, but I need to go back and use all 595 asvs
 ```
 
 
@@ -256,4 +284,8 @@ ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) + geom_bar(stat="iden
 
 
 
+#### end
+```{r}
+sessionInfo()
+```
 
