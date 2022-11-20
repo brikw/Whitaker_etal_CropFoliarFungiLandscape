@@ -1,0 +1,259 @@
+---
+title: "Fungal Guild Assignments"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+author: "Briana K. Whitaker"
+date: "`r Sys.Date()`"
+---
+\fontsize{9}{10}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning =FALSE, message=FALSE)
+```
+---
+
+
+
+
+* Run using `r version[['version.string']] `.
+
+# Objective
+This document reports on the **fungal guild assignments** from the NC Microbiome Landscapes Project, performed in the summer of 2019. 
+
+
+
+
+# 0) Load Packages, set path to data
+```{r, echo=FALSE, results='hide', include=FALSE} 
+
+x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "devtools",
+     "reshape2",  "viridis", "tidyr", "tidyverse")
+lapply(x, require, character.only = TRUE)
+
+#Load functions
+source("./code/multiplot.function.R")
+
+#add 'not in' function
+`%nin%` = Negate(`%in%`)
+
+#set seed
+set.seed(829)
+
+
+# set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+# color palettes
+display.brewer.pal(8, "Dark2") #assumes Phal is first in order
+brewer.pal(8, "Dark2")
+spp_color <- c("#E6AB02", "#D95F02", "#1B9E77", '#7570B3') 
+#gold, orange, green, purple
+
+#levels(sample_data(ps_filter)$species)
+#"CRN"  "SOY"  "SWCH" "WHT" 
+#https://mdigi.tools/color-shades/#a6761d
+crn_color <- c('#fed561', '#fdc422', '#dda402', '#9e7501')
+soy_color <- c('#fea561', '#fd8122', '#dd6102', '#9e4501')
+swc_color <- c('#77e8c6', '#40deaf', '#21bf90', '#178867')
+wht_color <- c('#cfcde4', '#8f8ac1', '#555096', '#2f2c53')
+
+site_color <- c(crn_color, soy_color, swc_color, wht_color)
+
+```
+
+```{r, include = FALSE}
+tidy_psmelt <- function(physeq) {
+    # First, make sure taxa are rows
+    if (taxa_are_rows(physeq)) {
+        st <- otu_table(physeq) %>% t
+    } else {
+        st <- otu_table(physeq)
+    }
+    # Convert to a tibble in tidy form
+    st <- st %>% 
+        as("matrix") %>%
+        as_tibble(rownames = "Sample") %>%
+        gather("OTU", "Abundance", -Sample)
+    # Get the sample data as a tibble
+    sam <- sample_data(physeq) %>% 
+        as("data.frame") %>% 
+        as_tibble(rownames = "Sample")
+    # Same for the tax table
+    tax <- tax_table(physeq) %>%
+        as("matrix") %>%
+        as_tibble(rownames = "OTU")
+    # Now join them all into one
+    tb <- st %>%
+        left_join(sam, by = "Sample") %>%
+        left_join(tax, by = "OTU")
+    tb
+}
+
+```
+
+
+### load data
+```{r, include=FALSE} 
+## Phyloseq obj
+load("./data/MBLand_ps_land.RData")
+ps_land #595 ASVs
+load("./data/MBLand_ps_vst.RData")
+ps_vst
+
+## DESeq2
+load("./data/MBLand_dds_land.RData")
+#rowData(dds_land)
+
+
+## VST
+SbySvst <- read.csv( "./data/MBLand_SbyS_vst_2021-11-17.csv", row.names = 1)
+dim(SbySvst)
+## Euclidean of VST
+dist.SbySvst <- stats::dist(SbySvst, method="euclidean")
+#dist.SbySvst
+
+
+## SbyE -- this version has final versions of the soil data
+SbyE0 <- read.csv("./data/MBLand_SbyE_2022-01-10.csv", 
+                 row.names = 1, stringsAsFactors = TRUE)
+dim(SbyE0)
+# for now, remove extraneous columns
+SbyE <- SbyE0 %>% dplyr::select(-Site.Sample.Order, -Field.Location, -site.rep, 
+    -OVT.Var.Entry, -variety.rep, -OVT.plot, -temp, -humid, -leaftemp.diff, -NPQt,
+    -Phi2, -PhiNO, -PhiNPQ, -PAR, -Chla, -leafthick, -LAI.ratio.type, -LAI.sd, -LAI.reps,
+    LAI.CV, -Notes)
+rownames(SbyE) <- SbyE$unique.plot
+SbyE$unique.plot <- as.factor(SbyE$unique.plot)
+dim(SbyE)
+
+
+sample_data(ps_land)$nestSite <- as.factor(paste(
+        sample_data(ps_land)$species, 
+        sample_data(ps_land)$site, sep ="-"))
+
+```
+
+```{r}
+taxa <- as.data.frame(as(tax_table(ps_land), "matrix"))
+taxa$ASV <- rownames(taxa)
+
+```
+
+# FunGUILD
+```{r}
+taxa %>% dplyr::rename(Kingdom = domain, Phylum = phylum, Class = class, Order = order, Family = family, Genus = genus, Species = species, OTU_ID = ASV) %>% dplyr::relocate(OTU_ID) -> taxa_table
+
+#taxa_table$Species
+
+#write.table(taxa_table, "./data/MBLand_taxa_table.txt", row.names = FALSE, quote = FALSE)
+# NOTE - MASSIVELY MANUALLY EDITED, converted to excel with color coding, re-saved as MBLand_taxa.taxa.txt to match funguild naming convention, just in case
+```
+
+```{r}
+#guild parser code
+#python3 FUNGuild.py guild -taxa example/MBLand_taxa.taxa.txt
+
+
+# results
+FG_results <- read.table("./data/MBLand_taxa.taxa.guilds.txt", 
+                    sep = "\t", header = TRUE, stringsAsFactors = TRUE)
+#str(FG_results)
+
+table(FG_results$confidenceRanking) 
+#only 22 highly probable, 294 are probable
+table(FG_results$trophicMode[FG_results$confidenceRanking=='Highly Probable']) 
+#highly probable: 9 Symbiotrophs, 10 Saprotrophs, 3 Patho-Sapro
+table(FG_results$trophicMode[FG_results$confidenceRanking=='Probable']) 
+#probable: 98 Pathotroph, 86 Saprotroph, 3 Symbiotroph, 
+#probable:(mixed) 85 Pathotroph-Saprotroph, 4 Pathotroph-Symbiotroph, 11 Saprotroph-Symbiotroph, 7 Pathotroph-Saprotroph-Symbiotroph (catchall)
+
+
+FG_results %>% 
+    filter(confidenceRanking == 'Highly Probable' | confidenceRanking == 'Probable') %>% 
+    filter(trophicMode == "Pathotroph" | trophicMode == "Saprotroph" | trophicMode == "Symbiotroph" |
+           trophicMode == "Pathotroph-Saprotroph" | 
+           trophicMode == "Pathotroph-Symbiotroph" | 
+           trophicMode == "Saprotroph-Symbiotroph") -> FG_sub
+dim(FG_results); dim(FG_sub)
+
+```
+
+* Out of 595 ASVs, 206 have either highly probable or probable confident trophicModes as one thing only: either patho, sapro, or symbio troph. 309 ASVs have either single or mixed triphicMode categoeies
+
+```{r}
+#subest ps_land to only have highly probable/probable confident at one class of trophicMode 
+conf_FG <- droplevels(FG_sub$OTU)
+
+#colnames(ps_land@sam_data)[4]
+colnames(ps_land@sam_data)[4] <- "crop"  #change name to avoid issues with tax_table 'Species' later
+#colnames(ps_land@sam_data)
+my_sub <- subset(otu_table(ps_land), rownames(otu_table(ps_land)) %in% conf_FG)
+ps_FG <- merge_phyloseq(my_sub, tax_table(ps_land), sample_data(ps_land), refseq(ps_land))
+ps_FG #206 ASVs/taxa #309 ASVs with mixed
+
+
+#suubset funguild output for use as a tax_table()
+FG_sub %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, Species, taxon, trophicMode, confidenceRanking, guild, growthForm) -> FG_sub_sub
+rownames(FG_sub_sub) <- FG_sub_sub$OTU
+FG_sub_sub %>% select(-OTU) -> FG_sub_sub
+colnames(FG_sub_sub)
+
+
+# create a new phyloseq obj with FUNGuild output as the taxa table
+merge_phyloseq(otu_table(ps_FG), sample_data(ps_FG), refseq(ps_FG), tax_table(as.matrix(FG_sub_sub))) -> ps_new
+
+#head(ps_new@tax_table)
+```
+
+### visualize
+```{r}
+dat <- tidy_psmelt(ps_new)
+#ggplot(dat, aes(x=trophicMode, y = Abundance, fill=crop)) + geom_violin() + geom_point() + scale_y_continuous(trans='sqrt')
+```
+```{r}
+ggplot(dat, aes(x = trophicMode, y = Abundance)) + geom_bar(stat="identity") +
+    theme(axis.text.x=element_text(angle=60,hjust=1))
+# most ASVs ID-ed as saprotrophs overall
+```
+```{r}
+ggplot(dat, aes(x = Order, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
+    theme(axis.text.x=element_text(angle=60,hjust=1))
+# most things with assignment are Dothideomycetes
+```
+```{r, fig.width = 9, fig.height = 6}
+ggplot(dat, aes(x = Family, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
+    theme(axis.text.x=element_text(angle=60,hjust=1))
+# most things with assignment are Mycosphaerellaceae or Phaeosphaeriaceae or Sporidiobolaceae
+```
+```{r, fig.width = 10, fig.height = 6}
+ggplot(dat, aes(x = crop, y = Abundance, fill = Order)) + geom_bar(stat="identity") +
+    facet_grid(.~trophicMode) +
+    theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") +
+    guides(fill=guide_legend(ncol=4))
+# switchgrass and corn have the most assignments overall
+```
+```{r, fig.width = 9}
+ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) + geom_bar(stat="identity") +
+    facet_grid(.~trophicMode) + scale_fill_manual("Site", values = site_color) +
+    theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") 
+# moderate differences across sites within crops
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
