@@ -192,6 +192,9 @@ dim(FG_results); dim(FG_sub)
 
 * Out of 595 ASVs, 206 have either highly probable or probable confident trophicModes as one thing only: either patho, sapro, or symbio troph. 309 ASVs have either single or mixed triphicMode categoeies. 316 ASVs have single, double or triple guild assignments
 
+
+
+###start
 ```{r}
 #subest ps_land to only have highly probable/probable confident
 conf_FG <- droplevels(FG_sub$OTU)
@@ -234,45 +237,79 @@ ggplot(dat, aes(x = Order, y = Abundance, fill = trophicMode)) + geom_bar(stat="
 # most things with assignment are Dothideomycetes
 ```
 ```{r, fig.width = 9, fig.height = 6}
-ggplot(dat, aes(x = Family, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
-    theme(axis.text.x=element_text(angle=60,hjust=1))
-# most things with assignment are Mycosphaerellaceae or Phaeosphaeriaceae or Sporidiobolaceae
+# ggplot(dat, aes(x = Family, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
+#     theme(axis.text.x=element_text(angle=60,hjust=1))
+# # most things with assignment are Mycosphaerellaceae or Phaeosphaeriaceae or Sporidiobolaceae
 ```
 ```{r, fig.width = 10, fig.height = 6}
-ggplot(dat, aes(x = crop, y = Abundance, fill = Order)) + geom_bar(stat="identity") +
-    facet_grid(.~trophicMode) +
-    theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") +
-    guides(fill=guide_legend(ncol=4))
-# switchgrass and corn have the most assignments overall
+# ggplot(dat, aes(x = crop, y = Abundance, fill = Order)) + geom_bar(stat="identity") +
+#     facet_grid(.~trophicMode) +
+#     theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") +
+#     guides(fill=guide_legend(ncol=4))
+# # switchgrass and corn have the most assignments overall
 ```
-```{r, fig.width = 9}
-ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) +
-    geom_bar(stat="identity") +
-    facet_grid(.~trophicMode) + scale_fill_manual("Site", values = site_color) +
-    theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") 
-# moderate differences across sites within crops
 
+
+
+# Analyze
+```{r}
+# head(FG_results)
+# levels_FG <- levels(FG_results$OTU)
+# ps_land
+
+# table(FG_results$confidenceRanking) # 77 Possibe
+# table(FG_results$trophicMode)       # 202 na's
+
+FG_results$myTrophicMode <- ifelse(FG_results$confidenceRanking != "Possible", 
+            as.character(FG_results$trophicMode), 'na')
+FG_results$myTrophicMode <- factor(FG_results$myTrophicMode)
+#table(FG_results$myTrophicMode) #202+77=279 na's
+levels(FG_results$myTrophicMode) <- list(
+    "Patho-other" = c("Pathotroph", "Pathotroph-Saprotroph"),
+    "Symbio-other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
+    "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"),
+    "na" = c("na", "Pathotroph-Saprotroph-Symbiotroph"))
+table(FG_results$myTrophicMode)
+
+
+#subset funguild output for use as a tax_table()
+FG_results %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, Species, taxon, trophicMode, confidenceRanking, myTrophicMode) -> FG_sub_all
+rownames(FG_sub_all) <- FG_sub_all$OTU
+FG_sub_all %>% select(-OTU) -> FG_sub_all
+colnames(FG_sub_all)
+
+
+# create a new phyloseq obj with FUNGuild output as the taxa table
+merge_phyloseq(otu_table(ps_land), sample_data(ps_land), refseq(ps_land), tax_table(as.matrix(FG_sub_all))) -> ps_FG_all
+
+#head(ps_FG_all@tax_table)
+
+# tidy melt
+FG_melt <- tidy_psmelt(ps_FG_all)
+#formerly dat
+dim(FG_melt)  #113645=191*595 
+dim(FG_results)
+ 
 ```
 
 ```{r}
-dim(dat)  #59019=191*309 
-dim(FG_sub)
-dat$trophicMode <- factor(dat$trophicMode)
-dat$myTrophicMode <- dat$trophicMode
-levels(dat$myTrophicMode) <- list(
+#make variables into factors after melt process
+FG_melt$myTrophicMode <- factor(FG_melt$myTrophicMode)
+
+levels(FG_melt$myTrophicMode) <- list(
     "Patho-other" = c("Pathotroph", "Pathotroph-Saprotroph"),
     "Symbio-other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
     "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"))
-ggplot(dat, aes(x = crop, y = Abundance, fill = nestSite)) +
+ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
     geom_bar(stat="identity") +
     facet_grid(.~myTrophicMode) + 
     scale_fill_manual("Site", values = site_color) +
     theme(axis.text.x=element_text(angle=60,hjust=1), 
-          legend.position = "bottom") 
-
-
-#i think something like this will work, but I need to go back and use all 595 asvs
+          legend.position = "bottom")
 ```
+
+
+
 
 
 
