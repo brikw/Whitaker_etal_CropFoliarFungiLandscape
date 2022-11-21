@@ -28,7 +28,7 @@ This document reports on the **fungal guild assignments** from the NC Microbiome
 
 
 
-# 0) Load Packages, set path to data
+# Load Packages, set path to data
 ```{r, echo=FALSE, results='hide', include=FALSE} 
 
 x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "devtools",
@@ -37,6 +37,8 @@ lapply(x, require, character.only = TRUE)
 
 #Load functions
 source("./code/multiplot.function.R")
+source("./code/tidy_psmelt.R")
+
 
 #add 'not in' function
 `%nin%` = Negate(`%in%`)
@@ -67,39 +69,7 @@ site_color <- c(crn_color, soy_color, swc_color, wht_color)
 
 ```
 
-```{r, include = FALSE}
-tidy_psmelt <- function(physeq) {
-    # First, make sure taxa are rows
-    if (taxa_are_rows(physeq)) {
-        st <- otu_table(physeq) %>% t
-    } else {
-        st <- otu_table(physeq)
-    }
-    # Convert to a tibble in tidy form
-    st <- st %>% 
-        as("matrix") %>%
-        as_tibble(rownames = "Sample") %>%
-        gather("OTU", "Abundance", -Sample)
-    # Get the sample data as a tibble
-    sam <- sample_data(physeq) %>% 
-        as("data.frame") %>% 
-        as_tibble(rownames = "Sample")
-    # Same for the tax table
-    tax <- tax_table(physeq) %>%
-        as("matrix") %>%
-        as_tibble(rownames = "OTU")
-    # Now join them all into one
-    tb <- st %>%
-        left_join(sam, by = "Sample") %>%
-        left_join(tax, by = "OTU")
-    tb
-}
-
-```
-
-
-### load data
-```{r, include=FALSE} 
+```{r, results = 'hide'} 
 ## Phyloseq obj
 load("./data/MBLand_ps_land.RData")
 ps_land #595 ASVs
@@ -123,6 +93,9 @@ dist.SbySvst <- stats::dist(SbySvst, method="euclidean")
 SbyE0 <- read.csv("./data/MBLand_SbyE_2022-01-10.csv", 
                  row.names = 1, stringsAsFactors = TRUE)
 dim(SbyE0)
+```
+
+```{r, include=FALSE}
 # for now, remove extraneous columns
 SbyE <- SbyE0 %>% dplyr::select(-Site.Sample.Order, -Field.Location, -site.rep, 
     -OVT.Var.Entry, -variety.rep, -OVT.plot, -temp, -humid, -leaftemp.diff, -NPQt,
@@ -146,13 +119,18 @@ taxa$ASV <- rownames(taxa)
 ```
 
 # FunGUILD
-```{r}
-taxa %>% dplyr::rename(Kingdom = domain, Phylum = phylum, Class = class, Order = order, Family = family, Genus = genus, Species = species, OTU_ID = ASV) %>% dplyr::relocate(OTU_ID) -> taxa_table
+```{r, include = FALSE}
+taxa %>% dplyr::rename(Kingdom = domain, Phylum = phylum, Class = class, 
+                       Order = order, Family = family, Genus = genus, 
+                       Species = species, OTU_ID = ASV) %>% 
+    dplyr::relocate(OTU_ID) -> taxa_table
 
 #taxa_table$Species
 
-#write.table(taxa_table, "./data/MBLand_taxa_table.txt", row.names = FALSE, quote = FALSE)
-# NOTE - MASSIVELY MANUALLY EDITED, converted to excel with color coding, re-saved as MBLand_taxa.taxa.txt to match funguild naming convention
+#write.table(taxa_table, "./data/MBLand_taxa_table.txt", 
+#    row.names = FALSE, quote = FALSE)
+# #NOTE - Manually edited, converted to excel with color coding, re-saved as 
+# #  MBLand_taxa.taxa.txt to match funguild naming convention
 ```
 
 ```{r}
@@ -174,8 +152,8 @@ table(FG_results$trophicMode[FG_results$confidenceRanking=='Probable'])
 #probable:(mixed) 85 Pathotroph-Saprotroph, 4 Pathotroph-Symbiotroph, 11 Saprotroph-Symbiotroph, 7 Pathotroph-Saprotroph-Symbiotroph (catchall)
 ```
 
-### Visualize results
-```{r}
+### Visualization - Original Data
+```{r, results = 'hide'}
 FG_results %>% 
     filter(confidenceRanking == 'Highly Probable' | 
            confidenceRanking == 'Probable') %>%
@@ -192,10 +170,7 @@ dim(FG_results); dim(FG_sub)
 
 * Out of 595 ASVs, 206 have either highly probable or probable confident trophicModes as one thing only: either patho, sapro, or symbio troph. 309 ASVs have either single or mixed triphicMode categoeies. 316 ASVs have single, double or triple guild assignments
 
-
-
-###start
-```{r}
+```{r, results = 'hide'}
 #subest ps_land to only have highly probable/probable confident
 conf_FG <- droplevels(FG_sub$OTU)
 
@@ -203,45 +178,51 @@ conf_FG <- droplevels(FG_sub$OTU)
 colnames(ps_land@sam_data)[4] <- "crop"  #change name to avoid issues with tax_table 'Species' later
 #colnames(ps_land@sam_data)
 my_sub <- subset(otu_table(ps_land), rownames(otu_table(ps_land)) %in% conf_FG)
-ps_FG <- merge_phyloseq(my_sub, tax_table(ps_land), sample_data(ps_land), refseq(ps_land))
+ps_FG <- merge_phyloseq(my_sub, tax_table(ps_land), 
+                        sample_data(ps_land), refseq(ps_land))
 ps_FG #309 ASVs
 
 
 #subset funguild output for use as a tax_table()
-FG_sub %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, Species, taxon, trophicMode, confidenceRanking, guild, growthForm) -> FG_sub_sub
+FG_sub %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, 
+                  Species, taxon, trophicMode, confidenceRanking, 
+                  guild, growthForm) -> FG_sub_sub
 rownames(FG_sub_sub) <- FG_sub_sub$OTU
 FG_sub_sub %>% select(-OTU) -> FG_sub_sub
 colnames(FG_sub_sub)
 
 
 # create a new phyloseq obj with FUNGuild output as the taxa table
-merge_phyloseq(otu_table(ps_FG), sample_data(ps_FG), refseq(ps_FG), tax_table(as.matrix(FG_sub_sub))) -> ps_new
+merge_phyloseq(otu_table(ps_FG), sample_data(ps_FG), refseq(ps_FG), 
+               tax_table(as.matrix(FG_sub_sub))) -> ps_new
 
 #head(ps_new@tax_table)
 
 # tidy melt
 dat <- tidy_psmelt(ps_new)
+rm(ps_new)
+rm(ps_FG)
 
 ```
 
-```{r}
+```{r, echo = FALSE}
 ggplot(dat, aes(x=trophicMode, y = Abundance, fill=crop)) + 
     geom_bar(stat="identity") + scale_y_continuous(trans='sqrt') +
     theme(axis.text.x=element_text(angle=60,hjust=1)) +
     scale_fill_manual("Site", values = spp_color)
 # most ASVs ID-ed as saprotrophs overall
 ```
-```{r}
+```{r, echo = FALSE}
 ggplot(dat, aes(x = Order, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
     theme(axis.text.x=element_text(angle=60,hjust=1))
 # most things with assignment are Dothideomycetes
 ```
-```{r, fig.width = 9, fig.height = 6}
+```{r, echo = FALSE, fig.width = 9, fig.height = 6}
 # ggplot(dat, aes(x = Family, y = Abundance, fill = trophicMode)) + geom_bar(stat="identity") +
 #     theme(axis.text.x=element_text(angle=60,hjust=1))
 # # most things with assignment are Mycosphaerellaceae or Phaeosphaeriaceae or Sporidiobolaceae
 ```
-```{r, fig.width = 10, fig.height = 6}
+```{r, echo = FALSE, fig.width = 10, fig.height = 6}
 # ggplot(dat, aes(x = crop, y = Abundance, fill = Order)) + geom_bar(stat="identity") +
 #     facet_grid(.~trophicMode) +
 #     theme(axis.text.x=element_text(angle=60,hjust=1), legend.position = "bottom") +
@@ -251,55 +232,51 @@ ggplot(dat, aes(x = Order, y = Abundance, fill = trophicMode)) + geom_bar(stat="
 
 
 
-# Analyze
-```{r}
-# head(FG_results)
-# levels_FG <- levels(FG_results$OTU)
-# ps_land
-
-# table(FG_results$confidenceRanking) # 77 Possibe
-# table(FG_results$trophicMode)       # 202 na's
-
+# Summarize Trophic Modes to Fewer Categories
+```{r, results = 'hide'}
 FG_results$myTrophicMode <- ifelse(FG_results$confidenceRanking != "Possible", 
             as.character(FG_results$trophicMode), 'na')
 FG_results$myTrophicMode <- factor(FG_results$myTrophicMode)
 #table(FG_results$myTrophicMode) #202+77=279 na's
 levels(FG_results$myTrophicMode) <- list(
-    "Patho-other" = c("Pathotroph", "Pathotroph-Saprotroph"),
-    "Symbio-other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
+    "Patho_other" = c("Pathotroph", "Pathotroph-Saprotroph"),
+    "Symbio_other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
     "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"),
     "na" = c("na", "Pathotroph-Saprotroph-Symbiotroph"))
 table(FG_results$myTrophicMode)
 
 
 #subset funguild output for use as a tax_table()
-FG_results %>% select(OTU, Kingdom, Phylum, Order, Class, Family, Genus, Species, taxon, trophicMode, confidenceRanking, myTrophicMode) -> FG_sub_all
+FG_results %>% select(OTU, Kingdom, Phylum, Order, Class, Family, 
+                      Genus, Species, taxon, trophicMode, 
+                      confidenceRanking, myTrophicMode) -> FG_sub_all
 rownames(FG_sub_all) <- FG_sub_all$OTU
 FG_sub_all %>% select(-OTU) -> FG_sub_all
 colnames(FG_sub_all)
 
 
 # create a new phyloseq obj with FUNGuild output as the taxa table
-merge_phyloseq(otu_table(ps_land), sample_data(ps_land), refseq(ps_land), tax_table(as.matrix(FG_sub_all))) -> ps_FG_all
-
+merge_phyloseq(otu_table(ps_land), sample_data(ps_land),
+               refseq(ps_land), tax_table(as.matrix(FG_sub_all))) -> ps_FG_all
 #head(ps_FG_all@tax_table)
 
 # tidy melt
 FG_melt <- tidy_psmelt(ps_FG_all)
 #formerly dat
-dim(FG_melt)  #113645=191*595 
-dim(FG_results)
+#dim(FG_melt)  #113645=191*595 
+#dim(FG_results)
  
 ```
 
+### Plot summarized trophic modes
 ```{r}
 #make variables into factors after melt process
 FG_melt$myTrophicMode <- factor(FG_melt$myTrophicMode)
 
-levels(FG_melt$myTrophicMode) <- list(
-    "Patho-other" = c("Pathotroph", "Pathotroph-Saprotroph"),
-    "Symbio-other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
-    "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"))
+# levels(FG_melt$myTrophicMode) <- list(
+#     "Patho_other" = c("Pathotroph", "Pathotroph-Saprotroph"),
+#     "Symbio_other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
+#     "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"))
 ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
     geom_bar(stat="identity") +
     facet_grid(.~myTrophicMode) + 
@@ -308,9 +285,83 @@ ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
           legend.position = "bottom")
 ```
 
+### Per Sample Abundance calculation
+```{r}
+# uniList <- levels(FG_melt$unique.plot)
+# trophList <- levels(FG_melt$myTrophicMode)
+# out <- list()
+# for (i in (1:length(uniList))) {
+#   myPlot <- FG_melt$unique.plot[i]
+#   allSum <- list()
+#   #print(as.character(myPlot))                         #debug line
+#   for (j in (1:length(trophList))) {
+#     myTroph <- levels(FG_melt$myTrophicMode)[j]
+#     #print(as.character(myTroph))                      #debug line
+# 
+#     #start
+#     require(dplyr)
+#     fg <- FG_melt %>%
+#         filter(myTrophicMode == myTroph) %>%
+#         filter(unique.plot == myPlot)
+#     mySum <- sum(fg$Abundance)
+#     allSum <- base::rbind(allSum,
+#                          cbind("plot" = as.character(myPlot),
+#                                "troph" = as.character(myTroph),
+#                                "sum" = mySum))
+#     #print(allSum)
+#   }
+#   rm(fg)                                              #cleanup
+#   out <- base::rbind(out, allSum)
+#   rm(allSum)                                          #cleanup
+#   #print(out)                                          #debug line
+#   }
+# dim(out)
+# rm(i, j, mySum, myPlot, myTroph)              #cleanup
+# #write.csv(out, "./data/MBLand_FunGuild_TrophicAbundance.csv")
+FG_sumAbund <- read.csv("./data/MBLand_FunGuild_TrophicAbundance.csv", 
+         header = TRUE, colClasses = c('character', 'character', 
+                                       'factor', 'character')) #otherwise does not read plot correctly
+FG_sumAbund$sum <- as.numeric(FG_sumAbund$sum)
+FG_sumAbund$plot <- as.factor(FG_sumAbund$plot)
+
+# pivot-wider
+SbyE_fg <- pivot_wider(FG_sumAbund, id_cols = "plot", 
+                       names_from = c("troph"), values_from = "sum")
+SbyE_fg <- as.data.frame(SbyE_fg)
+rownames(SbyE_fg) <- SbyE_fg$plot
+
+# creaete new and merge phyloseq
+ps_new <- sample_data(SbyE_fg)
+ps_FG <- merge_phyloseq(ps_land, ps_new)
+
+# create proportional variables, relative to seq depth
+sample_data(ps_FG)$prop_Patho_other <- c(sample_data(ps_FG)$Patho_other/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_Symbio_other <- c(sample_data(ps_FG)$Symbio_other/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_Other <- c(sample_data(ps_FG)$Other/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_na <- c(sample_data(ps_FG)$na/sample_data(ps_FG)$seqDepth_onlyFungi)
+
+# #visualize
+# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_Symbio_other))
+# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_Other))
+# plot(log2(ps_FG@sam_data$prop_Symbio_other) ~ log2(ps_FG@sam_data$prop_Other))
+# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_na))
+# plot(log2(ps_FG@sam_data$prop_Symbio_other) ~ log2(ps_FG@sam_data$prop_na))
+# plot(log2(ps_FG@sam_data$prop_Other) ~ log2(ps_FG@sam_data$prop_na))
+
+#organize for linear models
+SbyE_new <- data.frame(sample_data(ps_FG)@.Data)
+colnames(SbyE_new) <- ps_FG@sam_data@names
+rownames(SbyE_new) <- ps_FG@sam_data@row.names
+
+```
+
+### 
+```{r}
+
+lm(cbind(prop_Patho_other, prop_Symbio_other) ~ crop + nestSite, data = SbyE_new)
 
 
-
+```
 
 
 
