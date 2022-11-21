@@ -32,7 +32,7 @@ This document reports on the **fungal guild assignments** from the NC Microbiome
 ```{r, echo=FALSE, results='hide', include=FALSE} 
 
 x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "devtools",
-     "reshape2",  "viridis", "tidyr", "tidyverse")
+     "reshape2",  "viridis", "tidyr", "tidyverse", "RRPP", "car")
 lapply(x, require, character.only = TRUE)
 
 #Load functions
@@ -273,10 +273,6 @@ FG_melt <- tidy_psmelt(ps_FG_all)
 #make variables into factors after melt process
 FG_melt$myTrophicMode <- factor(FG_melt$myTrophicMode)
 
-# levels(FG_melt$myTrophicMode) <- list(
-#     "Patho_other" = c("Pathotroph", "Pathotroph-Saprotroph"),
-#     "Symbio_other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
-#     "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"))
 ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
     geom_bar(stat="identity") +
     facet_grid(.~myTrophicMode) + 
@@ -284,6 +280,8 @@ ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
     theme(axis.text.x=element_text(angle=60,hjust=1), 
           legend.position = "bottom")
 ```
+
+* Most of the assignments are in the NA or Other category. Very few pathogens or symbionts.
 
 ### Per Sample Abundance calculation
 ```{r}
@@ -318,6 +316,11 @@ ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
 # dim(out)
 # rm(i, j, mySum, myPlot, myTroph)              #cleanup
 # #write.csv(out, "./data/MBLand_FunGuild_TrophicAbundance.csv")
+```
+
+* Organize and rearrange. Convert data to proportional variables, relative to sequencing depth per sample. (code hidden)
+
+```{r, include = FALSE}
 FG_sumAbund <- read.csv("./data/MBLand_FunGuild_TrophicAbundance.csv", 
          header = TRUE, colClasses = c('character', 'character', 
                                        'factor', 'character')) #otherwise does not read plot correctly
@@ -355,18 +358,75 @@ rownames(SbyE_new) <- ps_FG@sam_data@row.names
 
 ```
 
-### 
-```{r}
+# Models
 
-lm(cbind(prop_Patho_other, prop_Symbio_other) ~ crop + nestSite, data = SbyE_new)
+### RRPP/MANOVA - Species-wide comparison
+* Does not include Variety (would need to split by crop)
 
+```{r, fig.width = 7}
+par(mfrow = c(1,2))
+hist(sqrt(SbyE_new$prop_Patho_other))
+hist(log10(SbyE_new$prop_Symbio_other))
+# should be transformed if run in a typical linear model. Likely fine for RRPP/permutation procedure
 
 ```
 
+```{r, results = 'hide'}
+fg_manova <- lm.rrpp(cbind(prop_Patho_other, prop_Symbio_other) ~ crop +
+                          crop:site +
+                          crop:site:plot.rep, iter = 999,
+                          print.progress = FALSE, data = SbyE_new, SS.type="III")
+```
+
+```{r}
+full.anova <- anova(fg_manova, effect.type = "F", error = c("crop:site:plot.rep",
+    "crop:site:plot.rep", "Residuals"))
+summary(full.anova, formula = false)
+```
+
+```{r, results = 'hide', echo = FALSE, fig.keep = 7}
+path_bySite <- ggplot(SbyE_new, aes(y = prop_Patho_other, x = nestSite, fill = factor(nestSite))) +
+    geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
+    geom_jitter(width = .1)+
+    scale_x_discrete("Site") +
+    scale_y_continuous("Proportion of Pathogen Sequences", limits = c(-0.01,0.65)) + 
+    guides(fill = 'none') +
+    theme(axis.text.x = element_text(angle = 90))
+symb_bySite <- ggplot(SbyE_new, aes(y = prop_Symbio_other, x = nestSite, fill = factor(nestSite))) +
+    geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
+    geom_jitter(width = .1)+
+    scale_x_discrete("Site") +
+    scale_y_continuous("Proportion of Symbiont Sequences", limits = c(-0.01,0.65)) + 
+    guides(fill = 'none') +
+    theme(axis.text.x = element_text(angle = 90))
+multiplot(path_bySite, symb_bySite, cols = 2)
+```
+
+### CVs of Proportions across Sites
+```{r}
+patho_CV <- c(round(tapply(SbyE_new$prop_Patho_other, SbyE_new$nestSite,
+    stats::sd)/tapply(SbyE_new$prop_Patho_other, SbyE_new$nestSite, mean),4)*100)
+
+symbio_CV <- c(round(tapply(SbyE_new$prop_Symbio_other, SbyE_new$nestSite, 
+    stats::sd)/tapply(SbyE_new$prop_Symbio_other, SbyE_new$nestSite, mean),4)*100)
+
+data.frame(patho_CV, symbio_CV)
+```
+
+* These C.V.'s are quite high, above 100% in some cases. Indicates data really should be analyzed at plot level.
+* *Dilemma* all of our follow-up analyses are at site level, such as climate and landscape vars. We'd risk pseudo-replication to analyze at plot level for data that only really exists at site level.
+
+### example of pseudo-replication
+```{r}
+
+test <- lm(prop_Patho_other ~ LT_90day, data = SbyE_new)
+Anova(test, type = "III")
+summary(test)$coefficients
+ggplot(SbyE_new, aes(x=LT_90day, y = prop_Patho_other, colour = nestSite)) +
+    geom_point(size = 3) + scale_colour_manual(values = site_color)
 
 
-
-
+```
 
 
 
