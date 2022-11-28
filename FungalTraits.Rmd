@@ -157,13 +157,13 @@ table(FG_results$trophicMode[FG_results$confidenceRanking=='Probable'])
 FG_results %>% 
     filter(confidenceRanking == 'Highly Probable' | 
            confidenceRanking == 'Probable') %>%
-    filter(trophicMode != "Pathotroph-Saprotroph-Symbiotroph") -> FG_sub         #%>% 
-    # filter(trophicMode == "Pathotroph" | 
-    #        trophicMode == "Saprotroph" | 
-    #        trophicMode == "Symbiotroph" |
-    #        trophicMode == "Pathotroph-Saprotroph" | 
-    #        trophicMode == "Pathotroph-Symbiotroph" | 
-    #        trophicMode == "Saprotroph-Symbiotroph") -> FG_sub
+    # filter(trophicMode != "Pathotroph-Saprotroph-Symbiotroph") -> FG_sub         #%>% 
+    filter(trophicMode == "Pathotroph" |
+           trophicMode == "Saprotroph" |
+           trophicMode == "Symbiotroph" ) -> FG_sub
+           # trophicMode == "Pathotroph-Saprotroph" |
+           # trophicMode == "Pathotroph-Symbiotroph" |
+           # trophicMode == "Saprotroph-Symbiotroph") -> FG_sub
 dim(FG_results); dim(FG_sub)
 
 ```
@@ -180,7 +180,7 @@ colnames(ps_land@sam_data)[4] <- "crop"  #change name to avoid issues with tax_t
 my_sub <- subset(otu_table(ps_land), rownames(otu_table(ps_land)) %in% conf_FG)
 ps_FG <- merge_phyloseq(my_sub, tax_table(ps_land), 
                         sample_data(ps_land), refseq(ps_land))
-ps_FG #309 ASVs
+ps_FG #206 ASVs
 
 
 #subset funguild output for use as a tax_table()
@@ -239,10 +239,11 @@ FG_results$myTrophicMode <- ifelse(FG_results$confidenceRanking != "Possible",
 FG_results$myTrophicMode <- factor(FG_results$myTrophicMode)
 #table(FG_results$myTrophicMode) #202+77=279 na's
 levels(FG_results$myTrophicMode) <- list(
-    "Patho_other" = c("Pathotroph", "Pathotroph-Saprotroph"),
-    "Symbio_other" = c("Symbiotroph", "Saprotroph-Symbiotroph"),
-    "Other" = c("Saprotroph", "Pathotroph-Symbiotroph"),
-    "na" = c("na", "Pathotroph-Saprotroph-Symbiotroph"))
+    "Pathotroph" = c("Pathotroph"),
+    "Symbiotroph" = c("Symbiotroph"),
+    "Saprotroph" = c("Saprotroph"),
+    "na" = c("Saprotroph-Symbiotroph", "Pathotroph-Saprotroph", "Pathotroph-Symbiotroph",
+             "na", "Pathotroph-Saprotroph-Symbiotroph"))
 table(FG_results$myTrophicMode)
 
 
@@ -281,7 +282,7 @@ ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
           legend.position = "bottom")
 ```
 
-* Most of the assignments are in the NA or Other category. Very few pathogens or symbionts.
+* Most of the assignments are in the NA category. Very few pathogens or symbionts.
 
 ### Per Sample Abundance calculation
 ```{r}
@@ -316,6 +317,7 @@ ggplot(FG_melt, aes(x = crop, y = Abundance, fill = nestSite)) +
 # dim(out)
 # rm(i, j, mySum, myPlot, myTroph)              #cleanup
 # #write.csv(out, "./data/MBLand_FunGuild_TrophicAbundance.csv")
+
 ```
 
 * Organize and rearrange. Convert data to proportional variables, relative to sequencing depth per sample. (code hidden)
@@ -338,18 +340,22 @@ ps_new <- sample_data(SbyE_fg)
 ps_FG <- merge_phyloseq(ps_land, ps_new)
 
 # create proportional variables, relative to seq depth
-sample_data(ps_FG)$prop_Patho_other <- c(sample_data(ps_FG)$Patho_other/sample_data(ps_FG)$seqDepth_onlyFungi)
-sample_data(ps_FG)$prop_Symbio_other <- c(sample_data(ps_FG)$Symbio_other/sample_data(ps_FG)$seqDepth_onlyFungi)
-sample_data(ps_FG)$prop_Other <- c(sample_data(ps_FG)$Other/sample_data(ps_FG)$seqDepth_onlyFungi)
-sample_data(ps_FG)$prop_na <- c(sample_data(ps_FG)$na/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_Pathotroph <- 
+    c(sample_data(ps_FG)$Pathotroph/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_Saprotroph <- 
+    c(sample_data(ps_FG)$Saprotroph/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_Symbiotroph <-
+    c(sample_data(ps_FG)$Symbiotroph/sample_data(ps_FG)$seqDepth_onlyFungi)
+sample_data(ps_FG)$prop_na <- 
+    c(sample_data(ps_FG)$na/sample_data(ps_FG)$seqDepth_onlyFungi)
 
 # #visualize
-# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_Symbio_other))
-# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_Other))
-# plot(log2(ps_FG@sam_data$prop_Symbio_other) ~ log2(ps_FG@sam_data$prop_Other))
-# plot(log2(ps_FG@sam_data$prop_Patho_other) ~ log2(ps_FG@sam_data$prop_na))
-# plot(log2(ps_FG@sam_data$prop_Symbio_other) ~ log2(ps_FG@sam_data$prop_na))
-# plot(log2(ps_FG@sam_data$prop_Other) ~ log2(ps_FG@sam_data$prop_na))
+# plot(log2(ps_FG@sam_data$prop_Pathotroph) ~ log2(ps_FG@sam_data$prop_Saprotroph))
+# plot(log2(ps_FG@sam_data$prop_Pathotroph) ~ log2(ps_FG@sam_data$prop_Symbiotroph))
+# plot(log2(ps_FG@sam_data$prop_Pathotroph) ~ log2(ps_FG@sam_data$prop_na))
+# plot(log2(ps_FG@sam_data$prop_Saprotroph) ~ log2(ps_FG@sam_data$prop_Symbiotroph))
+# plot(log2(ps_FG@sam_data$prop_Saprotroph) ~ log2(ps_FG@sam_data$prop_na))
+# plot(log2(ps_FG@sam_data$prop_Symbiotroph) ~ log2(ps_FG@sam_data$prop_na))
 
 #organize for linear models
 SbyE_new <- data.frame(sample_data(ps_FG)@.Data)
@@ -364,15 +370,17 @@ rownames(SbyE_new) <- ps_FG@sam_data@row.names
 * Does not include Variety (would need to split by crop)
 
 ```{r, fig.width = 7}
-par(mfrow = c(1,2))
-hist(sqrt(SbyE_new$prop_Patho_other))
-hist(log10(SbyE_new$prop_Symbio_other))
+par(mfrow = c(1,3))
+hist(log(SbyE_new$prop_Pathotroph))
+hist(log(SbyE_new$prop_Symbiotroph))
+hist(sqrt(SbyE_new$prop_Saprotroph))
 # should be transformed if run in a typical linear model. Likely fine for RRPP/permutation procedure
-
+par(mfrow = c(1,1))
 ```
 
 ```{r, results = 'hide'}
-fg_manova <- lm.rrpp(cbind(prop_Patho_other, prop_Symbio_other) ~ crop +
+fg_manova <- lm.rrpp(cbind(prop_Pathotroph, prop_Symbiotroph, prop_Saprotroph) ~ 
+                          crop +
                           crop:site +
                           crop:site:plot.rep, iter = 999,
                           print.progress = FALSE, data = SbyE_new, SS.type="III")
@@ -385,44 +393,54 @@ summary(full.anova, formula = false)
 ```
 
 ```{r, results = 'hide', echo = FALSE, fig.keep = 7}
-path_bySite <- ggplot(SbyE_new, aes(y = prop_Patho_other, x = nestSite, fill = factor(nestSite))) +
+path_bySite <- ggplot(SbyE_new, aes(y = prop_Pathotroph, x = nestSite, fill = factor(nestSite))) +
     geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
     geom_jitter(width = .1)+
     scale_x_discrete("Site") +
     scale_y_continuous("Proportion of Pathogen Sequences", limits = c(-0.01,0.65)) + 
     guides(fill = 'none') +
     theme(axis.text.x = element_text(angle = 90))
-symb_bySite <- ggplot(SbyE_new, aes(y = prop_Symbio_other, x = nestSite, fill = factor(nestSite))) +
+symb_bySite <- ggplot(SbyE_new, aes(y = prop_Symbiotroph, x = nestSite, fill = factor(nestSite))) +
     geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
     geom_jitter(width = .1)+
     scale_x_discrete("Site") +
     scale_y_continuous("Proportion of Symbiont Sequences", limits = c(-0.01,0.65)) + 
     guides(fill = 'none') +
     theme(axis.text.x = element_text(angle = 90))
-multiplot(path_bySite, symb_bySite, cols = 2)
+sapr_bySite <- ggplot(SbyE_new, aes(y = prop_Saprotroph, x = nestSite, fill = factor(nestSite))) +
+    geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
+    geom_jitter(width = .1)+
+    scale_x_discrete("Site") +
+    scale_y_continuous("Proportion of Saprobe Sequences", limits = c(-0.01,0.65)) + 
+    guides(fill = 'none') +
+    theme(axis.text.x = element_text(angle = 90))
+multiplot(path_bySite, symb_bySite, sapr_bySite, cols = 3)
 ```
 
 ### CVs of Proportions across Sites
 ```{r}
-patho_CV <- c(round(tapply(SbyE_new$prop_Patho_other, SbyE_new$nestSite,
-    stats::sd)/tapply(SbyE_new$prop_Patho_other, SbyE_new$nestSite, mean),4)*100)
+patho_CV <- c(round(tapply(SbyE_new$prop_Pathotroph, SbyE_new$nestSite,
+    stats::sd)/tapply(SbyE_new$prop_Pathotroph, SbyE_new$nestSite, mean),4)*100)
 
-symbio_CV <- c(round(tapply(SbyE_new$prop_Symbio_other, SbyE_new$nestSite, 
-    stats::sd)/tapply(SbyE_new$prop_Symbio_other, SbyE_new$nestSite, mean),4)*100)
+symbio_CV <- c(round(tapply(SbyE_new$prop_Symbiotroph, SbyE_new$nestSite, 
+    stats::sd)/tapply(SbyE_new$prop_Symbiotroph, SbyE_new$nestSite, mean),4)*100)
 
-data.frame(patho_CV, symbio_CV)
+sapro_CV <- c(round(tapply(SbyE_new$prop_Saprotroph, SbyE_new$nestSite, 
+    stats::sd)/tapply(SbyE_new$prop_Saprotroph, SbyE_new$nestSite, mean),4)*100)
+
+data.frame(patho_CV, symbio_CV, sapro_CV)
 ```
 
-* These C.V.'s are quite high, above 100% in some cases. Indicates data really should be analyzed at plot level.
+* These C.V.'s are quite high, above 100% in some cases for pathogen and symbiont. Ironically, the saprotroph CVs are the lowest. In general, indicates data really should be analyzed at plot level.
 * *Dilemma* all of our follow-up analyses are at site level, such as climate and landscape vars. We'd risk pseudo-replication to analyze at plot level for data that only really exists at site level.
 
 ### example of pseudo-replication
 ```{r}
 
-test <- lm(prop_Patho_other ~ LT_90day, data = SbyE_new)
+test <- lm(prop_Saprotroph ~ LT_90day, data = SbyE_new)
 Anova(test, type = "III")
 summary(test)$coefficients
-ggplot(SbyE_new, aes(x=LT_90day, y = prop_Patho_other, colour = nestSite)) +
+ggplot(SbyE_new, aes(x=LT_90day, y = prop_Saprotroph, colour = nestSite)) +
     geom_point(size = 3) + scale_colour_manual(values = site_color)
 
 
