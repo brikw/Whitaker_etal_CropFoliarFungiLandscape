@@ -32,7 +32,7 @@ This document reports on the **fungal guild assignments** from the NC Microbiome
 ```{r, echo=FALSE, results='hide', include=FALSE} 
 
 x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "devtools",
-     "reshape2",  "viridis", "tidyr", "tidyverse", "RRPP", "car")
+     "reshape2",  "viridis", "tidyr", "tidyverse", "RRPP", "car", "olsrr")
 lapply(x, require, character.only = TRUE)
 
 #Load functions
@@ -93,22 +93,53 @@ dist.SbySvst <- stats::dist(SbySvst, method="euclidean")
 SbyE0 <- read.csv("./data/MBLand_SbyE_2022-01-10.csv", 
                  row.names = 1, stringsAsFactors = TRUE)
 dim(SbyE0)
+
+
+
+# site level data
+SbyE_site <- read.csv("./data/MBLand_SbyE_site_2022-08-01.csv", 
+                      row.names = 1, stringsAsFactors = TRUE)
+#str(SbyE_site)
+SbyE_site2 <- SbyE_site %>% dplyr::select(-CEC, -P.soil, -K.soil, -Ca.soil, 
+        -Mg.soil, -Mn.soil, -Zn.soil, -Cu.soil, -Yield) %>% dplyr::rename(crop = species)
+        #%>% filter(nestSite != 'WHT-PASVT')
+
+
+vst.means2 <- read.csv("./data/MBLand_CommDistance_VST_means.csv", 
+                       row.names = 1, stringsAsFactors = TRUE)
+
+# merge datasets, as in 4-MBLand_CommAnalyses code
+vst_gee <- merge(vst.means2, SbyE_site2, 
+                 by.x = 'site', by.y = 'nestSite', all.x = TRUE, all.y = FALSE)
+dim(vst_gee)
+
+
 ```
 
 ```{r, include=FALSE}
 # for now, remove extraneous columns
-SbyE <- SbyE0 %>% dplyr::select(-Site.Sample.Order, -Field.Location, -site.rep, 
+SbyE1 <- SbyE0 %>% dplyr::select(-Site.Sample.Order, -Field.Location, -site.rep, 
     -OVT.Var.Entry, -variety.rep, -OVT.plot, -temp, -humid, -leaftemp.diff, -NPQt,
     -Phi2, -PhiNO, -PhiNPQ, -PAR, -Chla, -leafthick, -LAI.ratio.type, -LAI.sd, -LAI.reps,
-    LAI.CV, -Notes)
-rownames(SbyE) <- SbyE$unique.plot
-SbyE$unique.plot <- as.factor(SbyE$unique.plot)
-dim(SbyE)
+    -LAI.CV, -Notes, -HM_perc, -pH, -HM_perc_CV)
+rownames(SbyE1) <- SbyE1$unique.plot
+SbyE1$unique.plot <- as.factor(SbyE1$unique.plot)
+dim(SbyE1)
+
+vst_gee %>% dplyr::select(-Lat.N, -Lon.W, -Elev, 
+            -Precip_90day, -LT_90day, -HT_90day, -MAP, -MLT, -MHT, 
+            -soilmoist, -LAI.mean, -plantHt) -> vst_gee_sub
 
 
 sample_data(ps_land)$nestSite <- as.factor(paste(
         sample_data(ps_land)$species, 
         sample_data(ps_land)$site, sep ="-"))
+
+#colnames(SbyE1)
+#colnames(vst_gee_sub)
+
+#merge with site data
+SbyE <- merge(SbyE1, vst_gee_sub, by.x = "nestSite", by.y = "site", all.x = TRUE)
 
 ```
 
@@ -366,13 +397,13 @@ rownames(SbyE_new) <- ps_FG@sam_data@row.names
 
 # Models
 
-### RRPP/MANOVA - Species-wide comparison
+## RRPP/MANOVA - Do proportion saprobes/symbios/pathos differ by crop and site?
 * Does not include Variety (would need to split by crop)
 
 ```{r, fig.width = 7}
 par(mfrow = c(1,3))
-hist(log(SbyE_new$prop_Pathotroph))
-hist(log(SbyE_new$prop_Symbiotroph))
+hist(log(I(SbyE_new$prop_Pathotroph+0.0001)))
+hist(log(I(SbyE_new$prop_Symbiotroph+0.0001)))
 hist(sqrt(SbyE_new$prop_Saprotroph))
 # should be transformed if run in a typical linear model. Likely fine for RRPP/permutation procedure
 par(mfrow = c(1,1))
@@ -397,21 +428,21 @@ path_bySite <- ggplot(SbyE_new, aes(y = prop_Pathotroph, x = nestSite, fill = fa
     geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
     geom_jitter(width = .1)+
     scale_x_discrete("Site") +
-    scale_y_continuous("Proportion of Pathogen Sequences", limits = c(-0.01,0.65)) + 
+    scale_y_continuous("Proportion of Pathogen Sequences", limits = c(-0.01,0.73)) + 
     guides(fill = 'none') +
     theme(axis.text.x = element_text(angle = 90))
 symb_bySite <- ggplot(SbyE_new, aes(y = prop_Symbiotroph, x = nestSite, fill = factor(nestSite))) +
     geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
     geom_jitter(width = .1)+
     scale_x_discrete("Site") +
-    scale_y_continuous("Proportion of Symbiont Sequences", limits = c(-0.01,0.65)) + 
+    scale_y_continuous("Proportion of Symbiont Sequences", limits = c(-0.01,0.73)) + 
     guides(fill = 'none') +
     theme(axis.text.x = element_text(angle = 90))
 sapr_bySite <- ggplot(SbyE_new, aes(y = prop_Saprotroph, x = nestSite, fill = factor(nestSite))) +
     geom_boxplot(outlier.shape = NULL) + scale_fill_manual(values = site_color) +
     geom_jitter(width = .1)+
     scale_x_discrete("Site") +
-    scale_y_continuous("Proportion of Saprobe Sequences", limits = c(-0.01,0.65)) + 
+    scale_y_continuous("Proportion of Saprobe Sequences", limits = c(-0.01,0.73)) + 
     guides(fill = 'none') +
     theme(axis.text.x = element_text(angle = 90))
 multiplot(path_bySite, symb_bySite, sapr_bySite, cols = 3)
@@ -434,17 +465,301 @@ data.frame(patho_CV, symbio_CV, sapro_CV)
 * These C.V.'s are quite high, above 100% in some cases for pathogen and symbiont. Ironically, the saprotroph CVs are the lowest. In general, indicates data really should be analyzed at plot level.
 * *Dilemma* all of our follow-up analyses are at site level, such as climate and landscape vars. We'd risk pseudo-replication to analyze at plot level for data that only really exists at site level.
 
-### example of pseudo-replication
-```{r}
 
-test <- lm(prop_Saprotroph ~ LT_90day, data = SbyE_new)
-Anova(test, type = "III")
-summary(test)$coefficients
-ggplot(SbyE_new, aes(x=LT_90day, y = prop_Saprotroph, colour = nestSite)) +
-    geom_point(size = 3) + scale_colour_manual(values = site_color)
+## Best Subsets Approach
+### NOTE !!! This includes the soil properties, but has missing data for WHT-PASVT
+```{r, include = FALSE}
+#remove columns already present in main SbyE
+SbyE_new %>% dplyr::select(unique.plot, na, Pathotroph, Saprotroph, Symbiotroph,
+        prop_Pathotroph, prop_Saprotroph, prop_Symbiotroph, prop_na, 
+        seqDepth_onlyFungi) -> out
 
+out$unique.plot <- as.character(out$unique.plot)
+SbyE$unique.plot #corn plots named wihout the "E"
+
+# remove the E from corn plot names
+out$unique.plot <- c(unname(sapply(out$unique.plot, function(x) gsub("E","", x))))
+out$unique.plot <- as.factor(out$unique.plot)
+
+
+#merge
+SbyE_propFG <- merge(SbyE, out, 
+                 by = 'unique.plot', all.x = TRUE, all.y = TRUE)
+dim(SbyE_propFG)
 
 ```
+
+
+
+### Saprobes
+```{r}
+# Define initial model
+sapro1 <- lm(sqrt(prop_Saprotroph) ~ Elev + MLT + MHT + # Lat.N + Lon.W +  # to match best-subsets richness analysis (also Lon.W drops out during VIF and Lat.N only in the biggest model and actually reduced Adj.R2)
+                 Precip_90day + LT_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+Anova(sapro1)
+olsrr::ols_plot_resid_fit(sapro1)
+
+olsrr::ols_test_normality(sapro1) 
+
+olsrr::ols_test_breusch_pagan(sapro1, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(sapro1)$vif_t
+
+```
+
+```{r, results = 'hide'}
+# Redefine model with worst variable dropped
+sapro2 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + 
+                 Elev + MLT + MHT + Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro2)
+
+sapro3 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + 
+                 Elev + MHT + Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro3)
+
+sapro4 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + 
+                 MHT + Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro4)
+
+sapro5 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + 
+                 Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro5)
+
+sapro6 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + 
+                 Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro6)
+
+sapro7 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km +
+                 Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + Perc_veg_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro7)
+
+sapro8 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + 
+                 Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro8)
+
+sapro9 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc + 
+                 Precip_90day + HT_90day + MAP + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro9)
+```
+
+```{r}
+sapro10 <- lm(sqrt(prop_Saprotroph) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc + Perc_crop_10km + 
+                 Precip_90day + HT_90day + MAP + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(sapro10)
+olsrr::ols_step_best_subset(sapro10)
+```
+
+* models 4 and 5 best by AIC, and SBIC, --> more saprobes when it is MORE wet, LESS hot, and the plants are bigger/taller
+
+```{r, fig.height = 3, fig.width = 3}
+ggplot(SbyE_propFG, aes(x=HT_90day, y=prop_Saprotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=MAP, y=prop_Saprotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=LAI.mean, y=prop_Saprotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=plantHt, y=prop_Saprotroph)) + geom_point()
+#summary(sapro10)
+#HT_90day MAP LAI.mean plantHt 
+```
+
+
+
+### Pathogens
+```{r}
+# Define initial model
+patho1 <- lm(log(I(prop_Pathotroph+0.0001)) ~ 
+                 Elev + MLT + MHT + MAP + Precip_90day + LT_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+Anova(patho1)
+olsrr::ols_plot_resid_fit(patho1)  #there is a pattern here, but not sure of an easy fix
+
+olsrr::ols_test_normality(patho1)
+
+olsrr::ols_test_breusch_pagan(patho1, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(patho1)$vif_t
+
+```
+
+```{r, results = 'hide'}
+patho2 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + 
+                 Elev + MLT + MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho2)
+
+patho3 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + 
+                 Elev + MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho3)
+
+patho4 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + 
+                 MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho4)
+
+patho5 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho5)
+
+patho6 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho6)
+
+patho7 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km +
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho7)
+
+patho8 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho8)
+
+patho9 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho9)
+```
+
+```{r}
+patho10 <- lm(log(I(prop_Pathotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc + Perc_crop_10km + 
+                 MAP + Precip_90day + HT_90day + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(patho10)
+olsrr::ols_step_best_subset(patho10)
+```
+
+* models 3, 4 and 5 best by AIC, and SBIC, --> more pathogens when it is LESS wet, MORE hot, and the plants are bigger (but not taller?)
+
+```{r, fig.height = 3, fig.width = 3}
+#olsrr::ols_plot_resid_fit(patho10)  # a bit more normal
+
+ggplot(SbyE_propFG, aes(x=MAP, y=prop_Pathotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=HT_90day, y=prop_Pathotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=LAI.mean, y=prop_Pathotroph)) + geom_point()
+#summary(patho10)
+#MAP HT_90day LAI.mean
+```
+
+### Symbios
+```{r}
+# Define initial model
+symbio1 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ 
+                 Elev + MLT + MHT + MAP + Precip_90day + LT_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+Anova(symbio1)
+olsrr::ols_plot_resid_fit(symbio1)  #there is a pattern here, but not sure of an easy fix
+
+olsrr::ols_test_normality(symbio1)
+
+olsrr::ols_test_breusch_pagan(symbio1, rhs=TRUE, multiple=TRUE) 
+
+olsrr::ols_coll_diag(symbio1)$vif_t
+
+```
+
+```{r, results = 'hide'}
+symbio2 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + 
+                 Elev + MLT + MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio2)
+
+symbio3 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + 
+                 Elev + MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio3)
+
+symbio4 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + 
+                 MHT + MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio4)
+
+symbio5 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_crop_1km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio5)
+
+symbio6 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + Perc_veg_1km +
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio6)
+
+symbio7 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km +
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + Perc_veg_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio7)
+
+symbio8 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + HM_perc + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio8)
+
+symbio9 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc + 
+                 MAP + Precip_90day + HT_90day + 
+                 Perc_crop_10km + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio9)
+```
+
+```{r}
+symbio10 <- lm(log(I(prop_Symbiotroph+0.0001)) ~ #LT_90day + MLT + Elev + MHT + Perc_crop_1km + Perc_veg_1km + Perc_veg_10km + HM_perc +  Perc_crop_10km + 
+                 MAP + Precip_90day + HT_90day + 
+                 soilmoist + LAI.mean + plantHt + pH, data=SbyE_propFG)
+olsrr::ols_coll_diag(symbio10)
+olsrr::ols_step_best_subset(symbio10)
+```
+
+* models 4 best by AIC, SBIC, and SBC (though 5,6,7 close contenders) --> more symbionts when it is wetter, hotter, the plants are SMALLER, and the pH is higher?
+
+```{r, fig.height = 3, fig.width = 3}
+#olsrr::ols_plot_resid_fit(symbio10)  # a bit more normal, still a pattern though
+
+ggplot(SbyE_propFG, aes(x=Precip_90day, y=prop_Symbiotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=HT_90day, y=prop_Symbiotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=LAI.mean, y=prop_Symbiotroph)) + geom_point()
+ggplot(SbyE_propFG, aes(x=pH, y=prop_Symbiotroph)) + geom_point()
+#summary(symbio10)
+#Precip_90day HT_90day LAI.mean pH
+```
+
+
+
 
 
 
