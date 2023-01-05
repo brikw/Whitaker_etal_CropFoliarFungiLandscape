@@ -571,7 +571,7 @@ all_cca_vec
 ## without SOIL PROPERTIES
 
 ### 2e) Organize & Examine VIFs
-```{r, include=FALSE}
+```{r}
 
 # names(SbyE_site_sub)
 # "nestSite"       "Lat.N"         "Lon.W"          "Elev"
@@ -603,7 +603,7 @@ all_cca_vec
 ```
 
 ### 2f) Climate, Plant, Soil, & Landcover combo CCA
-```{r, include=FALSE}
+```{r}
 # make SbyE for CCA
 SbyE_site_sub <- as.matrix(SbyE_site_sub[,-c(1:3,7,9:13,17,18)]) #4
 head(SbyE_site_sub)
@@ -678,7 +678,7 @@ CCA_site_all2
 ```
 
 #### 16-site Without SOIL PROPERTIES version
-```{r, include=FALSE}
+```{r, echo = FALSE}
 
 cca_sig_16 <- c('LT_90day', 'LAI.mean')
 all_cca_vec_sig_16 <- all_cca_vec_16[all_cca_vec_16$vecs %in% cca_sig_16, ]
@@ -704,8 +704,8 @@ CCA_site_all_16 <- ggplot() + coord_equal() +
           axis.title = element_text(size = 24), axis.text = element_text(size =24),
           legend.text=element_text(size=17), legend.title=element_blank(),
           legend.background = element_rect(colour = NA, fill = NA),
-          legend.position = "bottom", legend.margin=margin(0,0,0,0), 
-          legend.box.margin=margin(-10,-10,-6,10)) 
+          legend.position = "bottom", legend.margin=margin(0,8,0,0), 
+          legend.box.margin=margin(-10,-6,-6,10)) 
 
 #tiff("./figures/CCA_all_SiteLevel_16sites.tiff", width=8.97, height=8.97, units="in", res=600)
 CCA_site_all_16
