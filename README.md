@@ -1,7 +1,7 @@
 # "Foliar fungal communities depend on crop identity and neighboring vegetation in agroecosystems"
 ### Whitaker, B.K., Heiniger, R., Hawkes, C.V.
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6984309.svg)](https://doi.org/10.5281/zenodo.6984309)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7888432.svg)](https://doi.org/10.5281/zenodo.7888432)
 
 This repository includes the R code, data files, small scripts, and a metadata file to supplement the manuscript by Whitaker et al. "Foliar fungal communities depend on crop identity and neighboring vegetation in agroecosystems".
 
@@ -13,7 +13,7 @@ The taxonomy matrix ("MBLand_RDP_WarcupDefault_AddUNITE.csv") includes the taxon
 
 Detailed information about column headers in the sample matrix and taxonomy matrix can be found in the metadata file "MBLand_Meta.xlsx".
 
-The DADA2_pipeline.Rmd document performs bioinformatic analysis using DADA2; Taxonomy_Curation.Rmd does taxonomic classification of fungal ASVs and removal of plant ASVs; Structure_Richness_RRPP.Rmd the Structure and Richness (Hyp1) analysis of the fungal communities; CCA_LandscapeBwSites.Rmd contains the CCA and between site dissimilarity landscape model; and LandscapeWithinSites.Rmd contains the models and figures for within site richness and dissimilarity landscape models. They should be run in this order: DADA2_pipeline.Rmd > Taxonomy_Curation.Rmd > Structure_Richness_RRPP.Rmd > CCA_LandscapeBwSites.Rmd > LandscapeWithinSites.Rmd.
+The DADA2_pipeline.Rmd document performs bioinformatic analysis using DADA2; Taxonomy_Curation.Rmd does taxonomic classification of fungal ASVs and removal of plant ASVs; Structure_Richness_RRPP.Rmd the Structure and Richness (Hyp1) analysis of the fungal communities; CCA_LandscapeBwSites.Rmd contains the CCA and between site dissimilarity landscape model; and LandscapeWithinSites.Rmd contains the models and figures for within site richness and dissimilarity landscape models. They should be run in this order: DADA2_pipeline.Rmd > Taxonomy_Curation.Rmd > Structure_Richness_RRPP.Rmd > CCA_LandscapeBwSites.Rmd > LandscapeWithinSites.Rmd. Two supplementary analyses are contained in the files Landscape_PlotLevel.Rmd and FungalTraits.Rmd.
 
 The /code folder contains the batch and R scripts necessary to run small codes inside R and the Goolge Earth Engine code. Data necessary to run the analyses can be found in /data folder.
 
