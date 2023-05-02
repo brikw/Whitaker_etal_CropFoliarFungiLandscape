@@ -1,0 +1,381 @@
+---
+title: "Native Vegetation at Plot Level"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+author: "Briana K. Whitaker"
+date: "`r Sys.Date()`"
+---
+\fontsize{9}{10}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning=FALSE, message=FALSE)
+```
+---
+
+
+* Run using `r version[['version.string']] `.
+
+# Objective
+This document reports on the plot-level landscape analyses from the NC Microbiome Landscapes Project, performed in the summer of 2019. 
+
+
+```{r, include=FALSE} 
+x<-c("ggplot2", "phyloseq", "dplyr", "RColorBrewer", "DESeq2", "viridis", "car", 
+     'olsrr', 'reshape2', 'egg', 'nlme')  
+lapply(x, require, character.only = TRUE)
+
+#add 'not in' function
+`%nin%` = Negate(`%in%`)
+
+#set seed
+#runif(1, min = 0, max = 1000)
+set.seed(713) 
+
+# set ggplot2 theme
+theme_set(theme_bw(base_size=16)) 
+theme_update(panel.grid.major=element_line(0), panel.grid.minor=element_line(0))
+
+
+#source("./code/multiplot.function.R")
+
+# color palettes
+
+spp_color <- c("#E6AB02", "#D95F02", "#1B9E77", '#7570B3') 
+#gold, orange, green, purple
+#levels(sample_data(ps_filter)$species)
+#"CRN"  "SOY"  "SWCH" "WHT" 
+#https://mdigi.tools/color-shades/#a6761d
+crn_color <- c('#fed561', '#fdc422', '#dda402', '#9e7501')
+soy_color <- c('#fea561', '#fd8122', '#dd6102', '#9e4501')
+swc_color <- c('#77e8c6', '#40deaf', '#21bf90', '#178867')
+wht_color <- c('#cfcde4', '#8f8ac1', '#555096', '#2f2c53')
+
+site_color <- c(crn_color, soy_color, swc_color, wht_color)
+
+```
+
+
+```{r, include=FALSE} 
+## Phyloseq obj
+load("./data/MBLand_ps_land.RData")
+ps_land #595 ASVs
+load("./data/MBLand_ps_onlyFungi_lulu_noCont.RData")
+ps_lulu #1211 ASVs  -----> pre-singleton and low abundance taxa
+
+
+# from non-filtered dataset, Remove reads with abundance <=2, but keep singletons (<2 based on analysis of controls)
+ps_filt1 <- prune_taxa(taxa_sums(ps_lulu) > 2, ps_lulu)
+ntaxa(ps_filt1)
+
+alpha1 <- phyloseq::estimate_richness(ps_land, split=TRUE, measures="Observed")
+alpha <- phyloseq::estimate_richness(ps_filt1, split=TRUE, measures="Observed")
+
+row.names(alpha1)<-sapply(stringr::str_remove_all(rownames(alpha1),"X"),"[")
+row.names(alpha)<-sapply(stringr::str_remove_all(rownames(alpha),"X"),"[")
+
+sam <- phyloseq::sample_data(ps_land)
+sam_rich1 <- merge(sam, alpha1, by="row.names", all=TRUE)
+rownames(sam_rich1) <- rownames(sam)
+sam_rich <- merge(sam_rich1, alpha, by.x="Row.names", by.y = "row.names", all=TRUE)
+colnames(sam_rich) #Observed.x = richness no singles, Observed.y = richness with singles
+#rename columns
+colnames(sam_rich) -> my_cols
+colnames(sam_rich) <- c(my_cols[-c(61:62)], "Rich_nosing" , "Rich_sing" )
+colnames(sam_rich)
+
+
+```
+
+
+
+
+```{r, include=FALSE}
+# read plot level GEE data for 1km level
+plot_gee <- read.csv("./data/MBLand_PlotData_GEE.csv", row.names = 1,
+                     colClasses = c("unique" = "character"))
+plot_gee$unique <- as.factor(plot_gee$unique)
+
+
+# subset sam_rich, remove tassel
+sam_rich2 <- sam_rich %>% filter(leaf.type != "Tassel")
+sam_rich2$nestSite <- as.factor(paste(sam_rich2$species, sam_rich2$site, sep ="-"))
+
+# pcoa plot data
+pcoa.dat <- read.csv("./intermediate/MBLand_pcoa.dat.csv",
+                     row.names = 1, colClasses = "character") %>% 
+    select(ids, V1, V2)
+pcoa.dat$V1 <- as.numeric(pcoa.dat$V1);pcoa.dat$V2 <- as.numeric(pcoa.dat$V2); pcoa.dat$ids <- as.factor(pcoa.dat$ids)
+
+# merge
+SbyEa <- merge(sam_rich2, plot_gee, by.x = "unique.plot", by.y = "unique")
+dim(SbyEa)
+SbyE <- merge(SbyEa, pcoa.dat, by.x = "unique.plot", by.y="ids")
+dim(SbyE)
+
+
+```
+
+# RICHNESS
+
+* needs transformation
+
+```{r}
+hist(sqrt(100-SbyE$Perc_veg_1km))  
+```
+
+
+### Random Intercepts Model
+```{r}
+lme1 <- nlme::lme(Rich_nosing ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1|species)
+Anova(lme1)
+plot(lme1)
+
+lme1$coefficients$random
+lme1$coefficients$fixed
+
+# refit with ML to compare to fixed effects models
+lme1a <- nlme::lme(Rich_nosing ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1|species, method = "ML")
+```
+
+### Random Intercepts and Slopes Model
+```{r}
+ris1 <- nlme::lme(Rich_nosing ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1+I(sqrt(100-Perc_veg_1km))|species )
+Anova(ris1)
+summary(ris1)
+plot(ris1)
+
+ris1$coefficients$random    #very very small differences off the slope
+ris1$coefficients$fixed
+
+# refit with ML to compare to fixed effects models
+ris1a <- nlme::lme(Rich_nosing ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1+I(sqrt(100-Perc_veg_1km))|species ,
+             method = "ML")
+```
+
+### Compare AIC
+```{r}
+### random effects models
+sapply(list(lme1a, ris1a), AIC)
+
+```
+
+* Random intercepts better than random intercepts and slopes model by AIC
+
+
+# WITHIN SITE HETEROGENEITY
+
+**Based on raw VST**
+
+```{r}
+vst.dist.ls <- read.csv("./data/MBLand_CommDistance_VST_spp_site.csv",
+                     row.names = 1) #don't read in factors
+vst.dist.ls$NBX <- as.character(vst.dist.ls$NBX)
+vst.dist.ls$NBY <- as.character(vst.dist.ls$NBY)
+
+# function to get within site beta diversity comparisons
+## coding accounts for triangular nature of distance matrices, need to count all comparisons between any focal plot and all other plots in its site
+# myPlots <- c(unique(vst.dist.ls$NBX), "99")
+# out <- list()
+# for (i in 1:length(myPlots)) {
+#     myID <- myPlots[i]
+#         sub1 <- vst.dist.ls[vst.dist.ls$NBX == myID | vst.dist.ls$NBY == myID,]
+#         sub2 <- sub1[sub1$site != "between",]
+#     myMean <- mean(sub2$vst.dist)
+#     mySD <- sd(sub2$vst.dist)
+#     myReps <- length(sub2$vst.dist)
+#     mySE <- mySD/sqrt(myReps)
+#         dat <- c(myID, myMean, mySD, myReps, mySE)
+#         out <- rbind(out, dat)
+# }
+# dim(out)
+# rownames(out) <- out[,1]
+# colnames(out) <- c("id", "plot_mean", "plot_sd", "plot_reps", "plot_se")
+# write.csv(out, "./data/MBLand_CommDistance_VST_Plotmeans.csv")
+
+plot_vst <- read.csv("./data/MBLand_CommDistance_VST_Plotmeans.csv",
+                               row.names = 1)
+plot_vst$id <- factor(plot_vst$id)
+SbyE$id <- sapply(SbyE$unique.plot, function(x) gsub("E","",x))
+
+SbyE <- merge(SbyE, plot_vst, by = "id")
+
+```
+
+```{r}
+par(mfrow=c(1,1))
+hist((SbyE$plot_mean))
+```
+* does not need transformation
+
+
+### Random Intercepts Model
+```{r}
+vst_lme1 <- nlme::lme(plot_mean ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1|species)
+Anova(vst_lme1)
+plot(vst_lme1)
+
+# vst_lme1$coefficients$random
+# vst_lme1$coefficients$fixed
+
+
+# refit with ML to compare to fixed effects models
+vst_lme1a <- nlme::lme(plot_mean ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1|species, method = "ML")
+
+#sapply(list(vst1, vst_lme1a), AIC)
+
+```
+
+### Random Intercepts and Slopes Model
+```{r}
+vst_ris1 <- nlme::lme(plot_mean ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1+I(sqrt(100-Perc_veg_1km))|species )
+Anova(vst_ris1)
+summary(vst_ris1)
+plot(vst_ris1)
+
+vst_ris1$coefficients$random   
+vst_ris1$coefficients$fixed
+
+# refit with ML to compare to fixed effects models
+vst_ris1a <- nlme::lme(plot_mean ~  I(sqrt(100-Perc_veg_1km)), 
+             data = SbyE , 
+             random = ~ 1+I(sqrt(100-Perc_veg_1km))|species ,
+             method = "ML")
+```
+
+### Compare AIC
+```{r}
+### random effects models
+sapply(list(vst_lme1a, vst_ris1a), AIC)
+
+```
+
+* random intercepts and random slopes models equivocal by AIC (delta=0.4)
+
+
+# MODEL-BASED REGRESSION FIGURES
+
+### Richness - Random Intercepts
+
+```{r}
+# create predicted results dataframe
+grid1<-with (SbyE, data.frame(
+  Perc_veg_1km = SbyE$Perc_veg_1km,
+  Rich_nosing=0,
+  species=species))
+grid1$Rich_nosing <- stats::predict(lme1)
+
+
+modRegPlot<- ggplot(SbyE, aes(y=Rich_nosing, x=Perc_veg_1km, color=species)) 
+modRegPlot2 <- modRegPlot +
+    geom_point(size =1.8) +
+    scale_colour_manual("", values = spp_color) +
+    scale_y_continuous("Observed Richness", limits = c(0,100)) +
+    scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
+    #theme(legend.position = c(0.12,0.9),
+        #legend.background = element_blank() ) +
+    guides(colour = 'none') +
+    geom_smooth(data = grid1, 
+        aes(group=species, colour = species), formula = y ~ x,
+        method=lm, se=FALSE, lwd=1.3, linetype = 1)     +
+    annotate(geom = "text", x = 1, y = 96, label = "A)", size = 6)
+
+#tiff("./figures/Richness Plot Level ~ Perc_Veg -RandIntMod.tiff", width=6.6, height=6.6, units="in", res=600)
+modRegPlot2
+#dev.off()
+```
+
+
+### Heterogenity - Random Intercepts
+```{r}
+# create predicted results dataframe
+grid2<-with (SbyE, data.frame(
+  Perc_veg_1km = SbyE$Perc_veg_1km,
+  plot_mean=0,
+  species=species))
+grid2$plot_mean <- stats::predict(vst_lme1)
+
+
+# Plot with model based regressions
+vst_modRegPlot<- ggplot(SbyE, aes(y=plot_mean, x=Perc_veg_1km, color=species)) 
+vst_modRegPlot2 <- vst_modRegPlot +
+    geom_point(size =1.8) +
+    scale_colour_manual("", values = spp_color) +
+    scale_y_continuous("Plot Dissimilarity", limits = c(0,67)) +
+    scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
+    theme(legend.position = c(0.8,0.27),
+        legend.background = element_blank() ) +
+    geom_smooth(data = grid2, 
+        aes(group=species, colour = species), formula = y ~ x,
+        method=lm, se=FALSE, lwd=1.3, linetype = 1) +
+    annotate(geom = "text", x = 1, y = 64, label = "B)", size = 6)
+
+#tiff("./figures/Heterogeneity Plot Level ~ Perc_Veg -RandIntMod.tiff", width=6.6, height=6.6, units="in", res=600)
+vst_modRegPlot2
+#dev.off()
+
+```
+
+```{r}
+# tiff("./figures/Dissim & Richness Plot Level ~ Perc_Veg -RandIntMod.tiff", width=180, height=100, units="mm", res=600)
+# ggarrange(modRegPlot2, vst_modRegPlot2, widths = c(1,1))
+# dev.off()
+```
+
+
+### Heterogenity - Random Intercepts & Slopes
+```{r}
+# create predicted results dataframe
+grid3<-with (SbyE, data.frame(
+  Perc_veg_1km = SbyE$Perc_veg_1km,
+  plot_mean=0,
+  species=species))
+grid3$plot_mean <- stats::predict(vst_ris1)
+
+
+# Plot with model based regressions
+vst_RISplot <- ggplot(SbyE, aes(y=plot_mean, x=Perc_veg_1km, color=species)) 
+vst_RISplot2 <- vst_RISplot +
+    geom_point(size =1.8) +
+    scale_colour_manual("", values = spp_color) +
+    scale_y_continuous("Plot Dissimilarity", limits = c(0,67)) +
+    scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
+    theme(legend.position = c(0.12,0.9),
+        legend.background = element_blank() ) +
+    geom_smooth(data = grid3, 
+        aes(group=species, colour = species), formula = y ~ x,
+        method=lm, se=FALSE, lwd=1.3, linetype = 1)
+
+#tiff("./figures/Heterogeneity Plot Level ~ Perc_Veg -RISMod.tiff", width=6.6, height=6.6, units="in", res=600)
+vst_RISplot2
+#dev.off()
+
+```
+
+
+
+
+
+
+
+```{r}
+sessionInfo()
+```

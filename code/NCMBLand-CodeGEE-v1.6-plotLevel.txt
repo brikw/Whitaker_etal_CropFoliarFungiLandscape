@@ -1,0 +1,141 @@
+//import table projects/cloud-geographer/assets/MBLand_Plot_LatLong
+
+print(table)
+
+//================================================ DATA LAYERS ===========================================================
+//Import USDA NASS Cropland Data Layers
+//Year 2019, 30m resolution
+var CDL = ee.ImageCollection('USDA/NASS/CDL')
+                  .filter(ee.Filter.date('2019-01-01', '2019-12-31')) //2019
+                  .first();
+
+function buffer_km(geom){
+  var geom_buffer = geom.buffer(1000)
+  return geom_buffer.copyProperties(geom)
+}
+
+var buffered = table.map(buffer_km)
+print(buffered)
+Map.addLayer(table)
+Map.addLayer(buffered)
+// //alternative
+// var geometry = ee.Geometry.Point([-76.252579, 36.262307]); //replace for each site; and for each crop, change crop layers used for % same crop
+// var geom1 = geometry.buffer(1000) //manually replace 10000, 5000, 1000 km
+
+// print(geometry)
+// var feature_area = ee.Feature(geom1).geometry().area();
+
+
+// Map.addLayer(geom1,{},'10km Buffer Zone', false)//Adds the buffer to the Map
+// Map.centerObject(geom1,11)//Centers the Map to the buffer at zoom level 11 out of [1,24]
+Map.setOptions('ROADMAP'); //either ROADMAP, SATELLITE, HYBRID, TERRAIN
+
+// Function to calculate ocean percentage
+function ocean_analysis(geom){
+  var cdl_filter = CDL.clip(geom);
+  var cropLandcover = cdl_filter.select('cropland')
+  var oceanLayer = cropLandcover.neq(0);
+  var oceanmasked = cropLandcover.updateMask(oceanLayer);
+  var feature_area = ee.Feature(geom).geometry().area();
+  var ocean_scl = ee.Number(ee.Image(oceanLayer).select('cropland').projection().nominalScale());
+  var non_ocean_area = (ee.Image(oceanLayer).reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom.geometry(),
+      'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':ocean_scl }));
+  var non_ocean_perc = ee.Number(non_ocean_area.get('cropland')).multiply(ocean_scl).multiply(ocean_scl).divide(feature_area).multiply(100)//.format('%.4f');
+  var ocean_perc = ee.Number(100).subtract(ee.Number(non_ocean_perc));
+  return geom.set("ocean_percentage",ocean_perc).copyProperties(geom);
+}
+
+var ocean_percentage = buffered.map(ocean_analysis)
+print(ocean_percentage)
+
+Export.table.toDrive({
+  collection:ocean_percentage,
+  description:"ocean_percentage",
+  fileFormat:'CSV',
+  selectors:['unique','ocean_percentage']
+})
+
+
+// Function to calculate manual cultivated land percentage
+function crop_analysis(geom){
+  var cdl_filter = CDL.clip(geom);
+  var cropLandcover = cdl_filter.select('cropland')
+  var feature_area = ee.Feature(geom).geometry().area();
+  var singleCDLbands = cropLandcover.remap([1,2,3,4,5,6,10,11,12,13,14,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,66,67,68,69,70,71,72,74,75,76,77,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,254], [1,2,3,4,5,6,10,11,12,13,14,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,66,67,68,69,70,71,72,74,75,76,77,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,254], 0)
+            .rename('mycropland')
+  var single_mask = singleCDLbands.neq(0);
+  var singleCDLmasked = singleCDLbands.updateMask(single_mask);
+  var single_scl = ee.Number(ee.Image(single_mask).select('mycropland').projection().nominalScale())
+  var single_img_area = (ee.Image(single_mask).select('mycropland').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom.geometry(),
+      'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':single_scl }))
+  var single_perc = ee.Number(single_img_area.get('mycropland')).multiply(single_scl).multiply(single_scl).divide(feature_area).multiply(100).format('%.4f')
+  return geom.set("crop_percentage",single_perc).copyProperties(geom);
+  
+}
+
+var crop_percentage = buffered.map(crop_analysis)
+print(crop_percentage)
+
+Export.table.toDrive({
+  collection:crop_percentage,
+  description:"crop_percentage",
+  fileFormat:'CSV',
+  selectors:['unique','crop_percentage']
+})        
+
+
+// Function to calculate percentage veg
+function veg_analysis(geom){
+  var cdl_filter = CDL.clip(geom);
+  var cropLandcover = cdl_filter.select('cropland')
+  var feature_area = ee.Feature(geom).geometry().area();
+  var vegCDLbands = cropLandcover
+              .remap([61,63,64,141,142,143,152,176,190,195], [61,63,64,141,142,143,152,176,190,195], 0)
+              .rename('myveg')
+  var veg_mask = vegCDLbands.neq(0);  //neq means 'not equal to'
+  var vegCDLmasked = vegCDLbands.updateMask(veg_mask);
+  var veg_scl = ee.Number(ee.Image(veg_mask).select('myveg').projection().nominalScale())
+  var veg_img_area = (ee.Image(veg_mask).select('myveg').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom.geometry(),
+      'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':veg_scl }))
+  var veg_perc = ee.Number(veg_img_area.get('myveg')).multiply(veg_scl).multiply(veg_scl).divide(feature_area).multiply(100).format('%.4f')  
+  return geom.set("veg_percentage",veg_perc).copyProperties(geom);
+}
+
+var veg_percentage = buffered.map(veg_analysis)
+print(veg_percentage)
+
+Export.table.toDrive({
+  collection:veg_percentage,
+  description:"veg_percentage",
+  fileFormat:'CSV',
+  selectors:['unique','veg_percentage']
+}) 
+
+
+
+//Function to calculate non-veg
+function nonveg_analysis(geom){
+  var cdl_filter = CDL.clip(geom);
+  var cropLandcover = cdl_filter.select('cropland')
+  var feature_area = ee.Feature(geom).geometry().area();
+  var nonvegCDLbands = cropLandcover
+              .remap([65,81,82,83,87,88,92,111,112,121,122,123,124,131], [65,81,82,83,87,88,92,111,112,121,122,123,124,131], 0)
+              .rename('mynonveg')
+  var nonveg_mask = nonvegCDLbands.neq(0);  //neq means 'not equal to'
+  var nonvegCDLmasked = nonvegCDLbands.updateMask(nonveg_mask);
+  var nonveg_scl = ee.Number(ee.Image(nonveg_mask).select('mynonveg').projection().nominalScale())
+  var nonveg_img_area = (ee.Image(nonveg_mask).select('mynonveg').reduceRegion({'reducer': ee.Reducer.sum().unweighted(),'geometry': geom.geometry(),
+      'bestEffort': false,'maxPixels': 1e12,'tileScale': 1,'scale':nonveg_scl }))
+  var nonveg_perc = ee.Number(nonveg_img_area.get('mynonveg')).multiply(nonveg_scl).multiply(nonveg_scl).divide(feature_area).multiply(100).format('%.4f')
+  return geom.set("nonveg_percentage",nonveg_perc).copyProperties(geom);
+}
+
+var nonveg_percentage = buffered.map(nonveg_analysis)
+print(nonveg_percentage)
+
+Export.table.toDrive({
+  collection:nonveg_percentage,
+  description:"nonveg_percentage",
+  fileFormat:'CSV',
+  selectors:['unique','nonveg_percentage']
+}) 
