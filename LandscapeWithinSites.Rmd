@@ -502,20 +502,20 @@ rich_veg1km <- ggplot(RichLU_long[RichLU_long$sig_vars == "Perc_veg_1km",],
        aes(x = values, y = Rich_nosing, colour = site)) +
   geom_smooth(aes(x = values, y = Rich_nosing), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 4) +
+  geom_point(size = 2) +
   geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=1.4) +
   scale_y_continuous("Avg. Within Site Richness", limits = c(0,90)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 28), axis.text = element_text(size = 28)) +
-  annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 9)
+        axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  annotate(geom = "text", x = 3, y = 84.65, label = "A)", size = 5)
 
 rich_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
        aes(x = values, y = Rich_nosing, colour = site)) +
   geom_smooth(aes(x = values, y = Rich_nosing), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 4) +
+  geom_point(size = 2) +
   geom_errorbar(aes(ymin=Rich_nosing-Rich_nosing_ci, ymax=Rich_nosing+Rich_nosing_ci), width=.5) +
   scale_y_continuous("Avg. Within Site Richness", limits = c(0,90)) +
   scale_x_continuous(expression(atop("90-day Low Temperature", 
@@ -523,27 +523,27 @@ rich_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
                                 limits = c(-5.5,11)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 28), axis.text = element_text(size = 28)) +
-  annotate(geom = "text", x = -5, y = 84.65, label = "B)", size = 9)
+        axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  annotate(geom = "text", x = -5, y = 84.65, label = "B)", size = 5)
 
 bdiv_veg1km <- ggplot(RichLU_long[RichLU_long$sig_vars == "Perc_veg_1km",],
        aes(x = values, y = mean, colour = site)) +
   geom_smooth(aes(x = values, y = mean), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 4) +
+  geom_point(size = 2) +
   geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=1.4) +
   scale_y_continuous("Avg. Within Site Dissimilarity", limits = c(0,65)) +
   scale_x_continuous("% Unmanaged Vegetation\n1-km scale", limits = c(0,55)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 28), axis.text = element_text(size =28)) +
-  annotate(geom = "text", x = 3, y = 61, label = "C)", size = 9)
+        axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  annotate(geom = "text", x = 3, y = 61, label = "C)", size = 5)
 
 bdiv_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
        aes(x = values, y = mean, colour = site)) +
   geom_smooth(aes(x = values, y = mean), method=lm, formula = y ~ x,
               se = TRUE, color = '#666666', linetype = 1) +
-  geom_point(size = 4) +
+  geom_point(size = 2) +
   geom_errorbar(aes(ymin=mean-ci, ymax=mean+ci), width=.5) +
   scale_y_continuous("Avg. Within Site Dissimilarity", limits = c(0,65)) +
   scale_x_continuous(expression(atop("90-day Low Temperature", 
@@ -551,11 +551,11 @@ bdiv_lt <- ggplot(RichLU_long[RichLU_long$sig_vars == "LT_90day",],
                                 limits = c(-5.5,11)) +
   scale_color_manual("", values = site_color) +
   theme(legend.position="none", 
-        axis.title = element_text(size = 28), axis.text = element_text(size =28)) +
-  annotate(geom = "text", x = -5, y = 61, label = "D)", size = 9)
+        axis.title = element_text(size = 14), axis.text = element_text(size = 14)) +
+  annotate(geom = "text", x = -5, y = 61, label = "D)", size = 5)
 
 
-#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=13.2, height=13.2, units="in", res=600)
+#tiff("./figures/Dissim & Richness (Alt) ~ Perc_Veg.tiff", width=180, height=180, units="mm", res=600, type = "cairo")
 ggarrange(rich_veg1km, rich_lt, bdiv_veg1km, bdiv_lt, widths = c(1,1))
 #dev.off()
 

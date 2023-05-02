@@ -393,6 +393,7 @@ PCoAscores$ids <- rownames(PCoAscores)
 #merge the temporary and SbyE dataframes
 pcoa.dat <- merge(PCoAscores, SbyE, by.x="ids",
                   by.y="unique.plot")
+#write.csv(pcoa.dat, "./intermediate/MBLand_pcoa.dat.csv")
 
 # function for PCoA ellipses - 
 veganCovEllipse <- function (cov, center = c(0, 0), scale = 1, npoints = 100)   {

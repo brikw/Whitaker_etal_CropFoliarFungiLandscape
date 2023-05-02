@@ -643,41 +643,9 @@ all_cca_vec_16
 ```
 
 ### 2g) Figure
-```{r, include=FALSE}
 
-cca_sig <- c('LT_90day', 'LAI.mean', 'plantHt', 'Perc_veg_10km')
-all_cca_vec_sig <- all_cca_vec[all_cca_vec$vecs %in% cca_sig, ]
 
-# figure
-CCA_site_all2 <- ggplot() + coord_equal() + 
-    geom_point(data = all_cca_x, aes(x =  CCA1, y =  CCA2, 
-          color = factor(nestSite)) , size = 5) +
-    geom_segment(data = all_cca_vec_sig, 
-                 aes(x = 0, xend = CCA1, y = 0, yend = CCA2),
-                 arrow = arrow(length = unit(0.25, "cm")), size = 0.8,
-                 colour = "gray30", linetype = 1 ) +
-    geom_text(data = all_cca_vec_sig,
-          aes(x = c(0.40+.40, 0.71+.72, 0.76+.40, 0.19-.37),
-              y = c(0.80,  0.04-.04, 0.11+.04, 0.69), label = vecs),
-                 size = 8, colour = "gray30", fontface = 'bold') +
-    scale_colour_manual("", values = site_color[c(1:13,15:16)]) +
-    scale_x_continuous(paste("CCA Axis-1 (", explain_all[1], "%)", sep = "")) +
-    scale_y_continuous(paste("CCA Axis-2 (", explain_all[2], "%)", sep = "")) +
-    guides(colour=guide_legend(ncol=4)) + #guides(colour = 'none') + 
-    theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
-          panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
-          axis.title = element_text(size = 24), axis.text = element_text(size =24),
-          legend.text=element_text(size=17), legend.title=element_blank(),
-          legend.background = element_rect(colour = NA, fill = NA),
-          legend.position = "bottom", legend.margin=margin(0,0,0,0), 
-          legend.box.margin=margin(-10,-10,-6,10)) 
-
-#tiff("./figures/CCA_all2_SiteLevel.tiff", width=8.97, height=8.97, units="in", res=600)
-CCA_site_all2
-#dev.off()
-```
-
-#### 16-site Without SOIL PROPERTIES version
+#### Without SOIL PROPERTIES
 ```{r, echo = FALSE}
 
 cca_sig_16 <- c('LT_90day', 'LAI.mean')
@@ -689,126 +657,29 @@ CCA_site_all_16 <- ggplot() + coord_equal() +
           color = factor(nestSite)) , size = 5) +
     geom_segment(data = all_cca_vec_sig_16, 
                  aes(x = 0, xend = CCA1, y = 0, yend = CCA2),
-                 arrow = arrow(length = unit(0.25, "cm")), size = 0.8,
+                 arrow = arrow(length = unit(0.25, "cm")), linewidth = 0.8,
                  colour = "gray30", linetype = 1 ) +
     geom_text(data = all_cca_vec_sig_16,
-          aes(x = c(0.89+.45, 0.71+.45),
-              y = c(0.39,    -0.52), label = vecs),
-                 size = 8, colour = "gray30", fontface = 'bold') +
+          aes(x = c(0.89+0.1, 0.71+0.1),
+              y = c(0.39+.25,    -0.52-.25), label = vecs),
+                 size = 5, colour = "gray30", fontface = 'bold') +
     scale_colour_manual("", values = site_color) +
     scale_x_continuous(paste("CCA Axis-1 (", explain_all_16[1], "%)", sep = "")) +
     scale_y_continuous(paste("CCA Axis-2 (", explain_all_16[2], "%)", sep = "")) +
-    guides(colour=guide_legend(ncol=4)) + #guides(colour = 'none') + 
+    guides(colour=guide_legend(ncol=2)) + #guides(colour = 'none') + 
     theme(panel.grid.major=element_line(colour = 'gray90', size = 0.5), 
           panel.grid.minor=element_line(0), legend.key.width = unit(.6, "cm"), 
-          axis.title = element_text(size = 24), axis.text = element_text(size =24),
-          legend.text=element_text(size=17), legend.title=element_blank(),
+          axis.title = element_text(size = 14), axis.text = element_text(size =12),
+          legend.text=element_text(size=12), legend.title=element_blank(),
           legend.background = element_rect(colour = NA, fill = NA),
-          legend.position = "bottom", legend.margin=margin(0,8,0,0), 
-          legend.box.margin=margin(-10,-6,-6,10)) 
+          legend.position = "right", legend.margin=margin(0,2,0,0), 
+          legend.box.margin=margin(-10,-6,-6,-10)) #t,r,b,l
 
-#tiff("./figures/CCA_all_SiteLevel_16sites.tiff", width=8.97, height=8.97, units="in", res=600)
+#tiff("./figures/CCA_all_SiteLevel_16sites.tiff", width=180, height=80, units="mm", res=600)
 CCA_site_all_16
 #dev.off()
 ```
 
-
-
-
-
-### 2h) No SWCH version of CCA
-```{r, include = FALSE}
-# SbyE_site_sub2 %>% dplyr::filter(species != 'SWCH') -> noSwch_cca
-# noSwch_cca <- droplevels(noSwch_cca)
-# 
-# # cor(noSwch_cca[,-c(1:3,20)])
-# # these ones are highest correlations
-# # MLT Elev 
-# # LT_90day HT_90day
-# # Perc_crop_1km Perc_veg_1km
-# 
-# # names(noSwch_cca)
-# # "nestSite"       "Lat.N"         "Lon.W"          "Elev"
-# # "Precip_90day"   "LT_90day"      "HT_90day"       "MAP"
-# # "MLT"            "MHT"           "Perc_crop_10km" "Perc_crop_1km"
-# # "Perc_veg_10km"  "Perc_veg_1km"  "soilmoist"      "LAI.mean"
-# # "plantHt"        "HM_perc"       "pH"             "species"
-# 
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,20)]))
-# # vif(M) #failed
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,9,20)])) #remove MLT
-# # vif(M) #failed
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,20)])) #remove HT_90day
-# # vif(M) #failed
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9,14,20)])) #remove Perc_veg_1km
-# # vif(M) #failed
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:10,14,20)])) #remove MHT 
-# # vif(M) #failed
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:11,14,20)])) #remove Perc_crop_10km 
-# # vif(M) #failed
-# # 
-# # # all of these failed, so followed same order as full dataset for variable removal 
-# # #  (which was based in part on strenght of cor() matrix output)
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14,20)])) #remove Perc_crop_1km 
-# # vif(M) # soilmoist highest
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,20)])) #remove soilmoist 
-# # vif(M) # HM_perc highest
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7,9:12,14:15,18,20)])) #remove HM_perc 
-# # vif(M) # MAP highest
-# # M <- lm(Elev ~., data = as.data.frame(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])) #remove MAP 
-# # vif(M) # all <2
-# #  # Precip_90day      LT_90day Perc_veg_10km      LAI.mean       plantHt            pH 
-# #  #     1.777599      1.603290      1.397612      1.627784      1.821604      1.798825 
-# # ## ++ Elev
-# 
-# ## organize data subsets
-# noSwch_cca2 <- as.matrix(noSwch_cca[,-c(1:3,7:8,9:12,14:15,18,20)])
-# noSwch_geog <- SbyE_site_geog2[c(1:8,13:15),]
-# ps_site_noSwch <- subset_samples(ps_land_site, 
-#                              sample_names(ps_land_site) != "WHT-PASVT" &
-#                              sample_names(ps_land_site) != "SWCH-CCRS" &
-#                              sample_names(ps_land_site) != "SWCH-OTRS" &
-#                              sample_names(ps_land_site) != "SWCH-SHFA" &
-#                              sample_names(ps_land_site) != "SWCH-WBFL" )
-# ps_site_noSwch <- filter_taxa(ps_site_noSwch, function(x) sum(x) > 0, TRUE)
-# #447  taxa across 11 samples
-# dds_site_noSwch <- phyloseq_to_deseq2(ps_site_noSwch, ~ 1)
-# gmMeans_land2 <- apply(counts(dds_site_noSwch), 1, gm_mean_protected)
-# dds_site_noSwch <- estimateSizeFactors(dds_site_noSwch, type = 'ratio', geoMeans = gmMeans_land2)
-# dds_site_noSwch <- estimateDispersions(dds_site_noSwch)
-# #rowData(dds_site_noSwch)
-# #sizeFactors(dds_site_noSwch)
-# plotDispEsts(dds_site_noSwch)
-# SbySvst_noSwch <- getVarianceStabilizedData(dds_site_noSwch)
-# SbySvst_noSwch <- t(SbySvst_noSwch) 
-# 
-# range(SbySvst_noSwch)  #-4.447807 14.589271
-# SbySvst_noSwch_tr <- SbySvst_noSwch+5
-# 
-# 
-# 
-# ## CCA
-# noSwch_dat_cca <- vegan::cca(SbySvst_noSwch_tr ~ noSwch_cca2 + Condition(noSwch_geog))
-# 
-# # # Permutation test for cca under reduced model (Marginal tests for axes)
-# # anova(noSwch_dat_cca, by = "axis", permutations = (nperm=999))
-# # no signif axes
-# 
-# #permutation test for the constrained ordination
-# all_cca_fit <- envfit(noSwch_dat_cca, noSwch_cca2, perm = 999) 
-# all_cca_fit #LT_90day, plantHt only significant
-# 
-# # permutation test for cca under null model
-# anova(noSwch_dat_cca, by = "mar", permutations = 999)
-# #not significant
-# 
-# #constrained eigs divided by sum of constrained + unconstrained/residual eigs
-# explain_all <- round(noSwch_dat_cca$CCA$eig/sum(c(noSwch_dat_cca$CCA$eig,noSwch_dat_cca$CA$eig)),3)*100
-# explain_all
-# # CCA1 CCA2 CCA3 CCA4 CCA5 CCA6 CCA7 
-# # 28.6 14.5 11.1 10.2  9.5  8.6  7.0 
-
-```
 
 
 
